@@ -1,11 +1,9 @@
-import { readFileSync } from "node:fs";
 import bodyParser from "body-parser";
 import RedisStore from "connect-redis";
 import cors from "cors";
 import type { Request, Response } from "express";
 import session from "express-session";
 import { createYoga } from "graphql-yoga";
-import { default as Spdy } from "spdy";
 import { CoreEnvironment } from "Environment/Core";
 import { Schema } from "GQL/Schema";
 import { CoreLogger } from "Logger/Core";
@@ -18,8 +16,7 @@ export class MainServer extends ProcessManager {
     await this.configureSessions();
     this.registerMiddleware();
     this.registerGraphQL();
-    const server = this.registerHTTP2();
-    this.Server = server.listen({ port: CoreEnvironment.SERVER_PORT }, () => {
+    this.Server = this.APP.listen({ port: CoreEnvironment.PORT }, () => {
       CoreLogger.core("Server Running");
     });
     return this.Server;
@@ -57,22 +54,6 @@ export class MainServer extends ProcessManager {
     );
   }
 
-  private static registerHTTP2() {
-    if (this.SSL) {
-      CoreLogger.core("Running HTTP/2");
-      return Spdy.createServer(this.keys, this.APP);
-    }
-    CoreLogger.core("Running HTTP/1");
-    return this.APP;
-  }
-
-  private static get keys() {
-    return {
-      key: readFileSync(CoreEnvironment.KEY),
-      cert: readFileSync(CoreEnvironment.CERT),
-    };
-  }
-
   private static registerGraphQL() {
     CoreLogger.GQL("Mounting GraphQL");
     const yoga = createYoga({
@@ -84,9 +65,5 @@ export class MainServer extends ProcessManager {
       yoga.graphqlEndpoint,
       (req: Request, res: Response) => void yoga(req, res),
     );
-  }
-
-  private static get SSL() {
-    return CoreEnvironment.SSL && !CoreEnvironment.LOCAL;
   }
 }
