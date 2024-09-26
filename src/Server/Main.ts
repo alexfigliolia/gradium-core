@@ -5,9 +5,9 @@ import cors from "cors";
 import type { Request, Response } from "express";
 import session from "express-session";
 import { createYoga } from "graphql-yoga";
-import { createServer } from "spdy";
+import { default as Spdy } from "spdy";
 import { CoreEnvironment } from "Environment/Core";
-import { Schema } from "GraphQL/Schema";
+import { Schema } from "GQL/Schema";
 import { CoreLogger } from "Logger/Core";
 import { SessionsClient } from "Sessions/Client";
 import { ProcessManager } from "./ProcessManager";
@@ -60,7 +60,7 @@ export class MainServer extends ProcessManager {
   private static registerHTTP2() {
     if (this.SSL) {
       CoreLogger.core("Running HTTP/2");
-      return createServer(this.keys, this.APP);
+      return Spdy.createServer(this.keys, this.APP);
     }
     CoreLogger.core("Running HTTP/1");
     return this.APP;

@@ -6,7 +6,7 @@
   "scripts": {
     "clear-sessions": "redis-cli flushall",
     "dev": "tsx devtools/dev-server/CLI.ts",
-    "build": "yarn ts-packager -e src",
+    "build": "yarn ts-packager -e src -c build-esm",
     "lint": "tsx ci/commands/Lint.ts",
     "test": "tsx ci/commands/Test.ts",
     "prisma:generate": "yarn prisma generate",
@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@figliolia/child-process": "^1.0.1",
-    "@figliolia/ts-packager": "^1.1.0",
+    "@figliolia/ts-packager": "^1.2.1",
     "@figliolia/typescript-dev-server": "^1.0.9",
     "@types/bcrypt": "^5.0.2",
     "@types/chalk": "^2.2.0",
@@ -80,7 +80,7 @@
       "types": "./dist/types/index.d.ts"
     }
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/mjs/index.js",
+  "main": "dist/esm/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts"
 }

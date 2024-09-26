@@ -1,5 +1,5 @@
 import { Prisma } from "DB/Client";
-import type { ISignUp } from "GraphQL/Login/Types";
+import type { ISignUp } from "GQL/Login/Types";
 
 export class UserController {
   public static findByEmail(email: string) {

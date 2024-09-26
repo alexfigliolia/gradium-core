@@ -1,6 +1,6 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import type { Role } from "@prisma/client";
-import { RoleType } from "GraphQL/Roles/Types";
+import { RoleType } from "GQL/Roles/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 

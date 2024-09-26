@@ -1,6 +1,6 @@
 import type { Request } from "express";
 import { Prisma } from "DB/Client";
-import type { ILoggedInUser } from "GraphQL/Login/Types";
+import type { ILoggedInUser } from "GQL/Login/Types";
 
 export class SessionsManager {
   public static async validateSession(request: Request) {

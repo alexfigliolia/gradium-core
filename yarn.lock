@@ -470,10 +470,10 @@
   resolved "https://registry.yarnpkg.com/@figliolia/child-process/-/child-process-1.0.4.tgz#5337c847f43a08ff9e1124793fa650f746515da5"
   integrity sha512-midiGoIu0pO9q+T607iYFSsEFSg6XlWJ7REaGcX/mCuxgrr8hudGSPz4OzyXznVUlp1UwaVTjfgYHlSUxuaJXg==
 
-"@figliolia/ts-packager@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@figliolia/ts-packager/-/ts-packager-1.1.0.tgz#4bd1b44e662cd0311019575489d28d803f0d636c"
-  integrity sha512-/h6sHT00hGKyU3YbIV7J3rl+LRYU5rwYTkycT3C0MldKhLXBQJxztrxUZbA+WAPIBrsXcec09GltSN4a/V1P/g==
+"@figliolia/ts-packager@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@figliolia/ts-packager/-/ts-packager-1.2.1.tgz#2a434dedba54faa65b104577f31a318f2cf68db2"
+  integrity sha512-pap32aWzr2TGoC7S4HFrQG1vKcbjb1oWAaGop5I3PKrl68UjDKqCgmczEHukh+ABvZfnAI6J34ItqPi93OAnHQ==
   dependencies:
     "@figliolia/child-process" "^1.0.1"
     chalk "^4.1.2"

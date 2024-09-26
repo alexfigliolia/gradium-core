@@ -2,7 +2,7 @@ import { compare, hash } from "bcrypt";
 import { GraphQLError } from "graphql";
 import { z, type ZodError } from "zod";
 import { Prisma } from "DB/Client";
-import { UserController } from "GraphQL/User/Controller";
+import { UserController } from "GQL/User/Controller";
 import type { ILogin, ISignUp } from "./Types";
 
 export class LoginController {
