@@ -1,0 +1,73 @@
+{
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
+  "compilerOptions": {
+    "composite": true,
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "CommonJS",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "moduleResolution": "Node",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./src",
+    "paths": {
+      "DB/*": [
+        "./DB/*"
+      ],
+      "Declarations/*": [
+        "./Declarations/*"
+      ],
+      "Environment/*": [
+        "./Environment/*"
+      ],
+      "GraphQL/*": [
+        "./GraphQL/*"
+      ],
+      "Logger/*": [
+        "./Logger/*"
+      ],
+      "Server/*": [
+        "./Server/*"
+      ],
+      "Sessions/*": [
+        "./Sessions/*"
+      ],
+      "Tools/*": [
+        "./Tools/*"
+      ],
+      "Types/*": [
+        "./Types/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src",
+    "**/*.ts",
+    "**/*.json",
+    "**/*.cjs",
+    "**/*.js",
+    ".eslintrc.cjs"
+  ]
+}
