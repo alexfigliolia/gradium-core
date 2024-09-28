@@ -8,15 +8,17 @@ export class SessionsManager {
     if (!userID || !organizations?.length) {
       return false;
     }
-    const user = await Prisma.user.findUnique({
-      where: { id: userID },
-      select: {
-        affiliations: {
-          select: {
-            organizationId: true,
+    const user = await Prisma.transact(client => {
+      return client.user.findUnique({
+        where: { id: userID },
+        select: {
+          affiliations: {
+            select: {
+              organizationId: true,
+            },
           },
         },
-      },
+      });
     });
     if (!user) {
       return false;

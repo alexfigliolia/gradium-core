@@ -34,18 +34,23 @@ export class LoginController {
     }
     const pw = await hash(password, this.SALTS);
     const user = await UserController.createUser({ name, email, password: pw });
-    const org = await Prisma.organization.create({ data: {} });
-    const person = await Prisma.person.create({
-      data: {
-        organizationId: org.id,
-        userId: user.id,
-      },
-    });
-    await Prisma.role.create({
-      data: {
-        personId: person.id,
-        role: "owner",
-      },
+    await Prisma.transact(async client => {
+      const org = await client.organization.create({
+        data: {},
+        select: { id: true },
+      });
+      const person = await client.person.create({
+        data: {
+          organizationId: org.id,
+          userId: user.id,
+        },
+      });
+      await client.role.create({
+        data: {
+          personId: person.id,
+          role: "owner",
+        },
+      });
     });
     return UserController.authenticatedUserScope(user.id);
   }

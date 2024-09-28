@@ -23,7 +23,7 @@ export class ProcessManager {
     this.shuttingDown = true;
     CoreLogger.silence();
     void SessionsClient.close();
-    void Prisma.$disconnect();
+    void Prisma.transact(client => client.$disconnect());
     this.Server?.close();
   };
 }
