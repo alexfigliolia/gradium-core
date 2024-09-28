@@ -10,8 +10,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("_POSTGRES_TRANSACTION_URL")
-  directUrl = env("_POSTGRES_SESSION_URL")
+  url       = env("POSTGRES_TRANSACTION_URL")
+  directUrl = env("POSTGRES_SESSION_URL")
 }
 
 model MaintenaceImage {
