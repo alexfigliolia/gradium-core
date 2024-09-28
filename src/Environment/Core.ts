@@ -8,10 +8,10 @@ export class CoreEnvironment {
   public static AUTH_SECRET = this.accessOrThrow("AUTH_SECRET");
   public static UI_SERVICE_URL = this.accessOrThrow("_UI_SERVICE_URL");
   public static POSTGRES_SESSION_URL = this.accessOrThrow(
-    "POSTGRES_SESSION_URL",
+    "_POSTGRES_SESSION_URL",
   );
   public static POSTGRES_TRANSACTION_URL = this.accessOrThrow(
-    "POSTGRES_TRANSACTION_URL",
+    "_POSTGRES_TRANSACTION_URL",
   );
 
   private static accessOrThrow(key: string) {

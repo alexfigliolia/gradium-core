@@ -2,7 +2,11 @@ import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import type { Role } from "@prisma/client";
 import { RoleType } from "GQL/Roles/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import type { Context, Identity } from "Types/GraphQL";
+
+export interface ID {
+  id: number;
+}
 
 export interface IEmail {
   email: string;
@@ -17,19 +21,35 @@ export interface ISignUp extends ILogin {
 }
 
 export interface IUserAffiliation {
-  organizationId: number;
+  organization: Identity;
   roles: Pick<Role, "role">[];
 }
+
+export const OrgAffiliation = new GraphQLObjectType<Identity, Context>({
+  name: "OrgAffiliation",
+  fields: {
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+      resolve: organization => organization.id,
+    },
+    name: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: organization => organization.name,
+    },
+  },
+});
 
 export const UserAffiliation = new GraphQLObjectType<IUserAffiliation, Context>(
   {
     name: "UserAffiliation",
     fields: {
-      organizationId: {
-        type: SchemaBuilder.nonNull(GraphQLString),
+      organization: {
+        type: SchemaBuilder.nonNull(OrgAffiliation),
+        resolve: affiliation => affiliation.organization,
       },
       roles: {
         type: SchemaBuilder.nonNullArray(RoleType),
+        resolve: affiliation => affiliation.roles,
       },
     },
   },

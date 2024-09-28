@@ -1,5 +1,5 @@
 import { Prisma } from "DB/Client";
-import type { ISignUp } from "GQL/Login/Types";
+import type { ISignUp } from "./Types";
 
 export class UserController {
   public static findByEmail(email: string) {
@@ -29,11 +29,21 @@ export class UserController {
         email: true,
         affiliations: {
           select: {
-            organizationId: true,
+            organization: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             roles: {
               select: {
                 role: true,
               },
+            },
+          },
+          orderBy: {
+            organization: {
+              createdAt: "desc",
             },
           },
         },

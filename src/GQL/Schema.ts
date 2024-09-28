@@ -6,10 +6,12 @@ import {
   logout,
   verifySession,
 } from "./Login/Resolvers";
+import { userScope } from "./User/Resolvers";
 
 const QueryRoot = new GraphQLObjectType({
   name: "Query",
   fields: {
+    userScope,
     verifySession,
   },
 });

@@ -3,12 +3,12 @@ import {
   type GraphQLFieldConfig,
   GraphQLString,
 } from "graphql";
+import type { IEmail, ILogin, ISignUp } from "GQL/User/Types";
+import { LoggedInUser } from "GQL/User/Types";
 import { SessionsManager } from "Sessions/Manager";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { LoginController } from "./Controller";
-import type { IEmail, ILogin, ISignUp } from "./Types";
-import { LoggedInUser } from "./Types";
 
 export const createAccount: GraphQLFieldConfig<any, Context, ISignUp> = {
   type: SchemaBuilder.nonNull(LoggedInUser),

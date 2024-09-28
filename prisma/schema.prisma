@@ -10,8 +10,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_TRANSACTION_URL")
-  directUrl = env("POSTGRES_SESSION_URL")
+  url       = env("_POSTGRES_TRANSACTION_URL")
+  directUrl = env("_POSTGRES_SESSION_URL")
 }
 
 model MaintenaceImage {
@@ -44,6 +44,9 @@ model MaintenanceItem {
   createdBy      Person                  @relation(fields: [personId], references: [id])
   personId       Int
   assignments    MaintenanceAssignment[]
+  property       Property?               @relation(fields: [propertyId], references: [id])
+  propertyId     Int?
+  priority       MaintenanceItemPriority @default(high)
 }
 
 model RentPayment {
@@ -161,22 +164,23 @@ model PropertyFloorPlan {
 }
 
 model Property {
-  id             Int                 @id @unique @default(autoincrement())
-  slug           String              @unique
-  name           String
-  address1       String
-  address2       String
-  city           String
-  state          String
-  zipCode        String
-  mapsLink       String              @default("")
-  images         PropertyImage[]
-  floorPlans     PropertyFloorPlan[]
-  livingSpaces   LivingSpace[]
-  amenities      Amenity[]
-  lease          Lease[]
-  organization   Organization        @relation(fields: [organizationId], references: [id])
-  organizationId Int
+  id              Int                 @id @unique @default(autoincrement())
+  slug            String              @unique
+  name            String
+  address1        String
+  address2        String
+  city            String
+  state           String
+  zipCode         String
+  mapsLink        String              @default("")
+  images          PropertyImage[]
+  floorPlans      PropertyFloorPlan[]
+  livingSpaces    LivingSpace[]
+  amenities       Amenity[]
+  lease           Lease[]
+  organization    Organization        @relation(fields: [organizationId], references: [id])
+  organizationId  Int
+  MaintenanceItem MaintenanceItem[]
 }
 
 model Role {
@@ -199,11 +203,14 @@ model Person {
 
 model Organization {
   id               Int               @id @unique @default(autoincrement())
+  name             String            @default("")
   properties       Property[]
   people           Person[]
   maintenanceItems MaintenanceItem[]
   rentPayments     RentPayment[]
   leases           Lease[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model User {
@@ -246,4 +253,10 @@ enum LeaseStatus {
   inProgress
   terminated
   pending
+}
+
+enum MaintenanceItemPriority {
+  immediate
+  high
+  low
 }

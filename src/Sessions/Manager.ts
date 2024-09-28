@@ -1,6 +1,6 @@
 import type { Request } from "express";
 import { Prisma } from "DB/Client";
-import type { ILoggedInUser } from "GQL/Login/Types";
+import type { ILoggedInUser } from "GQL/User/Types";
 
 export class SessionsManager {
   public static async validateSession(request: Request) {
@@ -31,7 +31,7 @@ export class SessionsManager {
   public static setSessionData(user: ILoggedInUser, request: Request) {
     request.session.userID = user.id;
     request.session.organizations = user.affiliations.map(
-      a => a.organizationId,
+      a => a.organization.id,
     );
   }
 

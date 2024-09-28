@@ -3,11 +3,11 @@ import { GraphQLError } from "graphql";
 import { z, type ZodError } from "zod";
 import { Prisma } from "DB/Client";
 import { UserController } from "GQL/User/Controller";
-import type { ILogin, ISignUp } from "./Types";
+import type { ILogin, ISignUp } from "GQL/User/Types";
 
 export class LoginController {
   public static SALTS = 10;
-  private static SIGN_UP = z
+  private static EMAIL_PARSER = z
     .string()
     .min(1, { message: "A valid email is required" })
     .email("A valid email is required");
@@ -34,7 +34,7 @@ export class LoginController {
     }
     const pw = await hash(password, this.SALTS);
     const user = await UserController.createUser({ name, email, password: pw });
-    const org = await Prisma.organization.create({});
+    const org = await Prisma.organization.create({ data: {} });
     const person = await Prisma.person.create({
       data: {
         organizationId: org.id,
@@ -62,7 +62,7 @@ export class LoginController {
 
   public static validateEmail(email: string) {
     try {
-      this.SIGN_UP.parse(email);
+      this.EMAIL_PARSER.parse(email);
     } catch (e: any) {
       const error = e as ZodError;
       throw new GraphQLError(error.issues[0].message);

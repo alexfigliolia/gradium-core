@@ -15,7 +15,9 @@ export class CreatePackage {
       join(this.ROOT, "tsconfig.json"),
       JSON.stringify(config, null, 2),
     );
-    await ChildProcess.execute(`npx eslint --fix '${this.ROOT}/tsconfig.json'`);
+    await ChildProcess.execute(
+      `yarn eslint --fix '${this.ROOT}/tsconfig.json'`,
+    );
   }
 
   private static modifyTSConfig() {
