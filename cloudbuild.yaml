@@ -1,13 +1,10 @@
 steps:
 - name: 'node'
   entrypoint: 'yarn'
-  - id
   args: ['install']
 - name: 'node'
   entrypoint: 'yarn'
   args: ['build']
-- name: 'node'
-entrypoint: 'yarn'
 - id: migrate
   name: gcr.io/cloud-builders/yarn
   entrypoint: sh
@@ -31,3 +28,4 @@ availableSecrets:
     env: 'POSTGRES_PASSWORD'
   - versionName: projects/971514052060/secrets/postgres-user/versions/latest
     env: 'POSTGRES_USER'
+
