@@ -4,6 +4,7 @@
   "description": "Gradium Core Service",
   "author": "Alex Figliolia",
   "scripts": {
+    "gcp-build": "yarn build",
     "clear-sessions": "redis-cli flushall",
     "dev": "tsx devtools/dev-server/CLI.ts",
     "build": "yarn ts-packager -e src -c build-esm",
