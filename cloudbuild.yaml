@@ -11,10 +11,3 @@ steps:
 timeout: '1600s'
 options:
   logging: CLOUD_LOGGING_ONLY
-availableSecrets:
-  secretManager:
-  - versionName: projects/971514052060/secrets/postgres-password/versions/latest
-    env: 'POSTGRES_PASSWORD'
-  - versionName: projects/971514052060/secrets/postgres-user/versions/latest
-    env: 'POSTGRES_USER'
-
