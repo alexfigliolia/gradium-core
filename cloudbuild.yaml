@@ -1,13 +1,33 @@
 steps:
 - name: 'node'
   entrypoint: 'yarn'
+  - id
   args: ['install']
 - name: 'node'
   entrypoint: 'yarn'
   args: ['build']
+- name: 'node'
+  entrypoint: 'yarn'
+  - id: migrate
+    name: gcr.io/cloud-builders/yarn
+    entrypoint: sh
+    args:
+      - "-c"
+      - |
+        export POSTGRES_SESSION_URL=postgresql://$$POSTGRES_USER:$$POSTGRES_PASSWORD@aws-0-us-west-1.pooler.supabase.com:5432/postgres
+        export POSTGRES_TRANSACTION_URL=postgresql://$$POSTGRES_USER:$$POSTGRES_PASSWORD@aws-0-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
+        yarn migrate:production
+    secretEnv: ['POSTGRES_PASSWORD', 'POSTGRES_USER']
+    timeout: '1200s'
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
 timeout: '1600s'
 options:
   logging: CLOUD_LOGGING_ONLY
+availableSecrets:
+  secretManager:
+  - versionName: projects/971514052060/secrets/postgres-password/versions/latest
+    env: 'POSTGRES_PASSWORD'
+  - versionName: projects/971514052060/secrets/postgres-user/versions/latest
+    env: 'POSTGRES_USER'
