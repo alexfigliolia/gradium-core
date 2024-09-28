@@ -59,7 +59,8 @@ export class MainServer extends ProcessManager {
     const yoga = createYoga({
       schema: Schema,
       graphqlEndpoint: "/graphql",
-      graphiql: CoreEnvironment.LOCAL,
+      // graphiql: CoreEnvironment.LOCAL,
+      graphiql: true,
     });
     this.APP.use(
       yoga.graphqlEndpoint,

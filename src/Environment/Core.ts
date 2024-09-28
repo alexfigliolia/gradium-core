@@ -6,7 +6,7 @@ export class CoreEnvironment {
   public static PORT = this.parsePort("PORT");
   public static REDIS_URL = this.accessOrThrow("REDIS_URL");
   public static AUTH_SECRET = this.accessOrThrow("AUTH_SECRET");
-  public static UI_SERVICE_URL = this.accessOrThrow("UI_SERVICE_URL");
+  public static UI_SERVICE_URL = this.accessOrThrow("_UI_SERVICE_URL");
   public static POSTGRES_SESSION_URL = this.accessOrThrow(
     "POSTGRES_SESSION_URL",
   );
