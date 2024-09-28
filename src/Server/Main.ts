@@ -7,6 +7,7 @@ import { createYoga } from "graphql-yoga";
 import { CoreEnvironment } from "Environment/Core";
 import { Schema } from "GQL/Schema";
 import { CoreLogger } from "Logger/Core";
+import { SecretManager } from "Secrets/Manager";
 import { SessionsClient } from "Sessions/Client";
 import { ProcessManager } from "./ProcessManager";
 
@@ -14,7 +15,7 @@ export class MainServer extends ProcessManager {
   public static async start() {
     this.listenForKills();
     await this.configureSessions();
-    this.registerMiddleware();
+    await this.registerMiddleware();
     this.registerGraphQL();
     this.Server = this.APP.listen({ port: CoreEnvironment.PORT }, () => {
       CoreLogger.core("Server Running");
@@ -22,12 +23,12 @@ export class MainServer extends ProcessManager {
     return this.Server;
   }
 
-  private static registerMiddleware() {
+  private static async registerMiddleware() {
     this.APP.use(
       cors({
         credentials: true,
         optionsSuccessStatus: 200,
-        origin: CoreEnvironment.UI_SERVICE_URL,
+        origin: await SecretManager.getSecret("ui-service-url"),
       }),
     );
     this.APP.use(bodyParser.json());
@@ -40,7 +41,7 @@ export class MainServer extends ProcessManager {
     this.APP.use(
       session({
         store: new RedisStore({ client: SessionsClient.Client }),
-        secret: CoreEnvironment.AUTH_SECRET,
+        secret: await SecretManager.getSecret("auth-encoding"),
         resave: false,
         saveUninitialized: false,
         cookie: {

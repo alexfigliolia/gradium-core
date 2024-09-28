@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { Manager } from "Secrets/Manager";
+import { SecretManager } from "Secrets/Manager";
 
 export class Prisma {
   private static Client?: PrismaClient;
@@ -12,17 +12,24 @@ export class Prisma {
     if (this.Client) {
       return this.Client;
     }
-    const [user, password] = await Manager.getSecrets(
+    const [user, password] = await SecretManager.getSecrets(
       "postgres-user",
       "postgres-password",
     );
     this.Client = new PrismaClient({
       datasources: {
         db: {
-          url: `postgresql://${user}:${password}@aws-0-us-west-1.pooler.supabase.com:5432/postgres`,
+          url: this.connectionURL(user, password),
         },
       },
     });
     return this.Client;
+  }
+
+  private static connectionURL(user: string, password: string) {
+    if (process.env.NODE_ENV !== "production") {
+      return `postgresql://${user}:${password}@localhost:5432/gradium`;
+    }
+    return `postgresql://${user}:${password}@aws-0-us-west-1.pooler.supabase.com:5432/postgres`;
   }
 }
