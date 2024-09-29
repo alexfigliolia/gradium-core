@@ -7,7 +7,7 @@ module.exports = {
   },
   ignorePatterns: [
     "node_modules",
-    "build",
+    "dist",
     "coverage",
     "__Stealth__",
     "production/server.js",

@@ -58,7 +58,7 @@ export class MainServer extends ProcessManager {
     CoreLogger.GQL("Mounting GraphQL");
     const yoga = createYoga({
       schema: Schema,
-      graphqlEndpoint: "/graphql",
+      graphqlEndpoint: process.env.NODE_ENV === "production" ? "/" : "/graphql",
       // graphiql: CoreEnvironment.LOCAL,
       graphiql: true,
     });
