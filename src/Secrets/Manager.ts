@@ -9,7 +9,7 @@ export class SecretManager {
       payload = process.env[name];
     } else {
       const [version] = await this.client.accessSecretVersion({
-        name,
+        name: `projects/gradium-436914/secrets/${name}/versions/latest`,
       });
       payload = version?.payload?.data?.toString?.();
     }
