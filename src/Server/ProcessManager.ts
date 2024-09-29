@@ -11,19 +11,26 @@ export class ProcessManager {
   public static Server?: HTTP2Server | HTTP1Server;
 
   public static listenForKills() {
-    process.on("exit", this.killServices);
-    process.on("SIGINT", this.killServices);
-    process.on("SIGTERM", this.killServices);
+    process.on("exit", this.close);
+    process.on("SIGINT", this.close);
+    process.on("SIGTERM", this.close);
   }
 
-  private static killServices = () => {
+  public static close = () => {
+    void this.closeAsync();
+  };
+
+  public static async closeAsync() {
     if (this.shuttingDown) {
       return;
     }
     this.shuttingDown = true;
     CoreLogger.silence();
-    void SessionsClient.close();
-    void Prisma.transact(client => client.$disconnect());
     this.Server?.close();
-  };
+    await Promise.all([
+      SessionsClient.close(),
+      Prisma.transact(client => client.$disconnect()),
+    ]);
+    process.exit(0);
+  }
 }

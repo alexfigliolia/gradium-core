@@ -5,20 +5,10 @@ steps:
 - name: 'node'
   entrypoint: 'yarn'
   args: ['build']
-- name: 'node'
-  entrypoint: 'yarn'
-  args: ['migrate:production']
-  secretEnv: ['POSTGRES_PASSWORD', 'POSTGRES_USER']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args: ['-c', 'gcloud config set app/cloud_build_timeout 1600 && gcloud app deploy']
 timeout: '1600s'
 options:
   logging: CLOUD_LOGGING_ONLY
-availableSecrets:
-  secretManager:
-  - versionName: projects/971514052060/secrets/postgres-password/versions/latest
-    env: 'POSTGRES_PASSWORD'
-  - versionName: projects/971514052060/secrets/postgres-user/versions/latest
-    env: 'POSTGRES_USER'
 

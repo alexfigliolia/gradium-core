@@ -44,6 +44,9 @@
       "Logger/*": [
         "./Logger/*"
       ],
+      "Migrations/*": [
+        "./Migrations/*"
+      ],
       "Secrets/*": [
         "./Secrets/*"
       ],

@@ -4,7 +4,6 @@
   "description": "Gradium Core Service",
   "author": "Alex Figliolia",
   "scripts": {
-    "gcp-build": "yarn build",
     "clear-sessions": "redis-cli flushall",
     "dev": "tsx devtools/dev-server/CLI.ts",
     "build": "yarn ts-packager -e src -c build-esm",
@@ -13,9 +12,6 @@
     "prisma:generate": "yarn prisma generate",
     "reset-db": "yarn prisma migrate reset && yarn prisma db push && yarn clear-sessions",
     "migrate": "yarn prisma migrate dev --name",
-    "migrate:production": "tsx ci/commands/Migrate.ts",
-    "prod": "pm2 start 'npm run start' -i max",
-    "prod:stop": "pm2 stop all",
     "start": "node dist/mjs/Start.js",
     "create-package": "tsx devtools/create-package/CLI.ts"
   },
