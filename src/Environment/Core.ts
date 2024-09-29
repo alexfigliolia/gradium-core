@@ -4,7 +4,6 @@ export class CoreEnvironment {
   public static SSL = !!process.env.SSL;
   public static LOCAL = !!process.env.LOCAL;
   public static PORT = this.parsePort("PORT");
-  public static REDIS_URL = this.accessOrThrow("REDIS_URL");
 
   private static accessOrThrow(key: string) {
     const value = process.env[key];

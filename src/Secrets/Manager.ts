@@ -13,7 +13,7 @@ export class SecretManager {
       });
       payload = version?.payload?.data?.toString?.();
     }
-    if (!payload) {
+    if (typeof payload === "undefined") {
       throw new Error(`Missing secret "${name}"`);
     }
     return payload;

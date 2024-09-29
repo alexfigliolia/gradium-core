@@ -1,2 +1,4 @@
 service: gradium-core
 runtime: nodejs20
+env_variables:
+  SSL: "1"

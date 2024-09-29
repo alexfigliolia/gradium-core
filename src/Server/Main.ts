@@ -37,10 +37,9 @@ export class MainServer extends ProcessManager {
   }
 
   private static async configureSessions() {
-    await SessionsClient.start();
     this.APP.use(
       session({
-        store: new RedisStore({ client: SessionsClient.Client }),
+        store: new RedisStore({ client: await SessionsClient.start() }),
         secret: await SecretManager.getSecret("auth-encoding"),
         resave: false,
         saveUninitialized: false,
