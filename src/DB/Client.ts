@@ -26,7 +26,7 @@ export class Prisma {
     return this.Client;
   }
 
-  private static connectionURL(user: string, password: string) {
+  public static connectionURL(user: string, password: string) {
     if (process.env.NODE_ENV !== "production") {
       return `postgresql://${user}:${password}@localhost:5432/gradium`;
     }

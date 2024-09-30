@@ -13,6 +13,9 @@ CREATE TYPE "RentPaymentFrequency" AS ENUM ('day', 'month', 'year');
 -- CreateEnum
 CREATE TYPE "LeaseStatus" AS ENUM ('complete', 'inProgress', 'terminated', 'pending');
 
+-- CreateEnum
+CREATE TYPE "MaintenanceItemPriority" AS ENUM ('immediate', 'high', 'low');
+
 -- CreateTable
 CREATE TABLE "MaintenaceImage" (
     "id" SERIAL NOT NULL,
@@ -43,6 +46,8 @@ CREATE TABLE "MaintenanceItem" (
     "description" TEXT NOT NULL,
     "organizationId" INTEGER NOT NULL,
     "personId" INTEGER NOT NULL,
+    "propertyId" INTEGER,
+    "priority" "MaintenanceItemPriority" NOT NULL DEFAULT 'high',
 
     CONSTRAINT "MaintenanceItem_pkey" PRIMARY KEY ("id")
 );
@@ -206,6 +211,9 @@ CREATE TABLE "Person" (
 -- CreateTable
 CREATE TABLE "Organization" (
     "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL DEFAULT '',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Organization_pkey" PRIMARY KEY ("id")
 );
@@ -311,6 +319,9 @@ ALTER TABLE "MaintenanceItem" ADD CONSTRAINT "MaintenanceItem_organizationId_fke
 
 -- AddForeignKey
 ALTER TABLE "MaintenanceItem" ADD CONSTRAINT "MaintenanceItem_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MaintenanceItem" ADD CONSTRAINT "MaintenanceItem_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
