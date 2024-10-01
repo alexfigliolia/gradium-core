@@ -6,6 +6,7 @@ export class SessionsManager {
   public static async validateSession(request: Request) {
     const { userID, organizations } = request.session;
     if (!userID || !organizations?.length) {
+      await this.destroySession(request);
       return false;
     }
     const user = await Prisma.transact(client => {
@@ -21,13 +22,24 @@ export class SessionsManager {
       });
     });
     if (!user) {
+      await this.destroySession(request);
       return false;
     }
+    let update = false;
     const set = new Set<number>(organizations);
     for (const { organizationId } of user.affiliations) {
-      this.lookup(organizationId, set);
+      if (set.has(organizationId)) {
+        set.delete(organizationId);
+      } else {
+        update = true;
+      }
     }
-    return set.size === 0;
+    if (update || set.size !== 0) {
+      request.session.organizations = user.affiliations.map(
+        a => a.organizationId,
+      );
+    }
+    return true;
   }
 
   public static setSessionData(user: ILoggedInUser, request: Request) {
@@ -48,13 +60,5 @@ export class SessionsManager {
         resolve();
       });
     });
-  }
-
-  private static lookup(id: number, set: Set<number>) {
-    if (!set.has(id)) {
-      return false;
-    }
-    set.delete(id);
-    return true;
   }
 }

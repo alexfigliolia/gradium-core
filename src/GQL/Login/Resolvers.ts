@@ -67,7 +67,7 @@ export const logout: GraphQLFieldConfig<any, Context, Record<string, never>> = {
 };
 
 export const forgotPassword: GraphQLFieldConfig<any, Context, IEmail> = {
-  type: SchemaBuilder.nonNull(GraphQLBoolean),
+  type: SchemaBuilder.nonNull(GraphQLString),
   args: {
     email: {
       type: SchemaBuilder.nonNull(GraphQLString),

@@ -13,12 +13,7 @@ export class LoginController {
     .email("A valid email is required");
 
   public static async login({ email, password }: ILogin) {
-    this.validateEmail(email);
-    this.validatePassword(password);
-    const user = await UserController.findByEmail(email);
-    if (!user) {
-      throw new GraphQLError("This email address is not recognized");
-    }
+    const user = await this.validateLoginEmail(email);
     if (!(await compare(password, user.password))) {
       throw new GraphQLError("Incorrect Password");
     }
@@ -62,7 +57,7 @@ export class LoginController {
       throw new GraphQLError("A user with this email address does not exist");
     }
     // send email
-    return true;
+    return "We've sent you an email with instructions to reset your password";
   }
 
   public static validateEmail(email: string) {
@@ -85,6 +80,19 @@ export class LoginController {
   public static validatePassword(password: string) {
     if (password.length < 5) {
       throw new GraphQLError("Passwords must be at lease 5 characters");
+    }
+  }
+
+  private static async validateLoginEmail(email: string) {
+    try {
+      this.validateEmail(email);
+      const user = await UserController.findByEmail(email);
+      if (!user) {
+        throw "Exit";
+      }
+      return user;
+    } catch (error) {
+      throw new GraphQLError("This email address is not recognized");
     }
   }
 }
