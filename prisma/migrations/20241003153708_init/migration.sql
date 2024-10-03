@@ -14,42 +14,54 @@ CREATE TYPE "RentPaymentFrequency" AS ENUM ('day', 'month', 'year');
 CREATE TYPE "LeaseStatus" AS ENUM ('complete', 'inProgress', 'terminated', 'pending');
 
 -- CreateEnum
-CREATE TYPE "MaintenanceItemPriority" AS ENUM ('immediate', 'high', 'low');
+CREATE TYPE "TaskPriority" AS ENUM ('immediate', 'high', 'low');
+
+-- CreateEnum
+CREATE TYPE "ManagementTaskStatus" AS ENUM ('incomplete', 'inProgress', 'blocked', 'complete');
 
 -- CreateTable
-CREATE TABLE "MaintenaceImage" (
+CREATE TABLE "ExpenseAttachment" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
-    "maintenanceItemId" INTEGER NOT NULL,
+    "expenseId" INTEGER NOT NULL,
 
-    CONSTRAINT "MaintenaceImage_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ExpenseAttachment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "MaintenanceAssignment" (
+CREATE TABLE "Expense" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deadline" TIMESTAMP(3),
-    "personId" INTEGER NOT NULL,
-    "maintenanceItemId" INTEGER NOT NULL,
+    "cost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "title" TEXT NOT NULL DEFAULT '',
+    "description" TEXT NOT NULL DEFAULT '',
 
-    CONSTRAINT "MaintenanceAssignment_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "MaintenanceItem" (
+CREATE TABLE "TaskImage" (
+    "id" SERIAL NOT NULL,
+    "url" TEXT NOT NULL,
+    "taskId" INTEGER NOT NULL,
+
+    CONSTRAINT "TaskImage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ManagementTask" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "completedAt" TIMESTAMP(3) NOT NULL,
-    "cost" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "organizationId" INTEGER NOT NULL,
     "personId" INTEGER NOT NULL,
     "propertyId" INTEGER,
-    "priority" "MaintenanceItemPriority" NOT NULL DEFAULT 'high',
+    "priority" "TaskPriority" NOT NULL DEFAULT 'high',
+    "assignStaffId" INTEGER,
 
-    CONSTRAINT "MaintenanceItem_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ManagementTask_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -191,6 +203,15 @@ CREATE TABLE "Property" (
 );
 
 -- CreateTable
+CREATE TABLE "StaffInvite" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "organizationId" INTEGER NOT NULL,
+
+    CONSTRAINT "StaffInvite_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Role" (
     "id" SERIAL NOT NULL,
     "role" "PersonRole" NOT NULL,
@@ -200,12 +221,22 @@ CREATE TABLE "Role" (
 );
 
 -- CreateTable
+CREATE TABLE "StaffProfile" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "organizationId" INTEGER NOT NULL,
+
+    CONSTRAINT "StaffProfile_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Person" (
     "id" SERIAL NOT NULL,
     "organizationId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
+    "staffId" INTEGER,
 
-    CONSTRAINT "Person_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Person_pkey" PRIMARY KEY ("organizationId","userId")
 );
 
 -- CreateTable
@@ -231,19 +262,34 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
+CREATE TABLE "_ExpenseToManagementTask" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_LeaseToUser" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "MaintenaceImage_id_key" ON "MaintenaceImage"("id");
+-- CreateTable
+CREATE TABLE "_PropertyToStaffProfile" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MaintenanceAssignment_id_key" ON "MaintenanceAssignment"("id");
+CREATE UNIQUE INDEX "ExpenseAttachment_id_key" ON "ExpenseAttachment"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MaintenanceItem_id_key" ON "MaintenanceItem"("id");
+CREATE UNIQUE INDEX "Expense_id_key" ON "Expense"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TaskImage_id_key" ON "TaskImage"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ManagementTask_id_key" ON "ManagementTask"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RentPayment_id_key" ON "RentPayment"("id");
@@ -285,7 +331,16 @@ CREATE UNIQUE INDEX "Property_id_key" ON "Property"("id");
 CREATE UNIQUE INDEX "Property_slug_key" ON "Property"("slug");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "StaffInvite_id_key" ON "StaffInvite"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Role_id_key" ON "Role"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StaffProfile_id_key" ON "StaffProfile"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StaffProfile_organizationId_userId_key" ON "StaffProfile"("organizationId", "userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Person_id_key" ON "Person"("id");
@@ -300,28 +355,40 @@ CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "_ExpenseToManagementTask_AB_unique" ON "_ExpenseToManagementTask"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_ExpenseToManagementTask_B_index" ON "_ExpenseToManagementTask"("B");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_LeaseToUser_AB_unique" ON "_LeaseToUser"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_LeaseToUser_B_index" ON "_LeaseToUser"("B");
 
--- AddForeignKey
-ALTER TABLE "MaintenaceImage" ADD CONSTRAINT "MaintenaceImage_maintenanceItemId_fkey" FOREIGN KEY ("maintenanceItemId") REFERENCES "MaintenanceItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "_PropertyToStaffProfile_AB_unique" ON "_PropertyToStaffProfile"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_PropertyToStaffProfile_B_index" ON "_PropertyToStaffProfile"("B");
 
 -- AddForeignKey
-ALTER TABLE "MaintenanceAssignment" ADD CONSTRAINT "MaintenanceAssignment_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ExpenseAttachment" ADD CONSTRAINT "ExpenseAttachment_expenseId_fkey" FOREIGN KEY ("expenseId") REFERENCES "Expense"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MaintenanceAssignment" ADD CONSTRAINT "MaintenanceAssignment_maintenanceItemId_fkey" FOREIGN KEY ("maintenanceItemId") REFERENCES "MaintenanceItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TaskImage" ADD CONSTRAINT "TaskImage_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "ManagementTask"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MaintenanceItem" ADD CONSTRAINT "MaintenanceItem_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MaintenanceItem" ADD CONSTRAINT "MaintenanceItem_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MaintenanceItem" ADD CONSTRAINT "MaintenanceItem_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_assignStaffId_fkey" FOREIGN KEY ("assignStaffId") REFERENCES "StaffProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -375,6 +442,9 @@ ALTER TABLE "PropertyFloorPlan" ADD CONSTRAINT "PropertyFloorPlan_propertyId_fke
 ALTER TABLE "Property" ADD CONSTRAINT "Property_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "StaffInvite" ADD CONSTRAINT "StaffInvite_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Role" ADD CONSTRAINT "Role_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -384,7 +454,22 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_organizationId_fkey" FOREIGN KEY ("o
 ALTER TABLE "Person" ADD CONSTRAINT "Person_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Person" ADD CONSTRAINT "Person_staffId_fkey" FOREIGN KEY ("staffId") REFERENCES "StaffProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ExpenseToManagementTask" ADD CONSTRAINT "_ExpenseToManagementTask_A_fkey" FOREIGN KEY ("A") REFERENCES "Expense"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ExpenseToManagementTask" ADD CONSTRAINT "_ExpenseToManagementTask_B_fkey" FOREIGN KEY ("B") REFERENCES "ManagementTask"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Lease"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_A_fkey" FOREIGN KEY ("A") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_B_fkey" FOREIGN KEY ("B") REFERENCES "StaffProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;

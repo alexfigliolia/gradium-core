@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { Session as ISession, SessionData } from "express-session";
 
 export interface Context {
   req: Request;
@@ -9,3 +10,5 @@ export interface Identity {
   id: number;
   name: string;
 }
+
+export type Session = ISession & Partial<SessionData>;

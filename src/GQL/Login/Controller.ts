@@ -1,16 +1,12 @@
 import { compare, hash } from "bcrypt";
 import { GraphQLError } from "graphql";
-import { z, type ZodError } from "zod";
 import { Prisma } from "DB/Client";
 import { UserController } from "GQL/User/Controller";
 import type { ILogin, ISignUp } from "GQL/User/Types";
+import { Validators } from "Tools/Validators";
 
 export class LoginController {
   public static SALTS = 10;
-  private static EMAIL_PARSER = z
-    .string()
-    .min(1, { message: "A valid email is required" })
-    .email("A valid email is required");
 
   public static async login({ email, password }: ILogin) {
     const user = await this.validateLoginEmail(email);
@@ -21,8 +17,8 @@ export class LoginController {
   }
 
   public static async signUp({ name, email, password }: ISignUp) {
-    this.validateName(name);
-    this.validateEmail(email);
+    Validators.validateName(name);
+    Validators.validateEmail(email);
     this.validatePassword(password);
     if (await UserController.findByEmail(email)) {
       throw new GraphQLError(`${name} is already a Gradium user. Please login`);
@@ -51,30 +47,13 @@ export class LoginController {
   }
 
   public static async sendPasswordResetEmail(email: string) {
-    this.validateEmail(email);
+    Validators.validateEmail(email);
     const user = await UserController.findByEmail(email);
     if (!user) {
       throw new GraphQLError("A user with this email address does not exist");
     }
     // send email
     return "We've sent you an email with instructions to reset your password";
-  }
-
-  public static validateEmail(email: string) {
-    try {
-      this.EMAIL_PARSER.parse(email);
-    } catch (e: any) {
-      const error = e as ZodError;
-      throw new GraphQLError(error.issues[0].message);
-    }
-  }
-
-  public static validateName(name: string) {
-    const tokens = name.split(" ");
-    if (tokens.length > 1 && tokens.every(t => t.length > 1)) {
-      return;
-    }
-    throw new GraphQLError("A valid name is required");
   }
 
   public static validatePassword(password: string) {
@@ -85,7 +64,7 @@ export class LoginController {
 
   private static async validateLoginEmail(email: string) {
     try {
-      this.validateEmail(email);
+      Validators.validateEmail(email);
       const user = await UserController.findByEmail(email);
       if (!user) {
         throw "Exit";
