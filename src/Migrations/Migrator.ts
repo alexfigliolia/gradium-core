@@ -17,7 +17,14 @@ export class Migrator {
     return this.exec("yarn prisma db push", "reset");
   }
 
-  private static async exec(command: string, type: "reset" | "migration") {
+  public static baseline() {
+    return this.exec(
+      "yarn prisma migrate resolve --applied 0_init",
+      "baseline",
+    );
+  }
+
+  private static async exec(command: string, type: Operation) {
     if (process.env.NODE_ENV !== "production") {
       return;
     }
@@ -50,3 +57,5 @@ export class Migrator {
     return `postgresql://${user}:${password}@aws-0-us-west-1.pooler.supabase.com:${port}/postgres`;
   }
 }
+
+type Operation = "reset" | "migration" | "baseline";

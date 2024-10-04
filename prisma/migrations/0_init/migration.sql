@@ -1,3 +1,5 @@
+yarn run v1.22.21
+$ /Users/alexfigliolia/DEV/gradium-core/node_modules/.bin/prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script
 -- CreateEnum
 CREATE TYPE "PersonRole" AS ENUM ('owner', 'manager', 'maintenance', 'resident');
 
@@ -474,3 +476,4 @@ ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_A_
 -- AddForeignKey
 ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_B_fkey" FOREIGN KEY ("B") REFERENCES "StaffProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+Done in 0.99s.
