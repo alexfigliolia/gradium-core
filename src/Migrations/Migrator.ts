@@ -18,6 +18,7 @@ export class Migrator {
         this.connectionURL(6543),
       ]);
       await new ChildProcess("yarn prisma migrate deploy", {
+        stdio: "inherit",
         env: {
           ...process.env,
           POSTGRES_SESSION_URL: sessionURL,
@@ -25,7 +26,7 @@ export class Migrator {
         },
       }).handler;
     } catch (error) {
-      CoreLogger.core("Migrations Failed. Terminating process");
+      CoreLogger.core("Migrations Failed. Terminating process", error);
       throw error;
     }
   }
