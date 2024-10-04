@@ -4,7 +4,12 @@ import { Prisma } from "DB/Client";
 import { SecretManager } from "Secrets/Manager";
 
 export class DevMigrator {
-  private static flags = new Set(["--migrate", "--reset", "--reset-hard"]);
+  private static flags = new Set([
+    "--migrate",
+    "--reset",
+    "--reset-hard",
+    "--exec",
+  ]);
 
   public static CLI() {
     const [command, ...rest] = process.argv.slice(2);
@@ -18,6 +23,8 @@ export class DevMigrator {
         return this.resetDB();
       case "--reset-hard":
         return this.resetHard();
+      case "--exec":
+        return this.exec(...rest);
       default:
         return this.commandError(command);
     }
@@ -51,6 +58,11 @@ export class DevMigrator {
     await new ChildProcess("npx prisma db seed", env).handler;
   }
 
+  public static async exec(...args: string[]) {
+    const env = await this.createENV();
+    await new ChildProcess(args.join(" "), env).handler;
+  }
+
   private static async createENV(): Promise<SpawnOptions> {
     const URL = await this.getURL();
     return {
@@ -71,9 +83,7 @@ export class DevMigrator {
     return Prisma.connectionURL(user, password);
   }
 
-  private static recognizedCommand(
-    command: string | Command,
-  ): command is Command {
+  private static recognizedCommand(command: string) {
     if (this.flags.has(command)) {
       return true;
     }
@@ -85,5 +95,3 @@ export class DevMigrator {
     process.exit(0);
   }
 }
-
-type Command = "--migrate" | "--reset" | "--reset-hard";

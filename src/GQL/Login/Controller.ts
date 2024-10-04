@@ -50,7 +50,7 @@ export class LoginController {
     Validators.validateEmail(email);
     const user = await UserController.findByEmail(email);
     if (!user) {
-      throw new GraphQLError("A user with this email address does not exist");
+      throw new GraphQLError("This email address is not recognized");
     }
     // send email
     return "We've sent you an email with instructions to reset your password";
