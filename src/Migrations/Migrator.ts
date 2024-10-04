@@ -9,17 +9,23 @@ export class Migrator {
     "postgres-user",
     "postgres-password",
   );
-  public static async run() {
+  public static run() {
+    return this.exec("yarn prisma migrate deploy", "migration");
+  }
+
+  public static runReset() {
+    return this.exec("yarn prisma db push", "reset");
+  }
+
+  private static async exec(command: string, type: "reset" | "migration") {
     if (process.env.NODE_ENV !== "production") {
       return;
     }
     try {
       const env = await this.createENV();
-      // await new ChildProcess("yarn prisma migrate reset", env).handler;
-      await new ChildProcess("yarn prisma db push", env).handler;
-      // await new ChildProcess("yarn prisma migrate deploy", env).handler;
+      await new ChildProcess(command, env).handler;
     } catch (error) {
-      CoreLogger.core("Migrations Failed. Terminating process", error);
+      CoreLogger.core(`DB ${type} Failed. Terminating process`, error);
       throw error;
     }
   }

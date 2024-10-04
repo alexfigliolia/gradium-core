@@ -3,7 +3,7 @@ import { ChildProcess } from "@figliolia/child-process";
 import { Prisma } from "DB/Client";
 import { SecretManager } from "Secrets/Manager";
 
-export class Migrator {
+export class DevMigrator {
   private static flags = new Set(["--migrate", "--reset", "--reset-hard"]);
 
   public static CLI() {
