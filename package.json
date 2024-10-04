@@ -10,8 +10,7 @@
     "lint": "tsx ci/commands/Lint.ts",
     "test": "tsx ci/commands/Test.ts",
     "prisma:generate": "yarn prisma generate",
-    "reset-db": "tsx devtools/migrations/Reset.ts",
-    "migrate": "tsx devtools/migrations/Migrate.ts",
+    "migrations": "tsx devtools/migrations/CLI.ts",
     "start": "node dist/mjs/Start.js",
     "create-package": "tsx devtools/create-package/CLI.ts"
   },
