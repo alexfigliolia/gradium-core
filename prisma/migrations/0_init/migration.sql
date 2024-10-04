@@ -473,5 +473,3 @@ ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_A_
 
 -- AddForeignKey
 ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_B_fkey" FOREIGN KEY ("B") REFERENCES "StaffProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-Done in 0.99s.
