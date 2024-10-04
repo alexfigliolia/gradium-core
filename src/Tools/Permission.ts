@@ -32,6 +32,10 @@ export class Permission {
     return typeof session.userID === "number";
   }
 
+  public static matchesKnownUser(session: Session, userId: number) {
+    return this.knownUser(session) && session.userID === userId;
+  }
+
   public static async hasOrganizationPermissions(
     session: Session,
     org: number,

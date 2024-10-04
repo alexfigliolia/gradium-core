@@ -24,16 +24,26 @@ export class LoginController {
       throw new GraphQLError(`${name} is already a Gradium user. Please login`);
     }
     const pw = await hash(password, this.SALTS);
-    const user = await UserController.createUser({ name, email, password: pw });
+    const { id: userId } = await UserController.createUser({
+      name,
+      password: pw,
+    });
     await Prisma.transact(async client => {
-      const org = await client.organization.create({
+      const { id: linkId } = await client.linkedEmail.create({
+        data: {
+          email,
+          userId,
+        },
+      });
+      const { id: orgId } = await client.organization.create({
         data: {},
         select: { id: true },
       });
       const person = await client.person.create({
         data: {
-          organizationId: org.id,
-          userId: user.id,
+          userId,
+          linkedEmailId: linkId,
+          organizationId: orgId,
         },
       });
       await client.role.create({
@@ -43,7 +53,7 @@ export class LoginController {
         },
       });
     });
-    return UserController.authenticatedUserScope(user.id);
+    return UserController.authenticatedUserScope(userId);
   }
 
   public static async sendPasswordResetEmail(email: string) {

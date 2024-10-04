@@ -227,6 +227,8 @@ model Person {
   createdTasks   ManagementTask[]
   staffProfile   StaffProfile?    @relation(fields: [staffId], references: [id])
   staffId        Int?
+  linkedEmail    LinkedEmail      @relation(fields: [linkedEmailId], references: [id])
+  linkedEmailId  Int
 
   @@id(name: "identity", [organizationId, userId])
 }
@@ -244,16 +246,24 @@ model Organization {
   staffInvites StaffInvite[]
 }
 
+model LinkedEmail {
+  id     Int      @id @unique @default(autoincrement())
+  email  String   @unique
+  user   User     @relation(fields: [userId], references: [id])
+  userId Int
+  person Person[]
+}
+
 model User {
   id           Int           @id @unique @default(autoincrement())
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   name         String
-  email        String        @unique()
   password     String
   leases       Lease[]
   rentPayments RentPayment[]
   affiliations Person[]
+  emails       LinkedEmail[]
 }
 
 enum PersonRole {

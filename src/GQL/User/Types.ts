@@ -16,14 +16,43 @@ export interface ILogin extends IEmail {
   password: string;
 }
 
+export interface ICreateUser {
+  name: string;
+  password: string;
+}
+
 export interface ISignUp extends ILogin {
   name: string;
+}
+
+export interface ILinkedEmail {
+  email: string;
 }
 
 export interface IUserAffiliation {
   organization: Identity;
   roles: Pick<Role, "role">[];
 }
+
+export interface ILoggedInUser {
+  id: number;
+  name: string;
+  emails: ILinkedEmail[];
+  affiliations: IUserAffiliation[];
+}
+
+export interface ILinkEmail {
+  userId: number;
+  email: string;
+}
+
+export interface IUpdateEmail {
+  next: string;
+  previous: string;
+  userId: number;
+}
+
+export type IBasicUser = Pick<ILoggedInUser, "name" | "emails">;
 
 export const OrgAffiliation = new GraphQLObjectType<Identity, Context>({
   name: "OrgAffiliation",
@@ -55,12 +84,29 @@ export const UserAffiliation = new GraphQLObjectType<IUserAffiliation, Context>(
   },
 );
 
-export interface ILoggedInUser {
-  id: number;
-  name: string;
-  email: string;
-  affiliations: IUserAffiliation[];
-}
+export const LinkedEmail = new GraphQLObjectType<ILinkedEmail, Context>({
+  name: "LinkedEmail",
+  fields: {
+    email: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: email => email.email,
+    },
+  },
+});
+
+export const BasicUser = new GraphQLObjectType<IBasicUser, Context>({
+  name: "BasicUser",
+  fields: {
+    name: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: user => user.name,
+    },
+    emails: {
+      type: SchemaBuilder.nonNullArray(LinkedEmail),
+      resolve: user => user.emails,
+    },
+  },
+});
 
 export const LoggedInUser = new GraphQLObjectType<ILoggedInUser, Context>({
   name: "LoggedInUser",
@@ -69,13 +115,13 @@ export const LoggedInUser = new GraphQLObjectType<ILoggedInUser, Context>({
       type: SchemaBuilder.nonNull(GraphQLInt),
       resolve: user => user.id,
     },
-    email: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-      resolve: user => user.email,
-    },
     name: {
       type: SchemaBuilder.nonNull(GraphQLString),
       resolve: user => user.name,
+    },
+    emails: {
+      type: SchemaBuilder.nonNullArray(LinkedEmail),
+      resolve: user => user.emails,
     },
     affiliations: {
       type: SchemaBuilder.nonNullArray(UserAffiliation),

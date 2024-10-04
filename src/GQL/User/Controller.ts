@@ -1,10 +1,18 @@
+import type { Request } from "express";
+import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
-import type { ISignUp } from "./Types";
+import { Permission } from "Tools/Permission";
+import { Validators } from "Tools/Validators";
+import type { ICreateUser, ILinkEmail, IUpdateEmail } from "./Types";
 
 export class UserController {
   public static findByEmail(email: string) {
-    return Prisma.transact(client => {
-      return client.user.findUnique({ where: { email } });
+    return Prisma.transact(async client => {
+      const link = await client.linkedEmail.findUnique({
+        where: { email },
+        select: { user: true },
+      });
+      return link?.user;
     });
   }
 
@@ -14,13 +22,42 @@ export class UserController {
     });
   }
 
-  public static createUser({ name, email, password }: ISignUp) {
+  public static createUser({ name, password }: ICreateUser) {
     return Prisma.transact(client => {
       return client.user.create({
         data: {
           name,
-          email,
           password,
+        },
+      });
+    });
+  }
+
+  public static async linkEmail({ userId, email }: ILinkEmail) {
+    Validators.validateEmail(email);
+    return Prisma.transact(client => {
+      return client.linkedEmail.create({
+        data: {
+          userId,
+          email,
+        },
+      });
+    });
+  }
+
+  public static async updateEmail({ userId, previous, next }: IUpdateEmail) {
+    Validators.validateEmail(next);
+    if (previous === next) {
+      return;
+    }
+    return Prisma.transact(client => {
+      return client.linkedEmail.update({
+        where: {
+          userId,
+          email: previous,
+        },
+        data: {
+          email: next,
         },
       });
     });
@@ -33,7 +70,11 @@ export class UserController {
         select: {
           id: true,
           name: true,
-          email: true,
+          emails: {
+            select: {
+              email: true,
+            },
+          },
           affiliations: {
             select: {
               organization: {
@@ -57,5 +98,33 @@ export class UserController {
         },
       });
     });
+  }
+
+  public static createUserModifier<A extends { userId: number }>(
+    callback: (args: A) => any,
+  ) {
+    return async (request: Request, args: A) => {
+      if (!Permission.matchesKnownUser(request.session, args.userId)) {
+        throw new GraphQLError(
+          "An email address may only be modified by the person that owns it",
+        );
+      }
+      await callback(args);
+      return Prisma.transact(client => {
+        return client.user.findUnique({
+          where: {
+            id: args.userId,
+          },
+          select: {
+            name: true,
+            emails: {
+              select: {
+                email: true,
+              },
+            },
+          },
+        });
+      });
+    };
   }
 }
