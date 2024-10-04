@@ -1,5 +1,5 @@
-import { Migrator } from "./Migrator";
+import { DevMigrator } from "./DevMigrator";
 
 (async () => {
-  await Migrator.CLI();
+  await DevMigrator.CLI();
 })().catch(console.log);
