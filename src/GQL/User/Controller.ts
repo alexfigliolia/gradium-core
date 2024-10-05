@@ -86,6 +86,9 @@ export class UserController {
             select: {
               email: true,
             },
+            orderBy: {
+              createdAt: "asc",
+            },
           },
           affiliations: {
             select: {
@@ -132,6 +135,9 @@ export class UserController {
             emails: {
               select: {
                 email: true,
+              },
+              orderBy: {
+                createdAt: "asc",
               },
             },
           },
