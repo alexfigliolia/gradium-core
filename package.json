@@ -12,7 +12,8 @@
     "prisma:generate": "yarn prisma generate",
     "migrations": "tsx devtools/migrations/CLI.ts",
     "start": "node dist/mjs/Start.js",
-    "create-package": "tsx devtools/create-package/CLI.ts"
+    "create-package": "tsx devtools/create-package/CLI.ts",
+    "postinstall": "yarn prisma generate"
   },
   "browserslist": [
     "defaults",
