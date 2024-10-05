@@ -41,7 +41,7 @@ export interface ILoggedInUser {
   affiliations: IUserAffiliation[];
 }
 
-export interface ILinkEmail {
+export interface IdentifyEmail {
   userId: number;
   email: string;
 }

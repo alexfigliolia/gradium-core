@@ -3,7 +3,7 @@ import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
 import { Permission } from "Tools/Permission";
 import { Validators } from "Tools/Validators";
-import type { ICreateUser, ILinkEmail, IUpdateEmail } from "./Types";
+import type { ICreateUser, IdentifyEmail, IUpdateEmail } from "./Types";
 
 export class UserController {
   public static findByEmail(email: string) {
@@ -33,11 +33,23 @@ export class UserController {
     });
   }
 
-  public static async linkEmail({ userId, email }: ILinkEmail) {
+  public static async linkEmail({ userId, email }: IdentifyEmail) {
     Validators.validateEmail(email);
     return Prisma.transact(client => {
       return client.linkedEmail.create({
         data: {
+          userId,
+          email,
+        },
+      });
+    });
+  }
+
+  public static async deleteEmail({ userId, email }: IdentifyEmail) {
+    Validators.validateEmail(email);
+    return Prisma.transact(client => {
+      return client.linkedEmail.delete({
+        where: {
           userId,
           email,
         },

@@ -8,7 +8,12 @@ import {
 } from "./Login/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
-import { linkEmail, updateEmail, userScope } from "./User/Resolvers";
+import {
+  deleteEmail,
+  linkEmail,
+  updateEmail,
+  userScope,
+} from "./User/Resolvers";
 
 const QueryRoot = new GraphQLObjectType({
   name: "Query",
@@ -24,6 +29,7 @@ const MutationRoot = new GraphQLObjectType({
     login,
     logout,
     linkEmail,
+    deleteEmail,
     updateEmail,
     createAccount,
     forgotPassword,

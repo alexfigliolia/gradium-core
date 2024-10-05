@@ -4,7 +4,7 @@ import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { UserController } from "./Controller";
-import type { ILinkEmail, IUpdateEmail } from "./Types";
+import type { IdentifyEmail, IUpdateEmail } from "./Types";
 import { BasicUser, LoggedInUser } from "./Types";
 
 export const userScope: GraphQLFieldConfig<
@@ -42,7 +42,7 @@ export const updateEmail: GraphQLFieldConfig<any, Context, IUpdateEmail> = {
   },
 };
 
-export const linkEmail: GraphQLFieldConfig<any, Context, ILinkEmail> = {
+export const linkEmail: GraphQLFieldConfig<any, Context, IdentifyEmail> = {
   type: SchemaBuilder.nonNull(BasicUser),
   args: {
     userId: {
@@ -55,6 +55,24 @@ export const linkEmail: GraphQLFieldConfig<any, Context, ILinkEmail> = {
   resolve: (_, args, context) => {
     const operation = UserController.createUserModifier(
       UserController.linkEmail,
+    );
+    return operation(context.req, args);
+  },
+};
+
+export const deleteEmail: GraphQLFieldConfig<any, Context, IdentifyEmail> = {
+  type: SchemaBuilder.nonNull(BasicUser),
+  args: {
+    userId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    email: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+  },
+  resolve: (_, args, context) => {
+    const operation = UserController.createUserModifier(
+      UserController.deleteEmail,
     );
     return operation(context.req, args);
   },
