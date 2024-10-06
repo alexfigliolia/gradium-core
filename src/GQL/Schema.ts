@@ -11,6 +11,7 @@ import { inviteStaffMember } from "./Staff/Resolvers";
 import {
   deleteEmail,
   linkEmail,
+  resetPassword,
   updateEmail,
   userScope,
 } from "./User/Resolvers";
@@ -31,6 +32,7 @@ const MutationRoot = new GraphQLObjectType({
     linkEmail,
     deleteEmail,
     updateEmail,
+    resetPassword,
     createAccount,
     forgotPassword,
     inviteStaffMember,

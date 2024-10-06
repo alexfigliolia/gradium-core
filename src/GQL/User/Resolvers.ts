@@ -1,10 +1,15 @@
 import type { GraphQLFieldConfig } from "graphql";
-import { GraphQLError, GraphQLInt, GraphQLString } from "graphql";
+import {
+  GraphQLBoolean,
+  GraphQLError,
+  GraphQLInt,
+  GraphQLString,
+} from "graphql";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { UserController } from "./Controller";
-import type { IdentifyEmail, IUpdateEmail } from "./Types";
+import type { IdentifyEmail, IUpdateStringValue } from "./Types";
 import { BasicUser, LoggedInUser } from "./Types";
 
 export const userScope: GraphQLFieldConfig<
@@ -21,26 +26,27 @@ export const userScope: GraphQLFieldConfig<
   },
 };
 
-export const updateEmail: GraphQLFieldConfig<any, Context, IUpdateEmail> = {
-  type: SchemaBuilder.nonNull(BasicUser),
-  args: {
-    userId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
+export const updateEmail: GraphQLFieldConfig<any, Context, IUpdateStringValue> =
+  {
+    type: SchemaBuilder.nonNull(BasicUser),
+    args: {
+      userId: {
+        type: SchemaBuilder.nonNull(GraphQLInt),
+      },
+      previous: {
+        type: SchemaBuilder.nonNull(GraphQLString),
+      },
+      next: {
+        type: SchemaBuilder.nonNull(GraphQLString),
+      },
     },
-    previous: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+    resolve: (_, args, context) => {
+      const operation = UserController.createUserModifier(
+        UserController.updateEmail,
+      );
+      return operation(context.req, args);
     },
-    next: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-  },
-  resolve: (_, args, context) => {
-    const operation = UserController.createUserModifier(
-      UserController.updateEmail,
-    );
-    return operation(context.req, args);
-  },
-};
+  };
 
 export const linkEmail: GraphQLFieldConfig<any, Context, IdentifyEmail> = {
   type: SchemaBuilder.nonNull(BasicUser),
@@ -75,5 +81,31 @@ export const deleteEmail: GraphQLFieldConfig<any, Context, IdentifyEmail> = {
       UserController.deleteEmail,
     );
     return operation(context.req, args);
+  },
+};
+
+export const resetPassword: GraphQLFieldConfig<
+  any,
+  Context,
+  IUpdateStringValue
+> = {
+  type: SchemaBuilder.nonNull(GraphQLBoolean),
+  args: {
+    userId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    previous: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    next: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+  },
+  resolve: async (_, args, context) => {
+    if (!Permission.matchesKnownUser(context.req.session, args.userId)) {
+      throw new GraphQLError("This operation is only permitted by the owner");
+    }
+    await UserController.resetPassword(args);
+    return true;
   },
 };

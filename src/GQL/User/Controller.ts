@@ -1,11 +1,14 @@
+import { compare, hash } from "bcrypt";
 import type { Request } from "express";
 import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
 import { Permission } from "Tools/Permission";
 import { Validators } from "Tools/Validators";
-import type { ICreateUser, IdentifyEmail, IUpdateEmail } from "./Types";
+import type { ICreateUser, IdentifyEmail, IUpdateStringValue } from "./Types";
 
 export class UserController {
+  public static readonly SALTS = 10;
+
   public static findByEmail(email: string) {
     return Prisma.transact(async client => {
       const link = await client.linkedEmail.findUnique({
@@ -57,7 +60,11 @@ export class UserController {
     });
   }
 
-  public static async updateEmail({ userId, previous, next }: IUpdateEmail) {
+  public static async updateEmail({
+    userId,
+    previous,
+    next,
+  }: IUpdateStringValue) {
     Validators.validateEmail(next);
     if (previous === next) {
       return;
@@ -70,6 +77,35 @@ export class UserController {
         },
         data: {
           email: next,
+        },
+      });
+    });
+  }
+
+  public static async resetPassword({
+    userId,
+    next,
+    previous,
+  }: IUpdateStringValue) {
+    const user = await Prisma.transact(client => {
+      return client.user.findUnique({
+        where: { id: userId },
+        select: {
+          password: true,
+        },
+      });
+    });
+    if (!user) {
+      throw new GraphQLError("Something went wrong. Please try again");
+    }
+    if (!(await compare(previous, user.password))) {
+      throw new GraphQLError("Your current password is incorrect");
+    }
+    await Prisma.transact(async client => {
+      return client.user.update({
+        where: { id: userId },
+        data: {
+          password: await hash(next, 10),
         },
       });
     });

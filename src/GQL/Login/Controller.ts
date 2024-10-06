@@ -6,8 +6,6 @@ import type { ILogin, ISignUp } from "GQL/User/Types";
 import { Validators } from "Tools/Validators";
 
 export class LoginController {
-  public static SALTS = 10;
-
   public static async login({ email, password }: ILogin) {
     const user = await this.validateLoginEmail(email);
     if (!(await compare(password, user.password))) {
@@ -23,7 +21,7 @@ export class LoginController {
     if (await UserController.findByEmail(email)) {
       throw new GraphQLError(`${name} is already a Gradium user. Please login`);
     }
-    const pw = await hash(password, this.SALTS);
+    const pw = await hash(password, UserController.SALTS);
     const { id: userId } = await UserController.createUser({
       name,
       password: pw,

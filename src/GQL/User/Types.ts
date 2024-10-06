@@ -46,7 +46,7 @@ export interface IdentifyEmail {
   email: string;
 }
 
-export interface IUpdateEmail {
+export interface IUpdateStringValue {
   next: string;
   previous: string;
   userId: number;
