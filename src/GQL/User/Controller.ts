@@ -38,11 +38,28 @@ export class UserController {
 
   public static async linkEmail({ userId, email }: IdentifyEmail) {
     Validators.validateEmail(email);
-    return Prisma.transact(client => {
+    return Prisma.transact(async client => {
+      const exists = await client.linkedEmail.findUnique({
+        where: {
+          userId,
+          email,
+        },
+        select: {
+          id: true,
+        },
+      });
+      if (exists) {
+        throw new GraphQLError(
+          "This email address is already registered to your account",
+        );
+      }
       return client.linkedEmail.create({
         data: {
           userId,
           email,
+        },
+        select: {
+          id: true,
         },
       });
     });
@@ -55,6 +72,9 @@ export class UserController {
         where: {
           userId,
           email,
+        },
+        select: {
+          id: true,
         },
       });
     });
@@ -77,6 +97,9 @@ export class UserController {
         },
         data: {
           email: next,
+        },
+        select: {
+          id: true,
         },
       });
     });
