@@ -2,11 +2,11 @@ import type { Request } from "express";
 import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
 import { Permission } from "Tools/Permission";
-import type { IOrganizationName } from "./Types";
+import type { INameAndOrgID } from "./Types";
 
 export class OrganizationController {
   public static async setName(
-    { name, organizationId }: IOrganizationName,
+    { name, organizationId }: INameAndOrgID,
     request: Request,
   ) {
     if (

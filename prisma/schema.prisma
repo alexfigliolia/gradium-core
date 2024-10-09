@@ -144,7 +144,7 @@ model LivingSpaceFloorPlan {
 
 model LivingSpace {
   id                  Int                    @id @unique @default(autoincrement())
-  name                String
+  name                String                 @unique
   type                LivingSpaceType
   beds                Int
   baths               Float
@@ -152,9 +152,16 @@ model LivingSpace {
   leases              Lease[]
   images              LivingSpaceImage[]
   amenityReservations AmenityReservation[]
-  flootPlans          LivingSpaceFloorPlan[]
+  floorPlans          LivingSpaceFloorPlan[]
   property            Property               @relation(fields: [propertyId], references: [id])
   propertyId          Int
+}
+
+model PropertyAddon {
+  id         Int               @id @unique @default(autoincrement())
+  type       PropertyAddonType
+  property   Property          @relation(fields: [propertyId], references: [id])
+  propertyId Int
 }
 
 model PropertyImage {
@@ -164,32 +171,25 @@ model PropertyImage {
   propertyId Int
 }
 
-model PropertyFloorPlan {
-  id         Int      @id @unique @default(autoincrement())
-  url        String
-  property   Property @relation(fields: [propertyId], references: [id])
-  propertyId Int
-}
-
 model Property {
-  id              Int                 @id @unique @default(autoincrement())
-  slug            String              @unique
+  id              Int              @id @unique @default(autoincrement())
+  slug            String
   name            String
-  address1        String
-  address2        String
-  city            String
-  state           String
-  zipCode         String
-  mapsLink        String              @default("")
+  address1        String           @default("")
+  address2        String           @default("")
+  city            String           @default("")
+  state           String           @default("")
+  zipCode         String           @default("")
+  mapsLink        String           @default("")
   images          PropertyImage[]
-  floorPlans      PropertyFloorPlan[]
   livingSpaces    LivingSpace[]
   amenities       Amenity[]
   lease           Lease[]
-  organization    Organization        @relation(fields: [organizationId], references: [id])
+  organization    Organization     @relation(fields: [organizationId], references: [id])
   organizationId  Int
-  ManagementTasks ManagementTask[]
+  managementTasks ManagementTask[]
   staffMembers    StaffProfile[]
+  addons          PropertyAddon[]
 }
 
 model StaffInvite {
@@ -310,4 +310,12 @@ enum ManagementTaskStatus {
   inProgress
   blocked
   complete
+}
+
+enum PropertyAddonType {
+  packageManagement
+  amenityReservations
+  propertyEvents
+  leaseManagement
+  hoaManagement
 }

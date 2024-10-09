@@ -5,6 +5,7 @@ import { SecretManager } from "Secrets/Manager";
 
 export class DevMigrator {
   private static flags = new Set([
+    "--push",
     "--migrate",
     "--reset",
     "--reset-hard",
@@ -17,6 +18,8 @@ export class DevMigrator {
       this.commandError(command);
     }
     switch (command) {
+      case "--push":
+        return this.push();
       case "--migrate":
         return this.migrate(...rest);
       case "--reset":
@@ -38,11 +41,15 @@ export class DevMigrator {
       );
       process.exit();
     }
-
     await new ChildProcess(
       `yarn prisma migrate dev --name ${name}`,
       await this.createENV(),
     ).handler;
+  }
+
+  public static async push() {
+    return new ChildProcess("yarn prisma db push", await this.createENV())
+      .handler;
   }
 
   public static async resetDB() {

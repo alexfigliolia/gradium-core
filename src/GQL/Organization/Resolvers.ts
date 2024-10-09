@@ -3,12 +3,12 @@ import { GraphQLBoolean, GraphQLInt, GraphQLString } from "graphql";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { OrganizationController } from "./Controller";
-import type { IOrganizationName } from "./Types";
+import type { INameAndOrgID } from "./Types";
 
 export const setOrganizationName: GraphQLFieldConfig<
   any,
   Context,
-  IOrganizationName
+  INameAndOrgID
 > = {
   type: SchemaBuilder.nonNull(GraphQLBoolean),
   args: {

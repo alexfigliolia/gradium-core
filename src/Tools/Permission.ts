@@ -15,7 +15,7 @@ export class Permission {
     maintenance: new Set([PersonRole.maintenance]),
   };
 
-  public static modifyOrg(
+  public static orgVisibility(
     session: Session,
     target: number,
   ): session is Omit<Session, "userID"> & { userID: number } {
@@ -41,7 +41,7 @@ export class Permission {
     org: number,
     ...permissions: PersonRole[]
   ) {
-    if (!this.modifyOrg(session, org)) {
+    if (!this.orgVisibility(session, org)) {
       return false;
     }
     const person = await Prisma.transact(client => {

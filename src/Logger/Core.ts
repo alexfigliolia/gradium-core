@@ -12,6 +12,10 @@ export class CoreLogger {
     this.LOG = this._LOG;
   }
 
+  public static warn = (...msg: any[]) => {
+    this.LOG(chalk.yellow.bold("Warning:"), ...msg);
+  };
+
   public static redis = (...msg: any[]) => {
     this.LOG(chalk.redBright.bold("Redis:", ...msg));
   };
