@@ -6,8 +6,11 @@ export interface Context {
   res: Response;
 }
 
-export interface Identity {
+export interface DBID {
   id: number;
+}
+
+export interface Identity extends DBID {
   name: string;
 }
 

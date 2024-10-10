@@ -162,6 +162,8 @@ model PropertyAddon {
   type       PropertyAddonType
   property   Property          @relation(fields: [propertyId], references: [id])
   propertyId Int
+
+  @@unique([propertyId, type])
 }
 
 model PropertyImage {

@@ -1,10 +1,5 @@
-import {
-  GraphQLEnumType,
-  GraphQLInt,
-  GraphQLObjectType,
-  GraphQLString,
-} from "graphql";
-import type { PropertyAddonType as IPropertyAddonType } from "@prisma/client";
+import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
+import { type IPropertyAddon, PropertyAddon } from "GQL/Addons/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
@@ -26,46 +21,6 @@ interface IPropertyImage {
   id: number;
   url: string;
 }
-
-interface IPropertyAddon {
-  id: number;
-  type: IPropertyAddonType;
-}
-
-export const PropertyAddonType = new GraphQLEnumType({
-  name: "PropertyAddonType",
-  values: {
-    packageManagement: {
-      value: "packageManagement",
-    },
-    amenityReservations: {
-      value: "amenityReservations",
-    },
-    propertyEvents: {
-      value: "propertyEvents",
-    },
-    leaseManagement: {
-      value: "leaseManagement",
-    },
-    hoaManagement: {
-      value: "hoaManagement",
-    },
-  },
-});
-
-export const PropertyAddon = new GraphQLObjectType<IPropertyAddon, Context>({
-  name: "PropertyAddon",
-  fields: {
-    id: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-      resolve: property => property.id,
-    },
-    type: {
-      type: SchemaBuilder.nonNull(PropertyAddonType),
-      resolve: property => property.type,
-    },
-  },
-});
 
 export const PropertyImage = new GraphQLObjectType<IPropertyImage, Context>({
   name: "PropertyImage",
