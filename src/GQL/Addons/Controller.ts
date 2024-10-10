@@ -68,6 +68,25 @@ export class AddonController {
     return this.getAddons(propertyId);
   };
 
+  public static deleteAddons = async (ids: number[], propertyId: number) => {
+    await Prisma.transact(async client => {
+      try {
+        await client.propertyAddon.deleteMany({
+          where: {
+            id: {
+              in: ids,
+            },
+          },
+        });
+      } catch (error) {
+        throw new GraphQLError(
+          "Something went wrong when deleting this addon. Please refresh your page.",
+        );
+      }
+    });
+    return this.getAddons(propertyId);
+  };
+
   public static wrapTransaction<F extends (...args: any[]) => any>(
     session: Session,
     organizationId: number,

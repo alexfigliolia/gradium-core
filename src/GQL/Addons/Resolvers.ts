@@ -4,6 +4,7 @@ import type { Context } from "Types/GraphQL";
 import { AddonController } from "./Controller";
 import type {
   IDeleteAddonArgs,
+  IDeleteAddonsArgs,
   IPropertyAddonArgs,
   IPropertyAddonsArgs,
 } from "./Types";
@@ -87,5 +88,32 @@ export const deletePropertyAddon: GraphQLFieldConfig<
       AddonController.deleteAddon,
     );
     return transaction(id, propertyId);
+  },
+};
+
+export const deletePropertyAddons: GraphQLFieldConfig<
+  any,
+  Context,
+  IDeleteAddonsArgs
+> = {
+  type: SchemaBuilder.nonNullArray(PropertyAddon),
+  args: {
+    propertyId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    ids: {
+      type: SchemaBuilder.nonNullArray(GraphQLInt),
+    },
+  },
+  resolve: async (_, { organizationId, propertyId, ids }, context) => {
+    const transaction = AddonController.wrapTransaction(
+      context.req.session,
+      organizationId,
+      AddonController.deleteAddons,
+    );
+    return transaction(ids, propertyId);
   },
 };

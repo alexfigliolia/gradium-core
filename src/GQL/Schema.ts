@@ -3,6 +3,7 @@ import {
   createPropertyAddon,
   createPropertyAddons,
   deletePropertyAddon,
+  deletePropertyAddons,
 } from "./Addons/Resolvers";
 import {
   createAccount,
@@ -48,6 +49,7 @@ const MutationRoot = new GraphQLObjectType({
     createPropertyAddon,
     deletePropertyAddon,
     createPropertyAddons,
+    deletePropertyAddons,
   },
 });
 

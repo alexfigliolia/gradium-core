@@ -14,6 +14,10 @@ export interface IdentifyProperty {
 
 export interface IDeleteAddonArgs extends DBID, IdentifyProperty {}
 
+export interface IDeleteAddonsArgs extends IdentifyProperty {
+  ids: number[];
+}
+
 export interface IPropertyAddonArgs extends IdentifyProperty {
   type: IPropertyAddonType;
 }
