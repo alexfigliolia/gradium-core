@@ -8,7 +8,7 @@ export class DevMigrator {
     "--push",
     "--migrate",
     "--reset",
-    "--reset-hard",
+    "--reset-data",
     "--exec",
   ]);
 
@@ -24,8 +24,8 @@ export class DevMigrator {
         return this.migrate(...rest);
       case "--reset":
         return this.resetDB();
-      case "--reset-hard":
-        return this.resetHard();
+      case "--reset-data":
+        return this.resetData();
       case "--exec":
         return this.exec(...rest);
       default:
@@ -59,7 +59,7 @@ export class DevMigrator {
     await new ChildProcess("yarn clear-sessions", env).handler;
   }
 
-  public static async resetHard() {
+  public static async resetData() {
     const env = await this.createENV();
     await new ChildProcess("yarn prisma db push --force-reset", env).handler;
   }
