@@ -1,15 +1,11 @@
 import { GraphQLEnumType, GraphQLInt, GraphQLObjectType } from "graphql";
 import type { PropertyAddonType as IPropertyAddonType } from "@prisma/client";
+import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID } from "Types/GraphQL";
 
 export interface IPropertyAddon extends DBID {
   type: IPropertyAddonType;
-}
-
-export interface IdentifyProperty {
-  propertyId: number;
-  organizationId: number;
 }
 
 export interface IModifyAddons extends IdentifyProperty {

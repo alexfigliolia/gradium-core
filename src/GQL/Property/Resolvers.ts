@@ -5,6 +5,7 @@ import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { PropertyController } from "./Controller";
+import type { IUpdateBasicPropertyInfo } from "./Types";
 import { AdminBasicProperty } from "./Types";
 
 export const createProperty: GraphQLFieldConfig<any, Context, INameAndOrgID> = {
@@ -24,6 +25,48 @@ export const createProperty: GraphQLFieldConfig<any, Context, INameAndOrgID> = {
       );
     }
     return PropertyController.create(args);
+  },
+};
+
+export const updateBasicPropertyInfo: GraphQLFieldConfig<
+  any,
+  Context,
+  IUpdateBasicPropertyInfo
+> = {
+  type: SchemaBuilder.nonNull(AdminBasicProperty),
+  args: {
+    propertyId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    name: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    address1: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    address2: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    city: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    state: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    zipCode: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+  },
+  resolve: (_, args, context) => {
+    const operation = PropertyController.wrapTransaction(
+      context.req.session,
+      args.organizationId,
+      PropertyController.updateBasicInfo,
+    );
+    return operation(args);
   },
 };
 

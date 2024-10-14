@@ -2,8 +2,12 @@ import { GraphQLError } from "graphql";
 import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import type { INameAndOrgID } from "GQL/Organization/Types";
+import { Permission } from "Tools/Permission";
+import type { Session } from "Types/GraphQL";
+import { Access } from "./Access";
+import type { IdentifyProperty, IUpdateBasicPropertyInfo } from "./Types";
 
-export class PropertyController {
+export class PropertyController extends Access {
   private static NON_ALPHA_NUMERICS = new RegExp("[^A-Za-z0-9]");
 
   public static async fetch(userId: number, organizationId: number) {
@@ -20,20 +24,7 @@ export class PropertyController {
         where: {
           organizationId,
         },
-        include: {
-          addons: {
-            select: {
-              id: true,
-              type: true,
-            },
-          },
-          images: {
-            select: {
-              id: true,
-              url: true,
-            },
-          },
-        },
+        include: this.BASIC_ATTRIBUTE_SELECTION,
       });
     });
   }
@@ -47,23 +38,38 @@ export class PropertyController {
             in: ids,
           },
         },
-        include: {
-          addons: {
-            select: {
-              id: true,
-              type: true,
-            },
-          },
-          images: {
-            select: {
-              id: true,
-              url: true,
-            },
-          },
-        },
+        include: this.BASIC_ATTRIBUTE_SELECTION,
       });
     });
   }
+
+  public static fetchById({ organizationId, propertyId }: IdentifyProperty) {
+    return Prisma.transact(client => {
+      return client.property.findUnique({
+        where: {
+          organizationId,
+          id: propertyId,
+        },
+        include: this.BASIC_ATTRIBUTE_SELECTION,
+      });
+    });
+  }
+
+  public static updateBasicInfo = async ({
+    propertyId,
+    organizationId,
+    ...data
+  }: IUpdateBasicPropertyInfo) => {
+    await Prisma.transact(client => {
+      return client.property.update({
+        where: {
+          id: propertyId,
+        },
+        data,
+      });
+    });
+    return this.fetchById({ propertyId, organizationId });
+  };
 
   public static create(args: INameAndOrgID) {
     return Prisma.transact(async client => {
@@ -93,20 +99,7 @@ export class PropertyController {
             ...args,
             slug,
           },
-          include: {
-            addons: {
-              select: {
-                id: true,
-                type: true,
-              },
-            },
-            images: {
-              select: {
-                id: true,
-                url: true,
-              },
-            },
-          },
+          include: this.BASIC_ATTRIBUTE_SELECTION,
         });
       }
       throw new GraphQLError(
@@ -144,44 +137,24 @@ export class PropertyController {
     });
   }
 
-  private static async getUserAccess(userId: number, organizationId: number) {
-    const user = await Prisma.transact(client => {
-      return client.person.findUnique({
-        where: {
-          identity: {
-            userId,
-            organizationId,
-          },
-        },
-        select: {
-          roles: {
-            select: {
-              role: true,
-            },
-          },
-          staffProfile: {
-            select: {
-              propertyAccess: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          },
-        },
-      });
-    });
-    if (!user) {
-      throw new GraphQLError(
-        "There were no accessible properties found. Please contact us",
-      );
-    }
-    if (user.roles.some(role => role.role === PersonRole.owner)) {
-      return "*";
-    }
-    if (!user.staffProfile) {
-      return [];
-    }
-    return user.staffProfile.propertyAccess.map(p => p.id);
+  public static wrapTransaction<F extends (...args: any[]) => any>(
+    session: Session,
+    organizationId: number,
+    callback: F,
+  ) {
+    return async (...args: Parameters<F>) => {
+      if (
+        !(await Permission.hasOrganizationPermissions(
+          session,
+          organizationId,
+          PersonRole.manager,
+        ))
+      ) {
+        throw new GraphQLError(
+          "You do not have permission to modify this property",
+        );
+      }
+      return callback(...args);
+    };
   }
 }

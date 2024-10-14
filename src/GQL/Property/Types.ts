@@ -3,15 +3,18 @@ import { type IPropertyAddon, PropertyAddon } from "GQL/Addons/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
-interface IAdminBasicProperty {
-  id: number;
-  slug: string;
+export interface IBasicPropertyInfo {
   name: string;
   address1: string;
   address2: string;
   city: string;
   state: string;
   zipCode: string;
+}
+
+interface IAdminBasicProperty extends IBasicPropertyInfo {
+  id: number;
+  slug: string;
   mapsLink: string;
   addons: IPropertyAddon[];
   images: IPropertyImage[];
@@ -21,6 +24,15 @@ interface IPropertyImage {
   id: number;
   url: string;
 }
+
+export interface IdentifyProperty {
+  propertyId: number;
+  organizationId: number;
+}
+
+export interface IUpdateBasicPropertyInfo
+  extends IdentifyProperty,
+    IBasicPropertyInfo {}
 
 export const PropertyImage = new GraphQLObjectType<IPropertyImage, Context>({
   name: "PropertyImage",

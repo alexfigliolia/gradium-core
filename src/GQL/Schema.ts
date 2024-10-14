@@ -8,7 +8,11 @@ import {
   verifySession,
 } from "./Login/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
-import { adminBasicPropertiesList, createProperty } from "./Property/Resolvers";
+import {
+  adminBasicPropertiesList,
+  createProperty,
+  updateBasicPropertyInfo,
+} from "./Property/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
 import {
   deleteEmail,
@@ -42,6 +46,7 @@ const MutationRoot = new GraphQLObjectType({
     inviteStaffMember,
     setOrganizationName,
     modifyPropertyAddons,
+    updateBasicPropertyInfo,
   },
 });
 
