@@ -12,18 +12,9 @@ export interface IdentifyProperty {
   organizationId: number;
 }
 
-export interface IDeleteAddonArgs extends DBID, IdentifyProperty {}
-
-export interface IDeleteAddonsArgs extends IdentifyProperty {
-  ids: number[];
-}
-
-export interface IPropertyAddonArgs extends IdentifyProperty {
-  type: IPropertyAddonType;
-}
-
-export interface IPropertyAddonsArgs extends IdentifyProperty {
-  addons: IPropertyAddonType[];
+export interface IModifyAddons extends IdentifyProperty {
+  deletions: number[];
+  additions: IPropertyAddonType[];
 }
 
 export const PropertyAddonType = new GraphQLEnumType({

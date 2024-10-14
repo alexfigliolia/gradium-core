@@ -1,10 +1,5 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
-import {
-  createPropertyAddon,
-  createPropertyAddons,
-  deletePropertyAddon,
-  deletePropertyAddons,
-} from "./Addons/Resolvers";
+import { modifyPropertyAddons } from "./Addons/Resolvers";
 import {
   createAccount,
   forgotPassword,
@@ -46,10 +41,7 @@ const MutationRoot = new GraphQLObjectType({
     createProperty,
     inviteStaffMember,
     setOrganizationName,
-    createPropertyAddon,
-    deletePropertyAddon,
-    createPropertyAddons,
-    deletePropertyAddons,
+    modifyPropertyAddons,
   },
 });
 
