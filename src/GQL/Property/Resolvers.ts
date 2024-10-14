@@ -27,7 +27,7 @@ export const createProperty: GraphQLFieldConfig<any, Context, INameAndOrgID> = {
   },
 };
 
-export const adminBasicProperties: GraphQLFieldConfig<
+export const adminBasicPropertiesList: GraphQLFieldConfig<
   any,
   Context,
   IOrganizationID

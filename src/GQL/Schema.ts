@@ -8,7 +8,7 @@ import {
   verifySession,
 } from "./Login/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
-import { adminBasicProperties, createProperty } from "./Property/Resolvers";
+import { adminBasicPropertiesList, createProperty } from "./Property/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
 import {
   deleteEmail,
@@ -23,7 +23,7 @@ const QueryRoot = new GraphQLObjectType({
   fields: {
     userScope,
     verifySession,
-    adminBasicProperties,
+    adminBasicPropertiesList,
   },
 });
 
