@@ -40,7 +40,7 @@ export const deletePropertyImage: GraphQLFieldConfig<
   Context,
   IDeletePropertyImage
 > = {
-  type: SchemaBuilder.nonNullArray(PropertyImage),
+  type: SchemaBuilder.nonNull(PropertyImage),
   args: {
     organizationId: {
       type: SchemaBuilder.nonNull(GraphQLInt),

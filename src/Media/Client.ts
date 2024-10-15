@@ -39,7 +39,7 @@ export class MediaClient {
     return { name: this.#name, api_key: this.#key, secret: this.#secret };
   }
 
-  public static async sign(type: IPropertyImageType) {
+  public static signUpload = async (type: IPropertyImageType) => {
     const Client = await this.getClient();
     const folder = this.getAssetDesination(type);
     const timestamp = Math.round(new Date().getTime() / 1000);
@@ -57,7 +57,36 @@ export class MediaClient {
         secret,
       ),
     };
-  }
+  };
+
+  public static signDestroy = async (
+    imageType: IPropertyImageType,
+    public_id: string,
+  ) => {
+    const Client = await this.getClient();
+    const folder = this.getAssetDesination(imageType);
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const { secret, name, api_key } = MediaClient.getConfiguration();
+    const resource_type = "image";
+    const invalidate = true;
+    return {
+      name,
+      folder,
+      api_key,
+      public_id,
+      timestamp,
+      invalidate,
+      resource_type,
+      signature: Client.utils.api_sign_request(
+        {
+          timestamp,
+          public_id,
+          invalidate,
+        },
+        secret,
+      ),
+    };
+  };
 
   private static getAssetDesination(type: IPropertyImageType) {
     const tokens: string[] = ["gradium"];

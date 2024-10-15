@@ -7,7 +7,10 @@ import {
   logout,
   verifySession,
 } from "./Login/Resolvers";
-import { generateCloudinarySignature } from "./Media/Resolvers";
+import {
+  generateDestroySignature,
+  generateUploadSignature,
+} from "./Media/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
 import {
   adminBasicPropertiesList,
@@ -32,7 +35,8 @@ const QueryRoot = new GraphQLObjectType({
   fields: {
     userScope,
     verifySession,
-    generateCloudinarySignature,
+    generateUploadSignature,
+    generateDestroySignature,
     adminBasicPropertiesList,
   },
 });
