@@ -39,23 +39,20 @@ export class MediaClient {
     return { name: this.#name, api_key: this.#key, secret: this.#secret };
   }
 
-  public static async signUpload(type: IPropertyImageType) {
+  public static async sign(type: IPropertyImageType) {
     const Client = await this.getClient();
     const folder = this.getAssetDesination(type);
     const timestamp = Math.round(new Date().getTime() / 1000);
     const { secret, name, api_key } = MediaClient.getConfiguration();
-    const transformation = "";
     return {
       name,
       folder,
       api_key,
       timestamp,
-      transformation,
       signature: Client.utils.api_sign_request(
         {
           folder,
           timestamp,
-          transformation,
         },
         secret,
       ),

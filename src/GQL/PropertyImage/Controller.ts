@@ -18,7 +18,7 @@ export class PropertyImageController {
 
   public static delete = (id: number) => {
     return Prisma.transact(async client => {
-      await client.propertyImage.delete({
+      return client.propertyImage.delete({
         where: {
           id,
         },
