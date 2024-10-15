@@ -1,8 +1,5 @@
 import { GraphQLError } from "graphql";
-import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
-import { Permission } from "Tools/Permission";
-import type { Session } from "Types/GraphQL";
 import type { IModifyAddons } from "./Types";
 
 export class AddonController {
@@ -54,25 +51,4 @@ export class AddonController {
     });
     return this.getAddons(propertyId);
   };
-
-  public static wrapTransaction<F extends (...args: any[]) => any>(
-    session: Session,
-    organizationId: number,
-    callback: F,
-  ) {
-    return async (...args: Parameters<F>) => {
-      if (
-        !(await Permission.hasOrganizationPermissions(
-          session,
-          organizationId,
-          PersonRole.manager,
-        ))
-      ) {
-        throw new GraphQLError(
-          "You do not have permission to modify the addons of this property",
-        );
-      }
-      return callback(...args);
-    };
-  }
 }

@@ -7,12 +7,14 @@ import {
   logout,
   verifySession,
 } from "./Login/Resolvers";
+import { generateUploadSignature } from "./Media/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
 import {
   adminBasicPropertiesList,
   createProperty,
   updateBasicPropertyInfo,
 } from "./Property/Resolvers";
+import { createPropertyImage } from "./PropertyImage/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
 import {
   deleteEmail,
@@ -27,6 +29,7 @@ const QueryRoot = new GraphQLObjectType({
   fields: {
     userScope,
     verifySession,
+    generateUploadSignature,
     adminBasicPropertiesList,
   },
 });
@@ -44,6 +47,7 @@ const MutationRoot = new GraphQLObjectType({
     forgotPassword,
     createProperty,
     inviteStaffMember,
+    createPropertyImage,
     setOrganizationName,
     modifyPropertyAddons,
     updateBasicPropertyInfo,

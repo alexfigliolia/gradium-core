@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import type { Session } from "Types/GraphQL";
@@ -15,7 +16,7 @@ export class Permission {
     maintenance: new Set([PersonRole.maintenance]),
   };
 
-  public static orgVisibility(
+  public static hasOrgAccess(
     session: Session,
     target: number,
   ): session is Omit<Session, "userID"> & { userID: number } {
@@ -41,7 +42,7 @@ export class Permission {
     org: number,
     ...permissions: PersonRole[]
   ) {
-    if (!this.orgVisibility(session, org)) {
+    if (!this.hasOrgAccess(session, org)) {
       return false;
     }
     const person = await Prisma.transact(client => {
@@ -74,5 +75,32 @@ export class Permission {
       }
     }
     return false;
+  }
+
+  public static permissedTransaction<F extends (...args: any[]) => any>({
+    session,
+    operation,
+    organizationId,
+    permissions = [PersonRole.manager],
+    errorMessage = "You do not have permission to modify this organization's data",
+  }: {
+    operation: F;
+    session: Session;
+    errorMessage?: string;
+    organizationId: number;
+    permissions?: PersonRole[];
+  }) {
+    return async (...args: Parameters<F>) => {
+      if (
+        !(await Permission.hasOrganizationPermissions(
+          session,
+          organizationId,
+          ...permissions,
+        ))
+      ) {
+        throw new GraphQLError(errorMessage);
+      }
+      return operation(...args);
+    };
   }
 }

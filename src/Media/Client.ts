@@ -1,7 +1,11 @@
 import { v2 as cloudinary } from "cloudinary";
+import { IPropertyImageType } from "GQL/PropertyImage/Types";
 import { SecretManager } from "Secrets/Manager";
 
 export class MediaClient {
+  static #key?: string;
+  static #name?: string;
+  static #secret?: string;
   private static _Client?: typeof cloudinary;
 
   public static async getClient() {
@@ -17,11 +21,56 @@ export class MediaClient {
       SecretManager.getSecret("cloudinary-name", true),
       SecretManager.getSecret("cloudinary-secret", true),
     ]);
+    this.#key = key;
+    this.#name = name;
+    this.#secret = secret;
     cloudinary.config({
       api_key: key,
       cloud_name: name,
       api_secret: secret,
     });
     return cloudinary;
+  }
+
+  public static getConfiguration() {
+    if (!this.#name || !this.#key || !this.#secret) {
+      throw "Something went wrong";
+    }
+    return { name: this.#name, api_key: this.#key, secret: this.#secret };
+  }
+
+  public static async signUpload(type: IPropertyImageType) {
+    const Client = await this.getClient();
+    const folder = this.getAssetDesination(type);
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const { secret, name, api_key } = MediaClient.getConfiguration();
+    const transformation = "";
+    return {
+      name,
+      folder,
+      api_key,
+      timestamp,
+      transformation,
+      signature: Client.utils.api_sign_request(
+        {
+          folder,
+          timestamp,
+          transformation,
+        },
+        secret,
+      ),
+    };
+  }
+
+  private static getAssetDesination(type: IPropertyImageType) {
+    const tokens: string[] = ["gradium"];
+    if (type === IPropertyImageType.propertyImage) {
+      tokens.push("property_images");
+    } else if (type === IPropertyImageType.livingSpaceImage) {
+      tokens.push("living_space_images");
+    } else if (type === IPropertyImageType.livingSpaceFloorPlan) {
+      tokens.push("living_space_floor_plans");
+    }
+    return tokens.join("/");
   }
 }

@@ -19,7 +19,7 @@ export const createProperty: GraphQLFieldConfig<any, Context, INameAndOrgID> = {
     },
   },
   resolve: (_, args, context) => {
-    if (!Permission.orgVisibility(context.req.session, args.organizationId)) {
+    if (!Permission.hasOrgAccess(context.req.session, args.organizationId)) {
       throw new GraphQLError(
         "You do not have permission to create properties within this organizaiton",
       );
@@ -61,11 +61,12 @@ export const updateBasicPropertyInfo: GraphQLFieldConfig<
     },
   },
   resolve: (_, args, context) => {
-    const operation = PropertyController.wrapTransaction(
-      context.req.session,
-      args.organizationId,
-      PropertyController.updateBasicInfo,
-    );
+    const operation = Permission.permissedTransaction({
+      session: context.req.session,
+      organizationId: args.organizationId,
+      operation: PropertyController.updateBasicInfo,
+      errorMessage: "You do not have permission to modify this property",
+    });
     return operation(args);
   },
 };
@@ -83,7 +84,7 @@ export const adminBasicPropertiesList: GraphQLFieldConfig<
   },
   resolve: (_, { organizationId }, context) => {
     const { session } = context.req;
-    if (!Permission.orgVisibility(session, organizationId)) {
+    if (!Permission.hasOrgAccess(session, organizationId)) {
       throw new GraphQLError("You do not have access to this organization");
     }
     return PropertyController.fetch(session.userID, organizationId);

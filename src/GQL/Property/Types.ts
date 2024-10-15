@@ -1,5 +1,6 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import { type IPropertyAddon, PropertyAddon } from "GQL/Addons/Types";
+import { type IPropertyImage, PropertyImage } from "GQL/PropertyImage/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
@@ -20,11 +21,6 @@ interface IAdminBasicProperty extends IBasicPropertyInfo {
   images: IPropertyImage[];
 }
 
-interface IPropertyImage {
-  id: number;
-  url: string;
-}
-
 export interface IdentifyProperty {
   propertyId: number;
   organizationId: number;
@@ -33,20 +29,6 @@ export interface IdentifyProperty {
 export interface IUpdateBasicPropertyInfo
   extends IdentifyProperty,
     IBasicPropertyInfo {}
-
-export const PropertyImage = new GraphQLObjectType<IPropertyImage, Context>({
-  name: "PropertyImage",
-  fields: {
-    id: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-      resolve: property => property.id,
-    },
-    url: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-      resolve: property => property.url,
-    },
-  },
-});
 
 export const AdminBasicProperty = new GraphQLObjectType<
   IAdminBasicProperty,

@@ -1,4 +1,5 @@
 import { type GraphQLFieldConfig, GraphQLInt } from "graphql";
+import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { AddonController } from "./Controller";
@@ -26,11 +27,13 @@ export const modifyPropertyAddons: GraphQLFieldConfig<
     },
   },
   resolve: async (_, args, context) => {
-    const transaction = AddonController.wrapTransaction(
-      context.req.session,
-      args.organizationId,
-      AddonController.modifyAddons,
-    );
+    const transaction = Permission.permissedTransaction({
+      session: context.req.session,
+      organizationId: args.organizationId,
+      operation: AddonController.modifyAddons,
+      errorMessage:
+        "You do not have permission to modify this property's addons",
+    });
     return transaction(args);
   },
 };

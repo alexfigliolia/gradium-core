@@ -3,6 +3,7 @@ import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
 
 export class Access {
+  private static NON_ALPHA_NUMERICS = new RegExp("[^A-Za-z0-9]");
   public static readonly BASIC_ATTRIBUTE_SELECTION = {
     addons: {
       select: {
@@ -57,5 +58,34 @@ export class Access {
       return [];
     }
     return user.staffProfile.propertyAccess.map(p => p.id);
+  }
+
+  protected static createSlug(name: string, ...appendages: string[]) {
+    const result: string[] = [];
+    for (const char of name) {
+      if (this.NON_ALPHA_NUMERICS.test(char)) {
+        if (char === " " || char === "_") {
+          result.push("-");
+        }
+      } else {
+        result.push(char.toLowerCase());
+      }
+    }
+    result.push(...appendages);
+    return result.join("");
+  }
+
+  protected static matchSlug(slug: string, organizationId: number) {
+    return Prisma.transact(async client => {
+      return client.property.findFirst({
+        where: {
+          slug,
+          organizationId,
+        },
+        select: {
+          id: true,
+        },
+      });
+    });
   }
 }
