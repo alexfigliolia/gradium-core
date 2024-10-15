@@ -15,4 +15,18 @@ export class PropertyImageController {
       });
     });
   };
+
+  public static delete = (id: number) => {
+    return Prisma.transact(async client => {
+      await client.propertyImage.delete({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+          url: true,
+        },
+      });
+    });
+  };
 }

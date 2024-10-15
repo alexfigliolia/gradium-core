@@ -17,6 +17,11 @@ export interface ICreatePropertyImage extends IdentifyProperty {
   url: string;
 }
 
+export interface IDeletePropertyImage {
+  id: number;
+  organizationId: number;
+}
+
 export enum IPropertyImageType {
   "propertyImage" = "propertyImage",
   "livingSpaceImage" = "livingSpaceImage",

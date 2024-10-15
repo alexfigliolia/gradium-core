@@ -14,7 +14,10 @@ import {
   createProperty,
   updateBasicPropertyInfo,
 } from "./Property/Resolvers";
-import { createPropertyImage } from "./PropertyImage/Resolvers";
+import {
+  createPropertyImage,
+  deletePropertyImage,
+} from "./PropertyImage/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
 import {
   deleteEmail,
@@ -48,6 +51,7 @@ const MutationRoot = new GraphQLObjectType({
     createProperty,
     inviteStaffMember,
     createPropertyImage,
+    deletePropertyImage,
     setOrganizationName,
     modifyPropertyAddons,
     updateBasicPropertyInfo,

@@ -3,7 +3,8 @@ import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { PropertyImageController } from "./Controller";
-import { type ICreatePropertyImage, PropertyImage } from "./Types";
+import type { ICreatePropertyImage, IDeletePropertyImage } from "./Types";
+import { PropertyImage } from "./Types";
 
 export const createPropertyImage: GraphQLFieldConfig<
   any,
@@ -31,5 +32,31 @@ export const createPropertyImage: GraphQLFieldConfig<
         "You do not have permission to modify this property's images",
     });
     return operation(rest);
+  },
+};
+
+export const deletePropertyImage: GraphQLFieldConfig<
+  any,
+  Context,
+  IDeletePropertyImage
+> = {
+  type: SchemaBuilder.nonNullArray(PropertyImage),
+  args: {
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+  },
+  resolve: (_, { organizationId, id }, context) => {
+    const operation = Permission.permissedTransaction({
+      organizationId,
+      session: context.req.session,
+      operation: PropertyImageController.delete,
+      errorMessage:
+        "You do not have permission to modify this property's images",
+    });
+    return operation(id);
   },
 };
