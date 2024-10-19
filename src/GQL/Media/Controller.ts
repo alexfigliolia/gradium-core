@@ -1,8 +1,11 @@
 import { GraphQLError } from "graphql";
 import { Permission } from "Tools/Permission";
 import type { Session } from "Types/GraphQL";
+import { ImageController } from "./Images";
 
 export class MediaController {
+  public static Images = new ImageController();
+
   public static verify(session: Session, organizationId: number) {
     if (!Permission.hasOrgAccess(session, organizationId)) {
       throw new GraphQLError("You do not have access to this organization");

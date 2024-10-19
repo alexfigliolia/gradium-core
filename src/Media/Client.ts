@@ -1,11 +1,19 @@
 import { v2 as cloudinary } from "cloudinary";
-import { IPropertyImageType } from "GQL/PropertyImage/Types";
+import { IGradiumImageType } from "GQL/Media/Types";
 import { SecretManager } from "Secrets/Manager";
 
 export class MediaClient {
   static #key?: string;
   static #name?: string;
   static #secret?: string;
+  private static readonly directoryMap = {
+    [IGradiumImageType.propertyImage]: "property_images",
+    [IGradiumImageType.livingSpaceImage]: "living_space_images",
+    [IGradiumImageType.livingSpaceFloorPlan]: "living_space_floor_plans",
+    [IGradiumImageType.amenityImage]: "amenity_images",
+    [IGradiumImageType.amenityFloorPlan]: "amenity_floor_plans",
+    [IGradiumImageType.taskImage]: "task_images",
+  };
   private static _Client?: typeof cloudinary;
 
   public static async getClient() {
@@ -39,7 +47,7 @@ export class MediaClient {
     return { name: this.#name, api_key: this.#key, secret: this.#secret };
   }
 
-  public static signUpload = async (type: IPropertyImageType) => {
+  public static signUpload = async (type: IGradiumImageType) => {
     const Client = await this.getClient();
     const folder = this.getAssetDesination(type);
     const timestamp = Math.round(new Date().getTime() / 1000);
@@ -60,7 +68,7 @@ export class MediaClient {
   };
 
   public static signDestroy = async (
-    imageType: IPropertyImageType,
+    imageType: IGradiumImageType,
     public_id: string,
   ) => {
     const Client = await this.getClient();
@@ -88,15 +96,12 @@ export class MediaClient {
     };
   };
 
-  private static getAssetDesination(type: IPropertyImageType) {
+  private static getAssetDesination(type: IGradiumImageType) {
     const tokens: string[] = ["gradium"];
-    if (type === IPropertyImageType.propertyImage) {
-      tokens.push("property_images");
-    } else if (type === IPropertyImageType.livingSpaceImage) {
-      tokens.push("living_space_images");
-    } else if (type === IPropertyImageType.livingSpaceFloorPlan) {
-      tokens.push("living_space_floor_plans");
+    if (!(type in this.directoryMap)) {
+      throw new Error("Media Client: Unknown image type");
     }
+    tokens.push(this.directoryMap[type]);
     return tokens.join("/");
   }
 }

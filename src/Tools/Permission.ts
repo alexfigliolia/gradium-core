@@ -90,7 +90,7 @@ export class Permission {
     organizationId: number;
     permissions?: PersonRole[];
   }) {
-    return async (...args: Parameters<F>) => {
+    return async (...args: Parameters<F>): Promise<ReturnType<F>> => {
       if (
         !(await Permission.hasOrganizationPermissions(
           session,

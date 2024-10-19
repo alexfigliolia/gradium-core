@@ -1,16 +1,17 @@
 import {
   GraphQLBoolean,
+  GraphQLEnumType,
   GraphQLInt,
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
 import type { IOrganizationID } from "GQL/Organization/Types";
-import type { IPropertyImageType } from "GQL/PropertyImage/Types";
+import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
 export interface IGenerateUploadSignature extends IOrganizationID {
-  type: IPropertyImageType;
+  type: IGradiumImageType;
 }
 
 export interface IGenerateDestroySignature extends IGenerateUploadSignature {
@@ -77,6 +78,70 @@ export const DestroySignature = new GraphQLObjectType<
     public_id: {
       type: SchemaBuilder.nonNull(GraphQLString),
       resolve: sig => sig.public_id,
+    },
+  },
+});
+
+export interface IGradiumImage {
+  id: number;
+  url: string;
+}
+export interface IdentifyGradiumImage extends IdentifyProperty {
+  type: IGradiumImageType;
+}
+
+export interface IDeleteGradiumImage extends IdentifyGradiumImage {
+  id: number;
+}
+
+export interface ICreateGradiumImage extends IdentifyGradiumImage {
+  url: string;
+  entityId: number;
+}
+
+export enum IGradiumImageType {
+  "propertyImage" = "propertyImage",
+  "livingSpaceImage" = "livingSpaceImage",
+  "livingSpaceFloorPlan" = "livingSpaceFloorPlan",
+  "amenityImage" = "amenityImage",
+  "amenityFloorPlan" = "amenityFloorPlan",
+  "taskImage" = "taskImage",
+}
+
+export const GradiumImageType = new GraphQLEnumType({
+  name: "GradiumImageType",
+  values: {
+    propertyImage: {
+      value: "propertyImage",
+    },
+    livingSpaceImage: {
+      value: "livingSpaceImage",
+    },
+    livingSpaceFloorPlan: {
+      value: "livingSpaceFloorPlan",
+    },
+    amenityImage: {
+      value: "amenityImage",
+    },
+    amenityFloorPlan: {
+      value: "amenityFloorPlan",
+    },
+    taskImage: {
+      value: "taskImage",
+    },
+  },
+});
+
+export const GradiumImage = new GraphQLObjectType<IGradiumImage, Context>({
+  name: "GradiumImage",
+  fields: {
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+      resolve: property => property.id,
+    },
+    url: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: property => property.url,
     },
   },
 });

@@ -1,15 +1,22 @@
 import type { GraphQLFieldConfig } from "graphql";
 import { GraphQLInt, GraphQLString } from "graphql";
-import { PropertyImageType } from "GQL/PropertyImage/Types";
 import { MediaClient } from "Media/Client";
+import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { MediaController } from "./Controller";
 import type {
+  ICreateGradiumImage,
+  IDeleteGradiumImage,
   IGenerateDestroySignature,
   IGenerateUploadSignature,
 } from "./Types";
-import { DestroySignature, UploadSignature } from "./Types";
+import {
+  DestroySignature,
+  GradiumImage,
+  GradiumImageType,
+  UploadSignature,
+} from "./Types";
 
 export const generateUploadSignature: GraphQLFieldConfig<
   any,
@@ -22,7 +29,7 @@ export const generateUploadSignature: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLInt),
     },
     type: {
-      type: SchemaBuilder.nonNull(PropertyImageType),
+      type: SchemaBuilder.nonNull(GradiumImageType),
     },
   },
   resolve: (_, { organizationId, type }, context) => {
@@ -45,7 +52,7 @@ export const generateDestroySignature: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLString),
     },
     type: {
-      type: SchemaBuilder.nonNull(PropertyImageType),
+      type: SchemaBuilder.nonNull(GradiumImageType),
     },
   },
   resolve: (_, { organizationId, publicId, type }, context) => {
@@ -57,3 +64,67 @@ export const generateDestroySignature: GraphQLFieldConfig<
     );
   },
 };
+
+export const deleteImage: GraphQLFieldConfig<
+  any,
+  Context,
+  IDeleteGradiumImage
+> = {
+  type: SchemaBuilder.nonNull(GradiumImage),
+  args: {
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    propertyId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    type: {
+      type: SchemaBuilder.nonNull(GradiumImageType),
+    },
+  },
+  resolve: (_, { organizationId, ...rest }, context) => {
+    const operation = Permission.permissedTransaction({
+      organizationId,
+      session: context.req.session,
+      operation: MediaController.Images.delete,
+      errorMessage:
+        "You do not have permission to modify this property's images",
+    });
+    return operation(rest);
+  },
+};
+
+export const saveImage: GraphQLFieldConfig<any, Context, ICreateGradiumImage> =
+  {
+    type: SchemaBuilder.nonNull(GradiumImage),
+    args: {
+      propertyId: {
+        type: SchemaBuilder.nonNull(GraphQLInt),
+      },
+      organizationId: {
+        type: SchemaBuilder.nonNull(GraphQLInt),
+      },
+      entityId: {
+        type: SchemaBuilder.nonNull(GraphQLInt),
+      },
+      url: {
+        type: SchemaBuilder.nonNull(GraphQLString),
+      },
+      type: {
+        type: SchemaBuilder.nonNull(GradiumImageType),
+      },
+    },
+    resolve: (_, { organizationId, ...rest }, context) => {
+      const operation = Permission.permissedTransaction({
+        organizationId,
+        session: context.req.session,
+        operation: MediaController.Images.create,
+        errorMessage:
+          "You do not have permission to modify this property's images",
+      });
+      return operation(rest);
+    },
+  };

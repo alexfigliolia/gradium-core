@@ -119,7 +119,7 @@ model Amenity {
   price               Float
   open                String
   close               String
-  footage             String               @default("")
+  footage             Float                @default(0)
   billed              BillFrequency
   images              AmenityImage[]
   floorPlans          AmenityFloorPlan[]
@@ -144,17 +144,19 @@ model LivingSpaceFloorPlan {
 
 model LivingSpace {
   id                  Int                    @id @unique @default(autoincrement())
-  name                String                 @unique
-  type                LivingSpaceType
-  beds                Int
-  baths               Float
-  footage             String                 @default("")
+  name                String                 @default("")
+  type                LivingSpaceType        @default(unit)
+  beds                Int                    @default(0)
+  baths               Float                  @default(0)
+  footage             Float                  @default(0)
   leases              Lease[]
   images              LivingSpaceImage[]
   amenityReservations AmenityReservation[]
   floorPlans          LivingSpaceFloorPlan[]
   property            Property               @relation(fields: [propertyId], references: [id])
   propertyId          Int
+
+  @@unique([propertyId, name])
 }
 
 model PropertyAddon {

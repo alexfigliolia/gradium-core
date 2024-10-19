@@ -1,6 +1,11 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
 import { modifyPropertyAddons } from "./Addons/Resolvers";
 import {
+  createOrUpdateLivingSpace,
+  deleteLivingSpace,
+  getLivingSpaces,
+} from "./LivingSpace/Resolvers";
+import {
   createAccount,
   forgotPassword,
   login,
@@ -8,8 +13,10 @@ import {
   verifySession,
 } from "./Login/Resolvers";
 import {
+  deleteImage,
   generateDestroySignature,
   generateUploadSignature,
+  saveImage,
 } from "./Media/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
 import {
@@ -17,10 +24,6 @@ import {
   createProperty,
   updateBasicPropertyInfo,
 } from "./Property/Resolvers";
-import {
-  createPropertyImage,
-  deletePropertyImage,
-} from "./PropertyImage/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
 import {
   deleteEmail,
@@ -35,6 +38,7 @@ const QueryRoot = new GraphQLObjectType({
   fields: {
     userScope,
     verifySession,
+    getLivingSpaces,
     generateUploadSignature,
     generateDestroySignature,
     adminBasicPropertiesList,
@@ -47,6 +51,8 @@ const MutationRoot = new GraphQLObjectType({
     login,
     logout,
     linkEmail,
+    saveImage,
+    deleteImage,
     deleteEmail,
     updateEmail,
     resetPassword,
@@ -54,11 +60,11 @@ const MutationRoot = new GraphQLObjectType({
     forgotPassword,
     createProperty,
     inviteStaffMember,
-    createPropertyImage,
-    deletePropertyImage,
+    deleteLivingSpace,
     setOrganizationName,
     modifyPropertyAddons,
     updateBasicPropertyInfo,
+    createOrUpdateLivingSpace,
   },
 });
 

@@ -1,6 +1,6 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import { type IPropertyAddon, PropertyAddon } from "GQL/Addons/Types";
-import { type IPropertyImage, PropertyImage } from "GQL/PropertyImage/Types";
+import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
@@ -18,7 +18,7 @@ interface IAdminBasicProperty extends IBasicPropertyInfo {
   slug: string;
   mapsLink: string;
   addons: IPropertyAddon[];
-  images: IPropertyImage[];
+  images: IGradiumImage[];
 }
 
 export interface IdentifyProperty {
@@ -73,7 +73,7 @@ export const AdminBasicProperty = new GraphQLObjectType<
       resolve: property => property.mapsLink,
     },
     images: {
-      type: SchemaBuilder.nonNullArray(PropertyImage),
+      type: SchemaBuilder.nonNullArray(GradiumImage),
       resolve: property => property.images,
     },
     addons: {
