@@ -115,12 +115,12 @@ model AmenityImage {
 
 model Amenity {
   id                  Int                  @id @unique @default(autoincrement())
-  name                String
-  price               Float
-  open                String
-  close               String
+  name                String               @default("")
+  price               Float                @default(0)
+  open                String               @default("9am")
+  close               String               @default("9pm")
   footage             Float                @default(0)
-  billed              BillFrequency
+  billed              BillFrequency        @default(hour)
   images              AmenityImage[]
   floorPlans          AmenityFloorPlan[]
   property            Property             @relation(fields: [propertyId], references: [id])
