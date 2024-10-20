@@ -1,6 +1,11 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
 import { modifyPropertyAddons } from "./Addons/Resolvers";
 import {
+  createOrUpdateAmenity,
+  deleteAmenity,
+  getAmenities,
+} from "./Amenity/Resolvers";
+import {
   createOrUpdateLivingSpace,
   deleteLivingSpace,
   getLivingSpaces,
@@ -37,6 +42,7 @@ const QueryRoot = new GraphQLObjectType({
   name: "Query",
   fields: {
     userScope,
+    getAmenities,
     verifySession,
     getLivingSpaces,
     generateUploadSignature,
@@ -58,11 +64,13 @@ const MutationRoot = new GraphQLObjectType({
     resetPassword,
     createAccount,
     forgotPassword,
+    deleteAmenity,
     createProperty,
     inviteStaffMember,
     deleteLivingSpace,
     setOrganizationName,
     modifyPropertyAddons,
+    createOrUpdateAmenity,
     updateBasicPropertyInfo,
     createOrUpdateLivingSpace,
   },

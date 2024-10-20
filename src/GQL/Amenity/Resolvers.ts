@@ -64,7 +64,7 @@ export const createOrUpdateAmenity: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLString),
     },
     price: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLFloat),
     },
     footage: {
       type: SchemaBuilder.nonNull(GraphQLFloat),

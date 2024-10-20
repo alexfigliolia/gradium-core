@@ -43,7 +43,7 @@ export enum IBillFrequency {
 }
 
 export const BillFrequency = new GraphQLEnumType({
-  name: "BillFrequencyType",
+  name: "BillFrequency",
   values: {
     hour: {
       value: "hour",
