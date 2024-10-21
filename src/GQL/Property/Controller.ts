@@ -60,7 +60,7 @@ export class PropertyController extends Access {
     organizationId,
     ...data
   }: IUpdateBasicPropertyInfo) => {
-    await Prisma.transact(client => {
+    return Prisma.transact(client => {
       return client.property.update({
         where: {
           organizationId,
