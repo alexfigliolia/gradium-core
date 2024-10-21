@@ -7,7 +7,7 @@ export class LivingSpaceController extends Access {
     return Prisma.transact(client => {
       return client.livingSpace.findMany({
         where: {
-          propertyId,
+          AND: [{ propertyId }, { deleted: false }],
         },
         select: this.BASIC_SELECTION,
       });
@@ -41,8 +41,9 @@ export class LivingSpaceController extends Access {
 
   public static delete = (id: number) => {
     return Prisma.transact(client => {
-      return client.livingSpace.delete({
+      return client.livingSpace.update({
         where: { id },
+        data: { deleted: true },
         select: this.BASIC_SELECTION,
       });
     });

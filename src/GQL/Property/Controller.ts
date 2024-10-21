@@ -17,7 +17,7 @@ export class PropertyController extends Access {
     return Prisma.transact(client => {
       return client.property.findMany({
         where: {
-          organizationId,
+          AND: [{ organizationId }, { deleted: false }],
         },
         include: this.BASIC_ATTRIBUTE_SELECTION,
       });
@@ -28,10 +28,15 @@ export class PropertyController extends Access {
     return Prisma.transact(client => {
       return client.property.findMany({
         where: {
-          organizationId,
-          id: {
-            in: ids,
-          },
+          AND: [
+            { organizationId },
+            { deleted: false },
+            {
+              id: {
+                in: ids,
+              },
+            },
+          ],
         },
         include: this.BASIC_ATTRIBUTE_SELECTION,
       });
@@ -58,12 +63,13 @@ export class PropertyController extends Access {
     await Prisma.transact(client => {
       return client.property.update({
         where: {
+          organizationId,
           id: propertyId,
         },
         data,
+        include: this.BASIC_ATTRIBUTE_SELECTION,
       });
     });
-    return this.fetchById({ propertyId, organizationId });
   };
 
   public static create(args: INameAndOrgID) {

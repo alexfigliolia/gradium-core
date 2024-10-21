@@ -7,7 +7,7 @@ export class AmenityController extends Access {
     return Prisma.transact(client => {
       return client.amenity.findMany({
         where: {
-          propertyId,
+          AND: [{ propertyId }, { deleted: false }],
         },
         select: this.BASIC_SELECTION,
       });
@@ -41,8 +41,9 @@ export class AmenityController extends Access {
 
   public static delete = (id: number) => {
     return Prisma.transact(client => {
-      return client.amenity.delete({
+      return client.amenity.update({
         where: { id },
+        data: { deleted: true },
         select: this.BASIC_SELECTION,
       });
     });

@@ -27,6 +27,7 @@ model Expense {
   cost        Float               @default(0)
   title       String              @default("")
   description String              @default("")
+  deleted     Boolean             @default(false)
   attachments ExpenseAttachment[]
   tasks       ManagementTask[]
 }
@@ -46,6 +47,7 @@ model ManagementTask {
   description    String
   organization   Organization  @relation(fields: [organizationId], references: [id])
   organizationId Int
+  deleted        Boolean       @default(false)
   images         TaskImage[]
   createdBy      Person        @relation(fields: [personId], references: [id])
   personId       Int
@@ -78,6 +80,7 @@ model Lease {
   lessees          User[]
   status           LeaseStatus
   paymentFrequency RentPaymentFrequency
+  deleted          Boolean              @default(false)
   payments         RentPayment[]
   organization     Organization         @relation(fields: [organizationId], references: [id])
   organizationId   Int
@@ -123,6 +126,7 @@ model Amenity {
   billed              BillFrequency        @default(hour)
   images              AmenityImage[]
   floorPlans          AmenityFloorPlan[]
+  deleted             Boolean              @default(false)
   property            Property             @relation(fields: [propertyId], references: [id])
   propertyId          Int
   amenityReservations AmenityReservation[]
@@ -149,6 +153,7 @@ model LivingSpace {
   beds                Int                    @default(0)
   baths               Float                  @default(0)
   footage             Float                  @default(0)
+  deleted             Boolean                @default(false)
   leases              Lease[]
   images              LivingSpaceImage[]
   amenityReservations AmenityReservation[]
@@ -185,6 +190,7 @@ model Property {
   state           String           @default("")
   zipCode         String           @default("")
   mapsLink        String           @default("")
+  deleted         Boolean          @default(false)
   images          PropertyImage[]
   livingSpaces    LivingSpace[]
   amenities       Amenity[]
@@ -245,6 +251,7 @@ model Organization {
   tasks        ManagementTask[]
   rentPayments RentPayment[]
   leases       Lease[]
+  deleted      Boolean          @default(false)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   staffInvites StaffInvite[]
@@ -267,6 +274,7 @@ model User {
   updatedAt    DateTime      @updatedAt
   name         String
   password     String
+  deleted      Boolean       @default(false)
   leases       Lease[]
   rentPayments RentPayment[]
   affiliations Person[]

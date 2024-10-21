@@ -8,6 +8,9 @@ import { Validators } from "Tools/Validators";
 export class LoginController {
   public static async login({ email, password }: ILogin) {
     const user = await this.validateLoginEmail(email);
+    if (user.deleted) {
+      throw new GraphQLError("This account no longer exists");
+    }
     if (!(await compare(password, user.password))) {
       throw new GraphQLError("Incorrect Password");
     }
