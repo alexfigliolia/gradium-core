@@ -23,4 +23,23 @@ export class Validators {
     }
     throw new GraphQLError("A valid name is required");
   }
+
+  public static validateFloat(value: any) {
+    if (typeof value !== "string") {
+      return false;
+    }
+    let dec = false;
+    for (const char of value) {
+      if (char === ".") {
+        if (dec) {
+          return false;
+        }
+        dec = true;
+        // @ts-ignore
+      } else if (parseInt(char) != char) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

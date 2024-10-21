@@ -24,7 +24,7 @@ model ExpenseAttachment {
 model Expense {
   id          Int                 @id @unique @default(autoincrement())
   createdAt   DateTime            @default(now())
-  cost        Float               @default(0)
+  cost        String              @default("0")
   title       String              @default("")
   description String              @default("")
   deleted     Boolean             @default(false)
@@ -119,10 +119,10 @@ model AmenityImage {
 model Amenity {
   id                  Int                  @id @unique @default(autoincrement())
   name                String               @default("")
-  price               Float                @default(0)
+  price               String               @default("0")
   open                String               @default("9am")
   close               String               @default("9pm")
-  footage             Float                @default(0)
+  size                String               @default("0")
   billed              BillFrequency        @default(hour)
   deleted             Boolean              @default(false)
   images              AmenityImage[]
@@ -152,7 +152,7 @@ model LivingSpace {
   type                LivingSpaceType        @default(unit)
   beds                Int                    @default(0)
   baths               Float                  @default(0)
-  footage             Float                  @default(0)
+  size                String                 @default("0")
   deleted             Boolean                @default(false)
   leases              Lease[]
   images              LivingSpaceImage[]

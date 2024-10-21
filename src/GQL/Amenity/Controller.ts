@@ -2,10 +2,15 @@ import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
 import { IGradiumImageType } from "GQL/Media/Types";
 import { MediaClient } from "Media/Client";
+import { Validators } from "Tools/Validators";
 import { Access } from "./Access";
 import type { IUpdateAmenity } from "./Types";
 
 export class AmenityController extends Access {
+  public static readonly FLOAT_KEYS: (keyof IUpdateAmenity)[] = [
+    "price",
+    "size",
+  ];
   public static fetchAll = async (propertyId: number) => {
     return Prisma.transact(client => {
       return client.amenity.findMany({
@@ -30,6 +35,7 @@ export class AmenityController extends Access {
     id,
     ...data
   }: Omit<IUpdateAmenity, "organizationId">) => {
+    this.validate(data);
     return Prisma.transact(client => {
       return client.amenity.upsert({
         where: {
@@ -83,4 +89,16 @@ export class AmenityController extends Access {
       return deletedAmenity;
     });
   };
+
+  private static validate(space: Partial<IUpdateAmenity>) {
+    for (const key of this.FLOAT_KEYS) {
+      if (key in space) {
+        if (!Validators.validateFloat(space[key])) {
+          throw new GraphQLError(
+            `The value specified for <strong>${key}</strong> is invalid`,
+          );
+        }
+      }
+    }
+  }
 }

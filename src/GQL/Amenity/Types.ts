@@ -1,6 +1,5 @@
 import {
   GraphQLEnumType,
-  GraphQLFloat,
   GraphQLInt,
   GraphQLObjectType,
   GraphQLString,
@@ -13,10 +12,10 @@ import type { Context } from "Types/GraphQL";
 export interface IAmenity {
   id: number;
   name: string;
-  price: number;
+  price: string;
   open: string;
   close: string;
-  footage: number;
+  size: string;
   billed: IBillFrequency;
   images: IGradiumImage[];
   floorPlans: IGradiumImage[];
@@ -26,10 +25,10 @@ export interface IAmenity {
 export interface IUpdateAmenity extends IdentifyProperty {
   id?: number;
   name: string;
-  price: number;
+  price: string;
   open: string;
   close: string;
-  footage: number;
+  size: string;
   billed: IBillFrequency;
 }
 
@@ -66,7 +65,7 @@ export const Amenity = new GraphQLObjectType<IAmenity, Context>({
       resolve: space => space.name,
     },
     price: {
-      type: SchemaBuilder.nonNull(GraphQLFloat),
+      type: SchemaBuilder.nonNull(GraphQLString),
       resolve: space => space.price,
     },
     billed: {
@@ -81,9 +80,9 @@ export const Amenity = new GraphQLObjectType<IAmenity, Context>({
       type: SchemaBuilder.nonNull(GraphQLString),
       resolve: space => space.close,
     },
-    footage: {
-      type: SchemaBuilder.nonNull(GraphQLFloat),
-      resolve: space => space.footage,
+    size: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: space => space.size,
     },
     propertyId: {
       type: SchemaBuilder.nonNull(GraphQLInt),

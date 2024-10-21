@@ -1,9 +1,4 @@
-import {
-  type GraphQLFieldConfig,
-  GraphQLFloat,
-  GraphQLInt,
-  GraphQLString,
-} from "graphql";
+import { type GraphQLFieldConfig, GraphQLInt, GraphQLString } from "graphql";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -64,10 +59,10 @@ export const createOrUpdateAmenity: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLString),
     },
     price: {
-      type: SchemaBuilder.nonNull(GraphQLFloat),
+      type: SchemaBuilder.nonNull(GraphQLString),
     },
-    footage: {
-      type: SchemaBuilder.nonNull(GraphQLFloat),
+    size: {
+      type: SchemaBuilder.nonNull(GraphQLString),
     },
   },
   resolve: (_, { organizationId, ...rest }, context) => {

@@ -5,7 +5,7 @@ export class Access {
     beds: true,
     type: true,
     baths: true,
-    footage: true,
+    size: true,
     propertyId: true,
     images: {
       select: {

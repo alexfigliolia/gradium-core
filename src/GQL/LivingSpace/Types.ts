@@ -17,19 +17,19 @@ export interface ILivingSpace {
   type: ILivingSpaceType;
   beds: number;
   baths: number;
-  footage: number;
+  size: string;
   propertyId: number;
   images: IGradiumImage;
   floorPlans: IGradiumImage;
 }
 
-export interface IUpdateProperty extends IdentifyProperty {
+export interface IUpdateLivingSpace extends IdentifyProperty {
   id?: number;
   name: string;
   type: ILivingSpaceType;
   beds: number;
   baths: number;
-  footage: number;
+  size: string;
 }
 
 export interface IDeleteLivingSpace extends IdentifyProperty {
@@ -71,9 +71,9 @@ export const LivingSpace = new GraphQLObjectType<ILivingSpace, Context>({
       type: SchemaBuilder.nonNull(GraphQLFloat),
       resolve: space => space.baths,
     },
-    footage: {
-      type: SchemaBuilder.nonNull(GraphQLFloat),
-      resolve: space => space.footage,
+    size: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: space => space.size,
     },
     propertyId: {
       type: SchemaBuilder.nonNull(GraphQLInt),

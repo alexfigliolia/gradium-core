@@ -9,7 +9,7 @@ import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { LivingSpaceController } from "./Controller";
-import type { IDeleteLivingSpace, IUpdateProperty } from "./Types";
+import type { IDeleteLivingSpace, IUpdateLivingSpace } from "./Types";
 import { LivingSpace, LivingSpaceType } from "./Types";
 
 export const getLivingSpaces: GraphQLFieldConfig<
@@ -41,7 +41,7 @@ export const getLivingSpaces: GraphQLFieldConfig<
 export const createOrUpdateLivingSpace: GraphQLFieldConfig<
   any,
   Context,
-  IUpdateProperty
+  IUpdateLivingSpace
 > = {
   type: SchemaBuilder.nonNull(LivingSpace),
   args: {
@@ -66,8 +66,8 @@ export const createOrUpdateLivingSpace: GraphQLFieldConfig<
     baths: {
       type: SchemaBuilder.nonNull(GraphQLFloat),
     },
-    footage: {
-      type: SchemaBuilder.nonNull(GraphQLFloat),
+    size: {
+      type: SchemaBuilder.nonNull(GraphQLString),
     },
   },
   resolve: (_, { organizationId, ...rest }, context) => {
