@@ -35,7 +35,7 @@ model Expense {
 model TaskImage {
   id     Int            @id @unique @default(autoincrement())
   url    String
-  task   ManagementTask @relation(fields: [taskId], references: [id])
+  task   ManagementTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId Int
 }
 
@@ -105,14 +105,14 @@ model AmenityReservation {
 model AmenityFloorPlan {
   id        Int     @id @unique @default(autoincrement())
   url       String
-  amenity   Amenity @relation(fields: [amenityId], references: [id])
+  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade)
   amenityId Int
 }
 
 model AmenityImage {
   id        Int     @id @unique @default(autoincrement())
   url       String
-  amenity   Amenity @relation(fields: [amenityId], references: [id])
+  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade)
   amenityId Int
 }
 
@@ -135,14 +135,14 @@ model Amenity {
 model LivingSpaceImage {
   id            Int         @id @unique @default(autoincrement())
   url           String
-  livingSpace   LivingSpace @relation(fields: [livingSpaceId], references: [id])
+  livingSpace   LivingSpace @relation(fields: [livingSpaceId], references: [id], onDelete: Cascade)
   livingSpaceId Int
 }
 
 model LivingSpaceFloorPlan {
   id            Int         @id @unique @default(autoincrement())
   url           String
-  livingSpace   LivingSpace @relation(fields: [livingSpaceId], references: [id])
+  livingSpace   LivingSpace @relation(fields: [livingSpaceId], references: [id], onDelete: Cascade)
   livingSpaceId Int
 }
 
