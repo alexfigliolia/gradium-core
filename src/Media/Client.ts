@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import type { IDestroySignature, IGradiumImage } from "GQL/Media/Types";
 import { IGradiumImageType } from "GQL/Media/Types";
 import { SecretManager } from "Secrets/Manager";
 
@@ -96,12 +97,56 @@ export class MediaClient {
     };
   };
 
+  public static destroyAssets(
+    type: IGradiumImageType,
+    ...images: IGradiumImage[]
+  ) {
+    return Promise.all(
+      images.map(image => this.destroyAsset(type, this.toPublicID(image.url))),
+    );
+  }
+
+  private static async destroyAsset(type: IGradiumImageType, publicId: string) {
+    const signature = await this.signDestroy(type, publicId);
+    const { name, ...rest } = signature;
+    const data = new FormData();
+    for (const K in rest) {
+      const key = K as keyof Omit<IDestroySignature, "__typename" | "name">;
+      data.append(key, rest[key].toString());
+    }
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${name}/image/destroy`,
+      {
+        method: "POST",
+        body: data,
+      },
+    );
+    if (!response.ok) {
+      throw "Failed to destroy cloudinary asset";
+    }
+    const json = await response.json();
+    if (json?.result === "not found") {
+      throw "Failed to destroy cloudinary asset";
+    }
+    return json;
+  }
+
   private static getAssetDesination(type: IGradiumImageType) {
     const tokens: string[] = ["gradium"];
     if (!(type in this.directoryMap)) {
       throw new Error("Media Client: Unknown image type");
     }
     tokens.push(this.directoryMap[type]);
+    return tokens.join("/");
+  }
+
+  private static toPublicID(url: string) {
+    const tokens = url.split("/").slice(-3);
+    const file = tokens
+      .pop()!
+      .replace(/([^.]+$)/, "")
+      .slice(0, -1);
+    tokens.push(file);
     return tokens.join("/");
   }
 }

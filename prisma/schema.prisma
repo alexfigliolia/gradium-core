@@ -124,9 +124,9 @@ model Amenity {
   close               String               @default("9pm")
   footage             Float                @default(0)
   billed              BillFrequency        @default(hour)
+  deleted             Boolean              @default(false)
   images              AmenityImage[]
   floorPlans          AmenityFloorPlan[]
-  deleted             Boolean              @default(false)
   property            Property             @relation(fields: [propertyId], references: [id])
   propertyId          Int
   amenityReservations AmenityReservation[]
@@ -160,8 +160,6 @@ model LivingSpace {
   floorPlans          LivingSpaceFloorPlan[]
   property            Property               @relation(fields: [propertyId], references: [id])
   propertyId          Int
-
-  @@unique([propertyId, name])
 }
 
 model PropertyAddon {

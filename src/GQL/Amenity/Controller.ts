@@ -1,4 +1,7 @@
+import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
+import { IGradiumImageType } from "GQL/Media/Types";
+import { MediaClient } from "Media/Client";
 import { Access } from "./Access";
 import type { IUpdateAmenity } from "./Types";
 
@@ -40,12 +43,44 @@ export class AmenityController extends Access {
   };
 
   public static delete = (id: number) => {
-    return Prisma.transact(client => {
-      return client.amenity.update({
+    return Prisma.transact(async client => {
+      const amenity = await client.amenity.findUnique({
         where: { id },
-        data: { deleted: true },
+        select: {
+          _count: {
+            select: {
+              amenityReservations: true,
+            },
+          },
+        },
+      });
+      if (!amenity) {
+        throw new GraphQLError(
+          "This amenity has already been deleted. Please refresh your page",
+        );
+      }
+      if (amenity._count.amenityReservations) {
+        return client.amenity.update({
+          where: { id },
+          data: { deleted: true },
+          select: this.BASIC_SELECTION,
+        });
+      }
+      const deletedAmenity = await client.amenity.delete({
+        where: { id },
         select: this.BASIC_SELECTION,
       });
+      await Promise.all([
+        MediaClient.destroyAssets(
+          IGradiumImageType.amenityImage,
+          ...deletedAmenity.images,
+        ),
+        MediaClient.destroyAssets(
+          IGradiumImageType.amenityFloorPlan,
+          ...deletedAmenity.floorPlans,
+        ),
+      ]);
+      return deletedAmenity;
     });
   };
 }
