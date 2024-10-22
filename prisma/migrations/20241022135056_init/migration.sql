@@ -19,6 +19,9 @@ CREATE TYPE "TaskPriority" AS ENUM ('immediate', 'high', 'low');
 -- CreateEnum
 CREATE TYPE "ManagementTaskStatus" AS ENUM ('incomplete', 'inProgress', 'blocked', 'complete');
 
+-- CreateEnum
+CREATE TYPE "PropertyAddonType" AS ENUM ('packageManagement', 'amenityReservations', 'propertyEvents', 'leaseManagement', 'hoaManagement');
+
 -- CreateTable
 CREATE TABLE "ExpenseAttachment" (
     "id" SERIAL NOT NULL,
@@ -32,9 +35,10 @@ CREATE TABLE "ExpenseAttachment" (
 CREATE TABLE "Expense" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "cost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "cost" TEXT NOT NULL DEFAULT '0',
     "title" TEXT NOT NULL DEFAULT '',
     "description" TEXT NOT NULL DEFAULT '',
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
 );
@@ -56,6 +60,7 @@ CREATE TABLE "ManagementTask" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "organizationId" INTEGER NOT NULL,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
     "personId" INTEGER NOT NULL,
     "propertyId" INTEGER,
     "priority" "TaskPriority" NOT NULL DEFAULT 'high',
@@ -85,6 +90,7 @@ CREATE TABLE "Lease" (
     "price" DOUBLE PRECISION NOT NULL,
     "status" "LeaseStatus" NOT NULL,
     "paymentFrequency" "RentPaymentFrequency" NOT NULL,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
     "organizationId" INTEGER NOT NULL,
     "propertyId" INTEGER NOT NULL,
     "livingSpaceId" INTEGER NOT NULL,
@@ -126,12 +132,13 @@ CREATE TABLE "AmenityImage" (
 -- CreateTable
 CREATE TABLE "Amenity" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
-    "open" TEXT NOT NULL,
-    "close" TEXT NOT NULL,
-    "footage" TEXT NOT NULL DEFAULT '',
-    "billed" "BillFrequency" NOT NULL,
+    "name" TEXT NOT NULL DEFAULT '',
+    "price" TEXT NOT NULL DEFAULT '0',
+    "open" TEXT NOT NULL DEFAULT '9am',
+    "close" TEXT NOT NULL DEFAULT '9pm',
+    "size" TEXT NOT NULL DEFAULT '0',
+    "billed" "BillFrequency" NOT NULL DEFAULT 'hour',
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
 
     CONSTRAINT "Amenity_pkey" PRIMARY KEY ("id")
@@ -158,14 +165,24 @@ CREATE TABLE "LivingSpaceFloorPlan" (
 -- CreateTable
 CREATE TABLE "LivingSpace" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "type" "LivingSpaceType" NOT NULL,
-    "beds" INTEGER NOT NULL,
-    "baths" DOUBLE PRECISION NOT NULL,
-    "footage" TEXT NOT NULL DEFAULT '',
+    "name" TEXT NOT NULL DEFAULT '',
+    "type" "LivingSpaceType" NOT NULL DEFAULT 'unit',
+    "beds" INTEGER NOT NULL DEFAULT 0,
+    "baths" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "size" TEXT NOT NULL DEFAULT '0',
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
 
     CONSTRAINT "LivingSpace_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PropertyAddon" (
+    "id" SERIAL NOT NULL,
+    "type" "PropertyAddonType" NOT NULL,
+    "propertyId" INTEGER NOT NULL,
+
+    CONSTRAINT "PropertyAddon_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -178,25 +195,17 @@ CREATE TABLE "PropertyImage" (
 );
 
 -- CreateTable
-CREATE TABLE "PropertyFloorPlan" (
-    "id" SERIAL NOT NULL,
-    "url" TEXT NOT NULL,
-    "propertyId" INTEGER NOT NULL,
-
-    CONSTRAINT "PropertyFloorPlan_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Property" (
     "id" SERIAL NOT NULL,
     "slug" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "address1" TEXT NOT NULL,
-    "address2" TEXT NOT NULL,
-    "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
-    "zipCode" TEXT NOT NULL,
+    "address1" TEXT NOT NULL DEFAULT '',
+    "address2" TEXT NOT NULL DEFAULT '',
+    "city" TEXT NOT NULL DEFAULT '',
+    "state" TEXT NOT NULL DEFAULT '',
+    "zipCode" TEXT NOT NULL DEFAULT '',
     "mapsLink" TEXT NOT NULL DEFAULT '',
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
     "organizationId" INTEGER NOT NULL,
 
     CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
@@ -244,6 +253,7 @@ CREATE TABLE "Person" (
 CREATE TABLE "Organization" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL DEFAULT '',
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -256,6 +266,8 @@ CREATE TABLE "LinkedEmail" (
     "email" TEXT NOT NULL,
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "userId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "LinkedEmail_pkey" PRIMARY KEY ("id")
 );
@@ -267,6 +279,7 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -329,16 +342,16 @@ CREATE UNIQUE INDEX "LivingSpaceFloorPlan_id_key" ON "LivingSpaceFloorPlan"("id"
 CREATE UNIQUE INDEX "LivingSpace_id_key" ON "LivingSpace"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "PropertyAddon_id_key" ON "PropertyAddon"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PropertyAddon_propertyId_type_key" ON "PropertyAddon"("propertyId", "type");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "PropertyImage_id_key" ON "PropertyImage"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PropertyFloorPlan_id_key" ON "PropertyFloorPlan"("id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Property_id_key" ON "Property"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Property_slug_key" ON "Property"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "StaffInvite_id_key" ON "StaffInvite"("id");
@@ -389,7 +402,7 @@ CREATE INDEX "_PropertyToStaffProfile_B_index" ON "_PropertyToStaffProfile"("B")
 ALTER TABLE "ExpenseAttachment" ADD CONSTRAINT "ExpenseAttachment_expenseId_fkey" FOREIGN KEY ("expenseId") REFERENCES "Expense"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TaskImage" ADD CONSTRAINT "TaskImage_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "ManagementTask"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TaskImage" ADD CONSTRAINT "TaskImage_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "ManagementTask"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -428,28 +441,28 @@ ALTER TABLE "AmenityReservation" ADD CONSTRAINT "AmenityReservation_amenityId_fk
 ALTER TABLE "AmenityReservation" ADD CONSTRAINT "AmenityReservation_livingSpaceId_fkey" FOREIGN KEY ("livingSpaceId") REFERENCES "LivingSpace"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AmenityFloorPlan" ADD CONSTRAINT "AmenityFloorPlan_amenityId_fkey" FOREIGN KEY ("amenityId") REFERENCES "Amenity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AmenityFloorPlan" ADD CONSTRAINT "AmenityFloorPlan_amenityId_fkey" FOREIGN KEY ("amenityId") REFERENCES "Amenity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AmenityImage" ADD CONSTRAINT "AmenityImage_amenityId_fkey" FOREIGN KEY ("amenityId") REFERENCES "Amenity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AmenityImage" ADD CONSTRAINT "AmenityImage_amenityId_fkey" FOREIGN KEY ("amenityId") REFERENCES "Amenity"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Amenity" ADD CONSTRAINT "Amenity_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "LivingSpaceImage" ADD CONSTRAINT "LivingSpaceImage_livingSpaceId_fkey" FOREIGN KEY ("livingSpaceId") REFERENCES "LivingSpace"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "LivingSpaceImage" ADD CONSTRAINT "LivingSpaceImage_livingSpaceId_fkey" FOREIGN KEY ("livingSpaceId") REFERENCES "LivingSpace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "LivingSpaceFloorPlan" ADD CONSTRAINT "LivingSpaceFloorPlan_livingSpaceId_fkey" FOREIGN KEY ("livingSpaceId") REFERENCES "LivingSpace"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "LivingSpaceFloorPlan" ADD CONSTRAINT "LivingSpaceFloorPlan_livingSpaceId_fkey" FOREIGN KEY ("livingSpaceId") REFERENCES "LivingSpace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LivingSpace" ADD CONSTRAINT "LivingSpace_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PropertyImage" ADD CONSTRAINT "PropertyImage_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PropertyAddon" ADD CONSTRAINT "PropertyAddon_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PropertyFloorPlan" ADD CONSTRAINT "PropertyFloorPlan_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PropertyImage" ADD CONSTRAINT "PropertyImage_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Property" ADD CONSTRAINT "Property_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
