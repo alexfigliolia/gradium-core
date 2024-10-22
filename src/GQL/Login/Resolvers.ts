@@ -3,7 +3,8 @@ import {
   type GraphQLFieldConfig,
   GraphQLString,
 } from "graphql";
-import type { IEmail, ILogin, ISignUp } from "GQL/User/Types";
+import type { IEmail } from "GQL/LinkedEmail/Types";
+import type { ILogin, ISignUp } from "GQL/User/Types";
 import { LoggedInUser } from "GQL/User/Types";
 import { SessionsManager } from "Sessions/Manager";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
