@@ -5,6 +5,7 @@ import {
   deleteAmenity,
   getAmenities,
 } from "./Amenity/Resolvers";
+import { deleteEmail, linkEmail, updateEmail } from "./LinkedEmail/Resolvers";
 import {
   createOrUpdateLivingSpace,
   deleteLivingSpace,
@@ -30,13 +31,7 @@ import {
   updateBasicPropertyInfo,
 } from "./Property/Resolvers";
 import { inviteStaffMember } from "./Staff/Resolvers";
-import {
-  deleteEmail,
-  linkEmail,
-  resetPassword,
-  updateEmail,
-  userScope,
-} from "./User/Resolvers";
+import { resetPassword, userScope } from "./User/Resolvers";
 
 const QueryRoot = new GraphQLObjectType({
   name: "Query",

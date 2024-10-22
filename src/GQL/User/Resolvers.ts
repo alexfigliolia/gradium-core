@@ -9,8 +9,8 @@ import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { UserController } from "./Controller";
-import type { IdentifyEmail, IUpdateStringValue } from "./Types";
-import { BasicUser, LoggedInUser } from "./Types";
+import type { IUpdateStringValue } from "./Types";
+import { LoggedInUser } from "./Types";
 
 export const userScope: GraphQLFieldConfig<
   any,
@@ -23,64 +23,6 @@ export const userScope: GraphQLFieldConfig<
       throw new GraphQLError("You must be logged in to access user data");
     }
     return UserController.authenticatedUserScope(context.req.session.userID);
-  },
-};
-
-export const updateEmail: GraphQLFieldConfig<any, Context, IUpdateStringValue> =
-  {
-    type: SchemaBuilder.nonNull(BasicUser),
-    args: {
-      userId: {
-        type: SchemaBuilder.nonNull(GraphQLInt),
-      },
-      previous: {
-        type: SchemaBuilder.nonNull(GraphQLString),
-      },
-      next: {
-        type: SchemaBuilder.nonNull(GraphQLString),
-      },
-    },
-    resolve: (_, args, context) => {
-      const operation = UserController.createUserModifier(
-        UserController.updateEmail,
-      );
-      return operation(context.req, args);
-    },
-  };
-
-export const linkEmail: GraphQLFieldConfig<any, Context, IdentifyEmail> = {
-  type: SchemaBuilder.nonNull(BasicUser),
-  args: {
-    userId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    email: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-  },
-  resolve: (_, args, context) => {
-    const operation = UserController.createUserModifier(
-      UserController.linkEmail,
-    );
-    return operation(context.req, args);
-  },
-};
-
-export const deleteEmail: GraphQLFieldConfig<any, Context, IdentifyEmail> = {
-  type: SchemaBuilder.nonNull(BasicUser),
-  args: {
-    userId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    email: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-  },
-  resolve: (_, args, context) => {
-    const operation = UserController.createUserModifier(
-      UserController.deleteEmail,
-    );
-    return operation(context.req, args);
   },
 };
 

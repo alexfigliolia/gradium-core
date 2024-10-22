@@ -1,3 +1,4 @@
+import type { Request } from "express";
 import { GraphQLError } from "graphql";
 import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
@@ -103,4 +104,24 @@ export class Permission {
       return operation(...args);
     };
   }
+
+  public static createUserModifier<A extends { userId: number }>({
+    operation,
+    errorMessage,
+  }: IUserModifierTransaction<A>) {
+    return async (request: Request, args: A) => {
+      if (!Permission.matchesKnownUser(request.session, args.userId)) {
+        throw new GraphQLError(
+          errorMessage ||
+            "This operation can only be completed by the user that owns the underlying data",
+        );
+      }
+      await operation(args);
+    };
+  }
+}
+
+export interface IUserModifierTransaction<T extends { userId: number }> {
+  operation: (args: T) => any;
+  errorMessage?: string;
 }

@@ -1,15 +1,12 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import type { Role } from "@prisma/client";
+import { type IEmail, LinkedEmail } from "GQL/LinkedEmail/Types";
 import { RoleType } from "GQL/Roles/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, Identity } from "Types/GraphQL";
 
 export interface ID {
   id: number;
-}
-
-export interface IEmail {
-  email: string;
 }
 
 export interface ILogin extends IEmail {
@@ -25,10 +22,6 @@ export interface ISignUp extends ILogin {
   name: string;
 }
 
-export interface ILinkedEmail {
-  email: string;
-}
-
 export interface IUserAffiliation {
   organization: Identity;
   roles: Pick<Role, "role">[];
@@ -37,13 +30,8 @@ export interface IUserAffiliation {
 export interface ILoggedInUser {
   id: number;
   name: string;
-  emails: ILinkedEmail[];
+  emails: IEmail[];
   affiliations: IUserAffiliation[];
-}
-
-export interface IdentifyEmail {
-  userId: number;
-  email: string;
 }
 
 export interface IUpdateStringValue {
@@ -83,16 +71,6 @@ export const UserAffiliation = new GraphQLObjectType<IUserAffiliation, Context>(
     },
   },
 );
-
-export const LinkedEmail = new GraphQLObjectType<ILinkedEmail, Context>({
-  name: "LinkedEmail",
-  fields: {
-    email: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-      resolve: email => email.email,
-    },
-  },
-});
 
 export const BasicUser = new GraphQLObjectType<IBasicUser, Context>({
   name: "BasicUser",

@@ -1,10 +1,7 @@
 import { compare, hash } from "bcrypt";
-import type { Request } from "express";
 import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
-import { Permission } from "Tools/Permission";
-import { Validators } from "Tools/Validators";
-import type { ICreateUser, IdentifyEmail, IUpdateStringValue } from "./Types";
+import type { ICreateUser, IUpdateStringValue } from "./Types";
 
 export class UserController {
   public static readonly SALTS = 10;
@@ -31,75 +28,6 @@ export class UserController {
         data: {
           name,
           password,
-        },
-      });
-    });
-  }
-
-  public static async linkEmail({ userId, email }: IdentifyEmail) {
-    Validators.validateEmail(email);
-    return Prisma.transact(async client => {
-      const exists = await client.linkedEmail.findUnique({
-        where: {
-          userId,
-          email,
-        },
-        select: {
-          id: true,
-        },
-      });
-      if (exists) {
-        throw new GraphQLError(
-          "This email address is already registered to your account",
-        );
-      }
-      return client.linkedEmail.create({
-        data: {
-          userId,
-          email,
-        },
-        select: {
-          id: true,
-        },
-      });
-    });
-  }
-
-  public static async deleteEmail({ userId, email }: IdentifyEmail) {
-    Validators.validateEmail(email);
-    return Prisma.transact(client => {
-      return client.linkedEmail.delete({
-        where: {
-          userId,
-          email,
-        },
-        select: {
-          id: true,
-        },
-      });
-    });
-  }
-
-  public static async updateEmail({
-    userId,
-    previous,
-    next,
-  }: IUpdateStringValue) {
-    Validators.validateEmail(next);
-    if (previous === next) {
-      return;
-    }
-    return Prisma.transact(client => {
-      return client.linkedEmail.update({
-        where: {
-          userId,
-          email: previous,
-        },
-        data: {
-          email: next,
-        },
-        select: {
-          id: true,
         },
       });
     });
@@ -172,36 +100,5 @@ export class UserController {
         },
       });
     });
-  }
-
-  public static createUserModifier<A extends { userId: number }>(
-    callback: (args: A) => any,
-  ) {
-    return async (request: Request, args: A) => {
-      if (!Permission.matchesKnownUser(request.session, args.userId)) {
-        throw new GraphQLError(
-          "An email address may only be modified by the person that owns it",
-        );
-      }
-      await callback(args);
-      return Prisma.transact(client => {
-        return client.user.findUnique({
-          where: {
-            id: args.userId,
-          },
-          select: {
-            name: true,
-            emails: {
-              select: {
-                email: true,
-              },
-              orderBy: {
-                createdAt: "asc",
-              },
-            },
-          },
-        });
-      });
-    };
   }
 }
