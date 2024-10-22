@@ -7,7 +7,7 @@ import { Validators } from "Tools/Validators";
 import type { IdentifyEmail } from "./Types";
 
 export class LinkedEmailController {
-  public static async linkEmail({ userId, email }: IdentifyEmail) {
+  public static linkEmail = ({ userId, email }: IdentifyEmail) => {
     Validators.validateEmail(email);
     return Prisma.transact(async client => {
       if (await this.findUnique(userId, email)) {
@@ -25,7 +25,7 @@ export class LinkedEmailController {
         },
       });
     });
-  }
+  };
 
   public static async deleteEmail({ userId, email }: IdentifyEmail) {
     Validators.validateEmail(email);
