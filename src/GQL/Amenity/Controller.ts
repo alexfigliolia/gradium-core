@@ -55,7 +55,7 @@ export class AmenityController extends Access {
         select: {
           _count: {
             select: {
-              amenityReservations: true,
+              reservations: true,
             },
           },
         },
@@ -65,7 +65,7 @@ export class AmenityController extends Access {
           "This amenity has already been deleted. Please refresh your page",
         );
       }
-      if (amenity._count.amenityReservations) {
+      if (amenity._count.reservations) {
         return client.amenity.update({
           where: { id },
           data: { deleted: true },

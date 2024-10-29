@@ -14,4 +14,9 @@ export interface Identity extends DBID {
   name: string;
 }
 
+export interface IPagination {
+  limit: number;
+  cursor?: number;
+}
+
 export type Session = ISession & Partial<SessionData>;

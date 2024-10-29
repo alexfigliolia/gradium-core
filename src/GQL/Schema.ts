@@ -25,6 +25,7 @@ import {
   saveImage,
 } from "./Media/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
+import { listPeople } from "./Person/Resolvers";
 import {
   adminBasicPropertiesList,
   createProperty,
@@ -37,6 +38,7 @@ const QueryRoot = new GraphQLObjectType({
   name: "Query",
   fields: {
     userScope,
+    listPeople,
     getAmenities,
     verifySession,
     getLivingSpaces,

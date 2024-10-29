@@ -53,7 +53,6 @@ export class LivingSpaceController extends Access {
           _count: {
             select: {
               leases: true,
-              amenityReservations: true,
             },
           },
         },
@@ -63,7 +62,7 @@ export class LivingSpaceController extends Access {
           "This space has already been deleted. Please refresh your page.",
         );
       }
-      if (space._count.leases || space._count.amenityReservations) {
+      if (space._count.leases) {
         return client.livingSpace.update({
           where: { id },
           data: { deleted: true },
