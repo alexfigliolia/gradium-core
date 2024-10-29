@@ -4,10 +4,10 @@ import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { PersonController } from "./Controller";
-import { Person } from "./Types";
+import { PaginatedPeople } from "./Types";
 
 export const listPeople: GraphQLFieldConfig<any, Context, any> = {
-  type: SchemaBuilder.nonNullArray(Person),
+  type: SchemaBuilder.nonNull(PaginatedPeople),
   args: {
     organizationId: {
       type: SchemaBuilder.nonNull(GraphQLInt),

@@ -30,3 +30,24 @@ export const Person = new GraphQLObjectType<IPerson, Context>({
     },
   },
 });
+
+export interface IPaginatedPeople {
+  cursor?: number;
+  list: IPerson[];
+}
+
+export const PaginatedPeople = new GraphQLObjectType<IPaginatedPeople, Context>(
+  {
+    name: "PaginatedPeople",
+    fields: {
+      cursor: {
+        type: GraphQLInt,
+        resolve: p => p.cursor,
+      },
+      list: {
+        type: SchemaBuilder.nonNullArray(Person),
+        resolve: p => p.list,
+      },
+    },
+  },
+);
