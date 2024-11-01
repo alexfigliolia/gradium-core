@@ -21,6 +21,16 @@ model ExpenseAttachment {
   expenseId Int
 }
 
+model ReservationCharge {
+  id            Int                @id @unique @default(autoincrement())
+  createdAt     DateTime           @default(now())
+  amount        Float
+  person        Person             @relation(fields: [personId], references: [id])
+  personId      Int
+  reservation   AmenityReservation @relation(fields: [reservationId], references: [id])
+  reservationId Int
+}
+
 model Expense {
   id          Int                 @id @unique @default(autoincrement())
   createdAt   DateTime            @default(now())
@@ -91,16 +101,15 @@ model Lease {
 }
 
 model AmenityReservation {
-  id                   Int      @id @unique @default(autoincrement())
-  price                Float
-  date                 DateTime
-  start                String
-  end                  String
-  amenity              Amenity  @relation(fields: [amenityId], references: [id])
-  amenityId            Int
-  person               Person   @relation(fields: [personOrganizationId, personUserId], references: [organizationId, userId])
-  personOrganizationId Int
-  personUserId         Int
+  id        Int                 @id @unique @default(autoincrement())
+  date      DateTime
+  start     String
+  end       String
+  amenity   Amenity             @relation(fields: [amenityId], references: [id])
+  amenityId Int
+  person    Person              @relation(fields: [personId], references: [id])
+  personId  Int
+  charges   ReservationCharge[]
 }
 
 model AmenityFloorPlan {
@@ -226,7 +235,7 @@ model StaffProfile {
 }
 
 model Person {
-  id                  Int                  @unique @default(autoincrement())
+  id                  Int                  @id @unique @default(autoincrement())
   organization        Organization         @relation(fields: [organizationId], references: [id])
   organizationId      Int
   user                User                 @relation(fields: [userId], references: [id])
@@ -238,8 +247,9 @@ model Person {
   linkedEmail         LinkedEmail          @relation(fields: [linkedEmailId], references: [id])
   linkedEmailId       Int
   amenityReservations AmenityReservation[]
+  reservationCharges  ReservationCharge[]
 
-  @@id(name: "identity", [organizationId, userId])
+  @@unique(name: "identity", [organizationId, userId])
 }
 
 model Organization {
