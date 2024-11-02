@@ -41,8 +41,13 @@ export class AmenityReservationController extends Access {
 
   public static createAmenityReservation = async (
     payload: Omit<ICreateReservation, "propertyId" | "organizationId">,
+    language: string,
   ) => {
-    const { price, billed } = await this.validateConstraints(payload, "create");
+    const { price, billed } = await this.validateConstraints(
+      payload,
+      "create",
+      language,
+    );
     const { charge = true, ...data } = payload;
     const { start, end } = data;
     return Prisma.transact(async client => {
@@ -70,8 +75,13 @@ export class AmenityReservationController extends Access {
 
   public static updateAmenityReservation = async (
     payload: Omit<IUpdateReservation, "propertyId" | "organizationId">,
+    language: string,
   ) => {
-    const { price, billed } = await this.validateConstraints(payload, "modify");
+    const { price, billed } = await this.validateConstraints(
+      payload,
+      "modify",
+      language,
+    );
     const { id, charge = true, ...data } = payload;
     const { start, end } = data;
     return Prisma.transact(async client => {
@@ -173,6 +183,7 @@ export class AmenityReservationController extends Access {
   private static async validateConstraints(
     payload: Omit<ICreateReservation, "propertyId" | "organizationId">,
     action: "create" | "modify",
+    language: string,
   ) {
     const { start, end, date, amenityId } = payload;
     if (this.toDate(start, new Date(date)).getTime() < Date.now()) {
@@ -195,6 +206,7 @@ export class AmenityReservationController extends Access {
       end,
       constraints.open,
       constraints.close,
+      language,
     );
     if (error) {
       throw new GraphQLError(error);
@@ -241,6 +253,7 @@ export class AmenityReservationController extends Access {
     end: string,
     open: string,
     close: string,
+    language: string,
   ) {
     const startTime = AmenityController.timeToInt(start);
     const endTime = AmenityController.timeToInt(end);
@@ -249,11 +262,11 @@ export class AmenityReservationController extends Access {
     }
     const openTime = AmenityController.timeToInt(open);
     if (startTime < openTime) {
-      return `Your reservation's start time cannot be before ${open.slice(0, -2)}`;
+      return `Your reservation's start time cannot be before <strong>${this.toLocaleTimeString(language, open)}</strong>`;
     }
     const closeTime = AmenityController.timeToInt(close);
     if (endTime > closeTime) {
-      return `Your reservation's end time cannot be after ${close.slice(0, -2)}`;
+      return `Your reservation's end time cannot be after <strong>${this.toLocaleTimeString(language, open)}</strong>`;
     }
   }
 
@@ -269,6 +282,17 @@ export class AmenityReservationController extends Access {
     date.setSeconds(0);
     date.setMilliseconds(0);
     return date;
+  }
+
+  private static toLocaleTimeString(
+    language: string,
+    time: string,
+    date = new Date(),
+  ) {
+    return this.toDate(time, date).toLocaleTimeString(language, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   private static getBillFrequency(frequency: BillFrequency) {
