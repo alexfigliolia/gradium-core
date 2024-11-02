@@ -1,6 +1,7 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import { type IPropertyAddon, PropertyAddon } from "GQL/Addons/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
+import type { IOrganizationID } from "GQL/Organization/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
@@ -21,9 +22,8 @@ interface IAdminBasicProperty extends IBasicPropertyInfo {
   images: IGradiumImage[];
 }
 
-export interface IdentifyProperty {
+export interface IdentifyProperty extends IOrganizationID {
   propertyId: number;
-  organizationId: number;
 }
 
 export interface IUpdateBasicPropertyInfo

@@ -4,6 +4,7 @@ import {
   GraphQLInt,
   GraphQLString,
 } from "graphql";
+import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -18,14 +19,7 @@ export const getLivingSpaces: GraphQLFieldConfig<
   IdentifyProperty
 > = {
   type: SchemaBuilder.nonNullArray(LivingSpace),
-  args: {
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-  },
+  args: IdentifyPropertyArgs,
   resolve: (_, { organizationId, propertyId }, context) => {
     const operation = Permission.permissedTransaction({
       organizationId,
@@ -45,12 +39,7 @@ export const createOrUpdateLivingSpace: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(LivingSpace),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     id: {
       type: GraphQLInt,
     },
@@ -94,12 +83,7 @@ export const deleteLivingSpace: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(LivingSpace),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     id: {
       type: SchemaBuilder.nonNull(GraphQLInt),
     },

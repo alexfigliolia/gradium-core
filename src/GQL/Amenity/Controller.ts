@@ -11,6 +11,7 @@ export class AmenityController extends Access {
     "price",
     "size",
   ];
+
   public static fetchAll = async (propertyId: number) => {
     return Prisma.transact(client => {
       return client.amenity.findMany({
@@ -90,15 +91,76 @@ export class AmenityController extends Access {
     });
   };
 
+  public static validateStartEndTimes(
+    start: string,
+    end: string,
+    error: string,
+  ) {
+    if (!start || !end) {
+      throw new GraphQLError(error);
+    }
+    if (this.timeToInt(start) >= this.timeToInt(end)) {
+      throw new GraphQLError(error);
+    }
+  }
+
+  public static getParameters(id: number) {
+    return Prisma.transact(client => {
+      return client.amenity.findUnique({
+        where: { id },
+        select: {
+          open: true,
+          close: true,
+          price: true,
+          billed: true,
+        },
+      });
+    });
+  }
+
+  public static getIDs(propertyId: number) {
+    return Prisma.transact(async client => {
+      const result = await client.property.findUnique({
+        where: { id: propertyId },
+        select: {
+          amenities: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      if (!result) {
+        return [];
+      }
+      return result.amenities.map(a => a.id);
+    });
+  }
+
+  public static timeToInt(time: string) {
+    return parseInt(time.split(":").join("") || "0");
+  }
+
   private static validate(space: Partial<IUpdateAmenity>) {
     for (const key of this.FLOAT_KEYS) {
       if (key in space) {
         if (!Validators.validateFloat(space[key])) {
-          throw new GraphQLError(
-            `The value specified for <strong>${key}</strong> is invalid`,
-          );
+          throw new GraphQLError(this.saveError(key, space.name));
         }
       }
     }
+    const { open = "09:00:00", close = "21:00:00" } = space;
+    this.validateStartEndTimes(
+      open,
+      close,
+      "An amenity must open prior to it closing",
+    );
+  }
+
+  private static saveError(key: string, name?: string) {
+    if (name) {
+      return `<strong>${name}</strong> didn't save properly. Please check the value for <strong>${key}</strong>.`;
+    }
+    return `Your amenity didn't save property. Please check the value for <strong>${key}</strong>.`;
   }
 }

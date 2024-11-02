@@ -1,4 +1,5 @@
 import { type GraphQLFieldConfig, GraphQLInt } from "graphql";
+import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
@@ -13,12 +14,7 @@ export const modifyPropertyAddons: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNullArray(PropertyAddon),
   args: {
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     additions: {
       type: SchemaBuilder.nonNullArray(PropertyAddonType),
     },

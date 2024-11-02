@@ -105,6 +105,7 @@ model AmenityReservation {
   date      DateTime
   start     String
   end       String
+  cancelled Boolean             @default(false)
   amenity   Amenity             @relation(fields: [amenityId], references: [id])
   amenityId Int
   person    Person              @relation(fields: [personId], references: [id])

@@ -5,6 +5,12 @@ import {
   deleteAmenity,
   getAmenities,
 } from "./Amenity/Resolvers";
+import {
+  cancelAmenityReservation,
+  createAmenityReservation,
+  fetchAmenityReservations,
+  updateAmenityReservation,
+} from "./AmenityReservation/Resolvers";
 import { deleteEmail, linkEmail, updateEmail } from "./LinkedEmail/Resolvers";
 import {
   createOrUpdateLivingSpace,
@@ -42,6 +48,7 @@ const QueryRoot = new GraphQLObjectType({
     getAmenities,
     verifySession,
     getLivingSpaces,
+    fetchAmenityReservations,
     generateUploadSignature,
     generateDestroySignature,
     adminBasicPropertiesList,
@@ -69,6 +76,9 @@ const MutationRoot = new GraphQLObjectType({
     modifyPropertyAddons,
     createOrUpdateAmenity,
     updateBasicPropertyInfo,
+    createAmenityReservation,
+    cancelAmenityReservation,
+    updateAmenityReservation,
     createOrUpdateLivingSpace,
   },
 });

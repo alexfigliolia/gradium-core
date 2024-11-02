@@ -91,11 +91,16 @@ export class LivingSpaceController extends Access {
     for (const key of this.FLOAT_KEYS) {
       if (key in space) {
         if (!Validators.validateFloat(space[key])) {
-          throw new GraphQLError(
-            `The value specified for <strong>${key}</strong> is invalid`,
-          );
+          throw new GraphQLError(this.saveError(key, space.name));
         }
       }
     }
+  }
+
+  private static saveError(key: string, name?: string) {
+    if (name) {
+      return `<strong>${name}</strong> didn't save properly. Please check the value for <strong>${key}</strong>.`;
+    }
+    return `Your amenity didn't save property. Please check the value for <strong>${key}</strong>.`;
   }
 }

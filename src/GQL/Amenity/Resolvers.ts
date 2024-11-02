@@ -1,4 +1,5 @@
 import { type GraphQLFieldConfig, GraphQLInt, GraphQLString } from "graphql";
+import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -10,14 +11,7 @@ import { Amenity, BillFrequency } from "./Types";
 export const getAmenities: GraphQLFieldConfig<any, Context, IdentifyProperty> =
   {
     type: SchemaBuilder.nonNullArray(Amenity),
-    args: {
-      propertyId: {
-        type: SchemaBuilder.nonNull(GraphQLInt),
-      },
-      organizationId: {
-        type: SchemaBuilder.nonNull(GraphQLInt),
-      },
-    },
+    args: IdentifyPropertyArgs,
     resolve: (_, { organizationId, propertyId }, context) => {
       const operation = Permission.permissedTransaction({
         organizationId,
@@ -37,12 +31,7 @@ export const createOrUpdateAmenity: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(Amenity),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     id: {
       type: GraphQLInt,
     },
@@ -85,12 +74,7 @@ export const createOrUpdateAmenity: GraphQLFieldConfig<
 export const deleteAmenity: GraphQLFieldConfig<any, Context, IDeleteAmenity> = {
   type: SchemaBuilder.nonNull(Amenity),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     id: {
       type: SchemaBuilder.nonNull(GraphQLInt),
     },

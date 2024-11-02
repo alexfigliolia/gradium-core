@@ -1,8 +1,12 @@
 import type { Request } from "express";
 import { GraphQLError } from "graphql";
 import { PersonRole } from "@prisma/client";
-import { Prisma } from "DB/Client";
-import type { Session } from "Types/GraphQL";
+import { PersonController } from "GQL/Person/Controller";
+import type {
+  IPermissedPropertyTransaction,
+  IPermissedTransaction,
+  Session,
+} from "Types/GraphQL";
 
 export class Permission {
   public static MANAGER_OWNER_PERMISSION_ERROR = `You do not have permission to update this organization. To request permission, go to your account settings and request "manager" or "owner" permissions`;
@@ -40,42 +44,20 @@ export class Permission {
 
   public static async hasOrganizationPermissions(
     session: Session,
-    org: number,
+    organizationId: number,
     ...permissions: PersonRole[]
   ) {
-    if (!this.hasOrgAccess(session, org)) {
+    if (!this.hasOrgAccess(session, organizationId)) {
       return false;
     }
-    const person = await Prisma.transact(client => {
-      return client.person.findUnique({
-        where: {
-          identity: {
-            userId: session.userID,
-            organizationId: org,
-          },
-        },
-        select: {
-          roles: {
-            select: {
-              role: true,
-            },
-          },
-        },
-      });
-    });
+    const person = await PersonController.fetchPerson(
+      organizationId,
+      session.userID,
+    );
     if (!person) {
       return false;
     }
-    const perms: Set<PersonRole>[] = [];
-    for (const { role } of person.roles) {
-      perms.push(this.permissions[role]);
-    }
-    for (const permission of permissions) {
-      if (perms.some(set => set.has(permission))) {
-        return true;
-      }
-    }
-    return false;
+    return this.matchesRolePermissions(person.roles, permissions);
   }
 
   public static permissedTransaction<F extends (...args: any[]) => any>({
@@ -84,13 +66,7 @@ export class Permission {
     organizationId,
     permissions = [PersonRole.manager],
     errorMessage = "You do not have permission to modify this organization's data",
-  }: {
-    operation: F;
-    session: Session;
-    errorMessage?: string;
-    organizationId: number;
-    permissions?: PersonRole[];
-  }) {
+  }: IPermissedTransaction<F>) {
     return async (...args: Parameters<F>): Promise<ReturnType<F>> => {
       if (
         !(await Permission.hasOrganizationPermissions(
@@ -99,6 +75,39 @@ export class Permission {
           ...permissions,
         ))
       ) {
+        throw new GraphQLError(errorMessage);
+      }
+      return operation(...args);
+    };
+  }
+
+  public static permissedPropertyTransaction<
+    F extends (...args: any[]) => any,
+  >({
+    session,
+    operation,
+    propertyId,
+    organizationId,
+    permissions = [PersonRole.manager],
+    errorMessage = "You do not have permission to modify this property's data",
+  }: IPermissedPropertyTransaction<F>) {
+    return async (...args: Parameters<F>): Promise<ReturnType<F>> => {
+      if (!this.hasOrgAccess(session, organizationId)) {
+        throw new GraphQLError(errorMessage);
+      }
+      const person = await PersonController.fetchPerson(
+        organizationId,
+        session.userID,
+        PersonController.ROLE_AND_PROPERTY_ACCESS,
+      );
+      if (!person || !this.matchesRolePermissions(person.roles, permissions)) {
+        throw new GraphQLError(errorMessage);
+      }
+      if (this.matchesRolePermissions(person.roles, [PersonRole.owner])) {
+        return operation(...args);
+      }
+      const access = person.staffProfile?.propertyAccess || [];
+      if (!access.some(({ id }) => id === propertyId)) {
         throw new GraphQLError(errorMessage);
       }
       return operation(...args);
@@ -118,6 +127,24 @@ export class Permission {
       }
       await operation(args);
     };
+  }
+
+  private static matchesRolePermissions(
+    roles: {
+      role: PersonRole;
+    }[],
+    permissions: PersonRole[],
+  ) {
+    const perms: Set<PersonRole>[] = [];
+    for (const { role } of roles) {
+      perms.push(this.permissions[role]);
+    }
+    for (const permission of permissions) {
+      if (perms.some(set => set.has(permission))) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

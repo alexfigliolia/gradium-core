@@ -1,5 +1,6 @@
 import type { GraphQLFieldConfig } from "graphql";
 import { GraphQLError, GraphQLInt, GraphQLString } from "graphql";
+import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { INameAndOrgID, IOrganizationID } from "GQL/Organization/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -35,12 +36,7 @@ export const updateBasicPropertyInfo: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(AdminBasicProperty),
   args: {
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     name: {
       type: SchemaBuilder.nonNull(GraphQLString),
     },

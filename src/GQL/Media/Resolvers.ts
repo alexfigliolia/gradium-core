@@ -1,5 +1,6 @@
 import type { GraphQLFieldConfig } from "graphql";
 import { GraphQLInt, GraphQLString } from "graphql";
+import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import { MediaClient } from "Media/Client";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -72,12 +73,7 @@ export const deleteImage: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(GradiumImage),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
+    ...IdentifyPropertyArgs,
     id: {
       type: SchemaBuilder.nonNull(GraphQLInt),
     },
@@ -101,12 +97,7 @@ export const saveImage: GraphQLFieldConfig<any, Context, ICreateGradiumImage> =
   {
     type: SchemaBuilder.nonNull(GradiumImage),
     args: {
-      propertyId: {
-        type: SchemaBuilder.nonNull(GraphQLInt),
-      },
-      organizationId: {
-        type: SchemaBuilder.nonNull(GraphQLInt),
-      },
+      ...IdentifyPropertyArgs,
       entityId: {
         type: SchemaBuilder.nonNull(GraphQLInt),
       },
