@@ -91,19 +91,6 @@ export class AmenityController extends Access {
     });
   };
 
-  public static validateStartEndTimes(
-    start: string,
-    end: string,
-    error: string,
-  ) {
-    if (!start || !end) {
-      throw new GraphQLError(error);
-    }
-    if (this.timeToInt(start) >= this.timeToInt(end)) {
-      throw new GraphQLError(error);
-    }
-  }
-
   public static getParameters(id: number) {
     return Prisma.transact(client => {
       return client.amenity.findUnique({
@@ -150,11 +137,11 @@ export class AmenityController extends Access {
       }
     }
     const { open = "09:00:00", close = "21:00:00" } = space;
-    this.validateStartEndTimes(
-      open,
-      close,
-      "An amenity must open prior to it closing",
-    );
+    if (!open || !close) {
+      throw new GraphQLError(
+        "An amenity must have a starting and ending hour of operations",
+      );
+    }
   }
 
   private static saveError(key: string, name?: string) {

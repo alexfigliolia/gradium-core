@@ -186,16 +186,16 @@ export class AmenityReservationController extends Access {
     language: string,
   ) {
     const { start, end, date, amenityId } = payload;
+    if (!start || !end) {
+      throw new GraphQLError(
+        "Reservations must have valid starting and ending times",
+      );
+    }
     if (this.toDate(start, new Date(date)).getTime() < Date.now()) {
       throw new GraphQLError(
         `You may only ${action} reservations for future times`,
       );
     }
-    AmenityController.validateStartEndTimes(
-      start,
-      end,
-      "The start of a reservation must come before the end of a reservation",
-    );
     const amenityConstraints = await AmenityController.getParameters(amenityId);
     if (!amenityConstraints) {
       throw new GraphQLError("This amenity does not exist");
