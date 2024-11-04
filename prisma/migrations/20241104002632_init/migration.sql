@@ -17,7 +17,7 @@ CREATE TYPE "LeaseStatus" AS ENUM ('complete', 'inProgress', 'terminated', 'pend
 CREATE TYPE "TaskPriority" AS ENUM ('immediate', 'high', 'low');
 
 -- CreateEnum
-CREATE TYPE "ManagementTaskStatus" AS ENUM ('incomplete', 'inProgress', 'blocked', 'complete');
+CREATE TYPE "ManagementTaskStatus" AS ENUM ('todo', 'inProgress', 'underReview', 'complete');
 
 -- CreateEnum
 CREATE TYPE "PropertyAddonType" AS ENUM ('packageManagement', 'amenityReservations', 'propertyEvents', 'leaseManagement', 'hoaManagement');
@@ -67,9 +67,9 @@ CREATE TABLE "TaskImage" (
 CREATE TABLE "ManagementTask" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "completedAt" TIMESTAMP(3) NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "status" "ManagementTaskStatus" NOT NULL,
     "organizationId" INTEGER NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "personId" INTEGER NOT NULL,
@@ -245,6 +245,7 @@ CREATE TABLE "StaffProfile" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "organizationId" INTEGER NOT NULL,
+    "personId" INTEGER NOT NULL,
 
     CONSTRAINT "StaffProfile_pkey" PRIMARY KEY ("id")
 );
@@ -254,7 +255,6 @@ CREATE TABLE "Person" (
     "id" SERIAL NOT NULL,
     "organizationId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
-    "staffId" INTEGER,
     "linkedEmailId" INTEGER NOT NULL,
 
     CONSTRAINT "Person_pkey" PRIMARY KEY ("id")
@@ -497,13 +497,13 @@ ALTER TABLE "StaffInvite" ADD CONSTRAINT "StaffInvite_organizationId_fkey" FOREI
 ALTER TABLE "Role" ADD CONSTRAINT "Role_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "StaffProfile" ADD CONSTRAINT "StaffProfile_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Person" ADD CONSTRAINT "Person_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Person" ADD CONSTRAINT "Person_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Person" ADD CONSTRAINT "Person_staffId_fkey" FOREIGN KEY ("staffId") REFERENCES "StaffProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Person" ADD CONSTRAINT "Person_linkedEmailId_fkey" FOREIGN KEY ("linkedEmailId") REFERENCES "LinkedEmail"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
