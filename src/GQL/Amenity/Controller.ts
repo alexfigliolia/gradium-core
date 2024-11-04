@@ -7,10 +7,7 @@ import { Access } from "./Access";
 import type { IUpdateAmenity } from "./Types";
 
 export class AmenityController extends Access {
-  public static readonly FLOAT_KEYS: (keyof IUpdateAmenity)[] = [
-    "price",
-    "size",
-  ];
+  public static readonly FLOAT_KEYS: (keyof IUpdateAmenity)[] = ["price"];
 
   public static fetchAll = async (propertyId: number) => {
     return Prisma.transact(client => {

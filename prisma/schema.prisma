@@ -131,9 +131,9 @@ model Amenity {
   id           Int                  @id @unique @default(autoincrement())
   name         String               @default("")
   price        String               @default("0")
-  open         String               @default("09:00:00")
-  close        String               @default("21:00:00")
-  size         String               @default("0")
+  open         String
+  close        String
+  capacity     Int
   billed       BillFrequency        @default(hour)
   deleted      Boolean              @default(false)
   images       AmenityImage[]

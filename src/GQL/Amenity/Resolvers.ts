@@ -50,8 +50,8 @@ export const createOrUpdateAmenity: GraphQLFieldConfig<
     price: {
       type: SchemaBuilder.nonNull(GraphQLString),
     },
-    size: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+    capacity: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
     },
   },
   resolve: (_, { organizationId, ...rest }, context) => {

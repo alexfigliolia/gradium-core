@@ -7,15 +7,14 @@ import {
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import type { Context, DBID } from "Types/GraphQL";
 
-export interface IAmenity {
-  id: number;
+export interface IAmenity extends DBID {
   name: string;
   price: string;
   open: string;
   close: string;
-  size: string;
+  capacity: number;
   billed: IBillFrequency;
   images: IGradiumImage[];
   floorPlans: IGradiumImage[];
@@ -28,7 +27,7 @@ export interface IUpdateAmenity extends IdentifyProperty {
   price: string;
   open: string;
   close: string;
-  size: string;
+  capacity: number;
   billed: IBillFrequency;
 }
 
@@ -80,9 +79,9 @@ export const Amenity = new GraphQLObjectType<IAmenity, Context>({
       type: SchemaBuilder.nonNull(GraphQLString),
       resolve: space => space.close,
     },
-    size: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-      resolve: space => space.size,
+    capacity: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+      resolve: space => space.capacity,
     },
     propertyId: {
       type: SchemaBuilder.nonNull(GraphQLInt),

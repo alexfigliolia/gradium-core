@@ -6,7 +6,7 @@ export class Access {
     close: true,
     price: true,
     billed: true,
-    size: true,
+    capacity: true,
     propertyId: true,
     images: {
       select: {
