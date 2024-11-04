@@ -57,7 +57,7 @@ export class Access {
     if (!user.staffProfile) {
       return [];
     }
-    return user.staffProfile.propertyAccess.map(p => p.id);
+    return user.staffProfile[0].propertyAccess.map(p => p.id);
   }
 
   protected static createSlug(name: string, ...appendages: string[]) {

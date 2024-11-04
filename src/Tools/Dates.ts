@@ -41,20 +41,6 @@ export class Dates {
     );
   }
 
-  public static dateTime(
-    hours = 0,
-    minutes = 0,
-    seconds = 0,
-    milliseconds = 0,
-  ) {
-    const date = new Date(new Date().toISOString());
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(seconds);
-    date.setMilliseconds(milliseconds);
-    return date;
-  }
-
   public static ISOTime(date: string) {
     const [_, time] = date.split("T");
     const [utcTime] = time.split(".");

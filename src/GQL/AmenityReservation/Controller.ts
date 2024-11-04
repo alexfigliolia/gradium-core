@@ -272,17 +272,6 @@ export class AmenityReservationController extends Access {
     return date;
   }
 
-  private static toLocaleTimeString(
-    language: string,
-    time: string,
-    date = new Date(),
-  ) {
-    return this.toDate(time, date).toLocaleTimeString(language, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
   private static getBillFrequency(frequency: BillFrequency) {
     if (frequency === BillFrequency.hour) {
       return this.ONE_HOUR;

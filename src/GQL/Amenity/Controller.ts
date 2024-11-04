@@ -2,18 +2,11 @@ import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
 import { IGradiumImageType } from "GQL/Media/Types";
 import { MediaClient } from "Media/Client";
-import { Dates } from "Tools/Dates";
 import { Validators } from "Tools/Validators";
 import { Access } from "./Access";
 import type { IUpdateAmenity } from "./Types";
 
 export class AmenityController extends Access {
-  public static readonly DEFAULT_OPEN = Dates.ISOTime(
-    Dates.dateTime(9).toISOString(),
-  );
-  public static readonly DEFAULT_CLOSE = Dates.ISOTime(
-    Dates.dateTime(21).toISOString(),
-  );
   public static readonly FLOAT_KEYS: (keyof IUpdateAmenity)[] = ["price"];
 
   public static fetchAll = async (propertyId: number) => {
@@ -21,19 +14,6 @@ export class AmenityController extends Access {
       return client.amenity.findMany({
         where: {
           AND: [{ propertyId }, { deleted: false }],
-        },
-        select: this.BASIC_SELECTION,
-      });
-    });
-  };
-
-  public static create = (propertyId: number) => {
-    return Prisma.transact(client => {
-      return client.amenity.create({
-        data: {
-          propertyId,
-          open: this.DEFAULT_OPEN,
-          close: this.DEFAULT_CLOSE,
         },
         select: this.BASIC_SELECTION,
       });
@@ -145,7 +125,7 @@ export class AmenityController extends Access {
         }
       }
     }
-    const { open = this.DEFAULT_OPEN, close = this.DEFAULT_CLOSE } = space;
+    const { open, close } = space;
     if (!open || !close) {
       throw new GraphQLError(
         "An amenity must have a starting and ending hour of operations",
