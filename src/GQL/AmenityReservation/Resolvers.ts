@@ -1,7 +1,7 @@
 import type { GraphQLFieldConfig } from "graphql";
-import { GraphQLInt, GraphQLList, GraphQLString } from "graphql";
+import { GraphQLInt, GraphQLList } from "graphql";
 import { PersonRole } from "@prisma/client";
-import { Locale } from "Tools/Locale";
+import { GraphQLDate } from "Tools/GraphQLDate";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
@@ -28,7 +28,7 @@ export const fetchAmenityReservations: GraphQLFieldConfig<
   args: {
     ...IdentifyPropertyArgs,
     date: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDate),
     },
     amenityIds: {
       type: new GraphQLList(SchemaBuilder.nonNull(GraphQLInt)),
@@ -66,7 +66,7 @@ export const createAmenityReservation: GraphQLFieldConfig<
       errorMessage:
         "You do not have permission to create reservations for this property",
     });
-    return transaction(rest, Locale.parseUserLanguage(context.req));
+    return transaction(rest);
   },
 };
 
@@ -87,7 +87,7 @@ export const updateAmenityReservation: GraphQLFieldConfig<
       errorMessage:
         "You do not have permission to update reservations for this property",
     });
-    return transaction(rest, Locale.parseUserLanguage(context.req));
+    return transaction(rest);
   },
 };
 

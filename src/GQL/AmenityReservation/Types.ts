@@ -6,6 +6,7 @@ import {
 } from "graphql";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
+import { GraphQLDate } from "Tools/GraphQLDate";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID, IEntitySnapshot } from "Types/GraphQL";
 import { EntitySnapshot } from "Types/GraphQL";
@@ -46,7 +47,7 @@ export const AmenityReservation = new GraphQLObjectType<IReservation, Context>({
       resolve: v => v.id,
     },
     date: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDate),
       resolve: v => v.date,
     },
     start: {
@@ -86,7 +87,7 @@ export const CreateReservationArgs = {
     type: SchemaBuilder.nonNull(GraphQLInt),
   },
   date: {
-    type: SchemaBuilder.nonNull(GraphQLString),
+    type: SchemaBuilder.nonNull(GraphQLDate),
   },
   start: {
     type: SchemaBuilder.nonNull(GraphQLString),

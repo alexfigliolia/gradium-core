@@ -96,6 +96,7 @@ export class AmenityController extends Access {
       return client.amenity.findUnique({
         where: { id },
         select: {
+          name: true,
           open: true,
           close: true,
           price: true,

@@ -1,3 +1,4 @@
+import { isAfter, isBefore, isEqual } from "date-fns";
 import { GraphQLError } from "graphql";
 import type { Prisma as Client } from "@prisma/client";
 import { BillFrequency } from "@prisma/client";
@@ -41,13 +42,8 @@ export class AmenityReservationController extends Access {
 
   public static createAmenityReservation = async (
     payload: Omit<ICreateReservation, "propertyId" | "organizationId">,
-    language: string,
   ) => {
-    const { price, billed } = await this.validateConstraints(
-      payload,
-      "create",
-      language,
-    );
+    const { price, billed } = await this.validateConstraints(payload, "create");
     const { charge = true, ...data } = payload;
     const { start, end } = data;
     return Prisma.transact(async client => {
@@ -75,13 +71,8 @@ export class AmenityReservationController extends Access {
 
   public static updateAmenityReservation = async (
     payload: Omit<IUpdateReservation, "propertyId" | "organizationId">,
-    language: string,
   ) => {
-    const { price, billed } = await this.validateConstraints(
-      payload,
-      "modify",
-      language,
-    );
+    const { price, billed } = await this.validateConstraints(payload, "modify");
     const { id, charge = true, ...data } = payload;
     const { start, end } = data;
     return Prisma.transact(async client => {
@@ -145,10 +136,9 @@ export class AmenityReservationController extends Access {
           "This reservation was already deleted by another user. Please refresh your page",
         );
       }
-      const { personId, charges, start, end, date, amenity } = reservation;
-      const now = new Date().getTime();
-      const endTime = this.toDate(end, new Date(date)).getTime();
-      if (now > endTime) {
+      const now = new Date(new Date().toISOString());
+      const { personId, charges, start, end, amenity } = reservation;
+      if (isAfter(now, end)) {
         throw new GraphQLError("You cannot cancel past reservations");
       }
       await client.amenityReservation.update({
@@ -158,14 +148,13 @@ export class AmenityReservationController extends Access {
       if (!charges.length) {
         return id;
       }
-      const startTime = this.toDate(start, new Date(date)).getTime();
       await ReservationChargeController.deleteMany(charges.map(c => c.id));
-      if (now < startTime) {
+      if (isBefore(now, start)) {
         return id;
       }
       const { billed, price } = amenity;
       const amount = this.calculate(
-        Math.min(now, endTime) - startTime,
+        Math.min(now.getTime(), end.getTime()) - start.getTime(),
         billed,
         price,
       );
@@ -183,30 +172,28 @@ export class AmenityReservationController extends Access {
   private static async validateConstraints(
     payload: Omit<ICreateReservation, "propertyId" | "organizationId">,
     action: "create" | "modify",
-    language: string,
   ) {
-    const { start, end, date, amenityId } = payload;
+    const { start, end, amenityId } = payload;
     if (!start || !end) {
       throw new GraphQLError(
         "Reservations must have valid starting and ending times",
       );
     }
-    if (this.toDate(start, new Date(date)).getTime() < Date.now()) {
+    if (isBefore(new Date(start), new Date(new Date().toISOString()))) {
       throw new GraphQLError(
         `You may only ${action} reservations for future times`,
       );
     }
-    const amenityConstraints = await AmenityController.getParameters(amenityId);
-    if (!amenityConstraints) {
+    const constraints = await AmenityController.getParameters(amenityId);
+    if (!constraints) {
       throw new GraphQLError("This amenity does not exist");
     }
-    const constraints = amenityConstraints;
     const error = this.validateDuration(
       start,
       end,
       constraints.open,
       constraints.close,
-      language,
+      constraints.name,
     );
     if (error) {
       throw new GraphQLError(error);
@@ -253,20 +240,21 @@ export class AmenityReservationController extends Access {
     end: string,
     open: string,
     close: string,
-    language: string,
+    name: string,
   ) {
-    const startTime = AmenityController.timeToInt(start);
-    const endTime = AmenityController.timeToInt(end);
-    if (startTime >= endTime) {
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+    if (isAfter(startTime, endTime) || isEqual(startTime, endTime)) {
       return "Your reservation's start time must be before its end time";
     }
-    const openTime = AmenityController.timeToInt(open);
-    if (startTime < openTime) {
-      return `Your reservation's start time cannot be before <strong>${this.toLocaleTimeString(language, open)}</strong>`;
+    const openTime = this.toDate(open, new Date(start));
+    if (isBefore(startTime, openTime)) {
+      return `Your reservation's start time cannot be before the ${name} opens`;
     }
-    const closeTime = AmenityController.timeToInt(close);
-    if (endTime > closeTime) {
-      return `Your reservation's end time cannot be after <strong>${this.toLocaleTimeString(language, open)}</strong>`;
+    // TODO allow reservations that span multiple days
+    const closeTime = this.toDate(close, new Date(end));
+    if (isAfter(endTime, closeTime)) {
+      return `Your reservation's end time cannot be after after the ${name} opens`;
     }
   }
 
