@@ -50,21 +50,21 @@ model TaskImage {
 }
 
 model ManagementTask {
-  id             Int           @id @unique @default(autoincrement())
-  createdAt      DateTime      @default(now())
-  completedAt    DateTime
+  id             Int                  @id @unique @default(autoincrement())
+  createdAt      DateTime             @default(now())
   title          String
   description    String
-  organization   Organization  @relation(fields: [organizationId], references: [id])
+  status         ManagementTaskStatus
+  organization   Organization         @relation(fields: [organizationId], references: [id])
   organizationId Int
-  deleted        Boolean       @default(false)
+  deleted        Boolean              @default(false)
   images         TaskImage[]
-  createdBy      Person        @relation(fields: [personId], references: [id])
+  createdBy      Person               @relation(fields: [personId], references: [id])
   personId       Int
-  property       Property?     @relation(fields: [propertyId], references: [id])
+  property       Property?            @relation(fields: [propertyId], references: [id])
   propertyId     Int?
-  priority       TaskPriority  @default(high)
-  assignedTo     StaffProfile? @relation(fields: [assignStaffId], references: [id])
+  priority       TaskPriority         @default(high)
+  assignedTo     StaffProfile?        @relation(fields: [assignStaffId], references: [id])
   assignStaffId  Int?
   expenses       Expense[]
 }
@@ -228,7 +228,8 @@ model StaffProfile {
   id             Int              @id @unique @default(autoincrement())
   userId         Int
   organizationId Int
-  person         Person[]
+  person         Person           @relation(fields: [personId], references: [id])
+  personId       Int
   propertyAccess Property[]
   assignments    ManagementTask[]
 
@@ -243,12 +244,11 @@ model Person {
   userId              Int
   roles               Role[]
   createdTasks        ManagementTask[]
-  staffProfile        StaffProfile?        @relation(fields: [staffId], references: [id])
-  staffId             Int?
   linkedEmail         LinkedEmail          @relation(fields: [linkedEmailId], references: [id])
   linkedEmailId       Int
   amenityReservations AmenityReservation[]
   reservationCharges  ReservationCharge[]
+  staffProfile        StaffProfile[]
 
   @@unique(name: "identity", [organizationId, userId])
 }
@@ -328,9 +328,9 @@ enum TaskPriority {
 }
 
 enum ManagementTaskStatus {
-  incomplete
+  todo
   inProgress
-  blocked
+  underReview
   complete
 }
 

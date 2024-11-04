@@ -23,8 +23,6 @@ export class PersonController extends Access {
           : undefined,
         select: {
           id: true,
-          organizationId: true,
-          userId: true,
           user: {
             select: {
               name: true,
@@ -34,8 +32,6 @@ export class PersonController extends Access {
       });
       const list = results.map(item => ({
         id: item.id,
-        organizationId: item.organizationId,
-        userId: item.userId,
         name: item.user.name,
       }));
       return { list, cursor: list[list.length - 1]?.id ?? 0 };

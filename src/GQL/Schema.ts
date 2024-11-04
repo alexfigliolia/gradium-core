@@ -25,6 +25,10 @@ import {
   verifySession,
 } from "./Login/Resolvers";
 import {
+  listManagementTasks,
+  setManagementTaskStatus,
+} from "./ManagementTask/Resolvers";
+import {
   deleteImage,
   generateDestroySignature,
   generateUploadSignature,
@@ -48,6 +52,7 @@ const QueryRoot = new GraphQLObjectType({
     getAmenities,
     verifySession,
     getLivingSpaces,
+    listManagementTasks,
     fetchAmenityReservations,
     generateUploadSignature,
     generateDestroySignature,
@@ -75,6 +80,7 @@ const MutationRoot = new GraphQLObjectType({
     setOrganizationName,
     modifyPropertyAddons,
     createOrUpdateAmenity,
+    setManagementTaskStatus,
     updateBasicPropertyInfo,
     createAmenityReservation,
     cancelAmenityReservation,

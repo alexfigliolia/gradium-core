@@ -82,3 +82,29 @@ export const AdminBasicProperty = new GraphQLObjectType<
     },
   },
 });
+
+export type IConnectedProperty = Pick<
+  IAdminBasicProperty,
+  "name" | "slug" | "images"
+>;
+
+export const ConnectedProperty = new GraphQLObjectType<
+  IConnectedProperty,
+  Context
+>({
+  name: "ConnectedProperty",
+  fields: {
+    name: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: c => c.name,
+    },
+    slug: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: c => c.slug,
+    },
+    images: {
+      type: SchemaBuilder.nonNullArray(GradiumImage),
+      resolve: c => c.images,
+    },
+  },
+});

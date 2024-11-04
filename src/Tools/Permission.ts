@@ -106,7 +106,7 @@ export class Permission {
       if (this.matchesRolePermissions(person.roles, [PersonRole.owner])) {
         return operation(...args);
       }
-      const access = person.staffProfile?.propertyAccess || [];
+      const access = person.staffProfile?.[0]?.propertyAccess || [];
       if (!access.some(({ id }) => id === propertyId)) {
         throw new GraphQLError(errorMessage);
       }
