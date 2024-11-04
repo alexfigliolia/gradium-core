@@ -133,7 +133,7 @@ model Amenity {
   price        String               @default("0")
   open         String
   close        String
-  capacity     Int
+  capacity     Int                  @default(0)
   billed       BillFrequency        @default(hour)
   deleted      Boolean              @default(false)
   images       AmenityImage[]
