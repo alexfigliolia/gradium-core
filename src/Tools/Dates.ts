@@ -41,12 +41,6 @@ export class Dates {
     );
   }
 
-  public static ISOTime(date: string) {
-    const [_, time] = date.split("T");
-    const [utcTime] = time.split(".");
-    return utcTime;
-  }
-
   private static validToken(
     int: number,
     key: keyof (typeof Dates)["VALIDATION_MAP"],
@@ -56,5 +50,38 @@ export class Dates {
     }
     const { min, max } = this.VALIDATION_MAP[key];
     return int >= min && int <= max;
+  }
+
+  public static dateToTime(input: Date | string) {
+    const date = typeof input === "string" ? new Date(input) : input;
+    return `${this.pad(date.getHours())}:${this.pad(date.getMinutes())}:${this.pad(date.getSeconds())}`;
+  }
+
+  public static dateToTimeInt(input: Date | string) {
+    return parseInt(this.dateToTime(input).split(":").join(""));
+  }
+
+  public static populateTimeFrom(input: Date | string, base = new Date()) {
+    const date = typeof input === "string" ? new Date(input) : input;
+    base.setHours(date.getHours());
+    base.setMinutes(date.getMinutes());
+    base.setSeconds(date.getSeconds());
+    base.setMilliseconds(0);
+    return date;
+  }
+
+  public static populateDateFrom(input: Date | string, base = new Date()) {
+    const date = typeof input === "string" ? new Date(input) : input;
+    base.setFullYear(date.getFullYear());
+    base.setMonth(date.getMonth());
+    base.setDate(date.getDate());
+    return date;
+  }
+
+  private static pad(value: number) {
+    if (value < 10) {
+      return `0${value}`;
+    }
+    return value.toString();
   }
 }

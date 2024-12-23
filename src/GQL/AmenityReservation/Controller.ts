@@ -1,10 +1,11 @@
-import { isAfter, isBefore, isEqual } from "date-fns";
+import { differenceInMilliseconds, isAfter, isBefore } from "date-fns";
 import { GraphQLError } from "graphql";
 import type { Prisma as Client } from "@prisma/client";
 import { BillFrequency } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { AmenityController } from "GQL/Amenity/Controller";
 import { ReservationChargeController } from "GQL/ReservationCharge/Controller";
+import { Dates } from "Tools/Dates";
 import { Access } from "./Access";
 import type {
   ICreateReservation,
@@ -136,7 +137,7 @@ export class AmenityReservationController extends Access {
           "This reservation was already deleted by another user. Please refresh your page",
         );
       }
-      const now = new Date(new Date().toISOString());
+      const now = new Date();
       const { personId, charges, start, end, amenity } = reservation;
       if (isAfter(now, end)) {
         throw new GraphQLError("You cannot cancel past reservations");
@@ -154,7 +155,7 @@ export class AmenityReservationController extends Access {
       }
       const { billed, price } = amenity;
       const amount = this.calculate(
-        Math.min(now.getTime(), end.getTime()) - start.getTime(),
+        differenceInMilliseconds(now, start),
         billed,
         price,
       );
@@ -212,11 +213,12 @@ export class AmenityReservationController extends Access {
     end: string,
     price: string,
     billed: BillFrequency,
-    date = new Date(),
   ) {
-    const startMS = this.toDate(start, new Date(date)).getTime();
-    const endMS = this.toDate(end, new Date(date)).getTime();
-    return this.calculate(endMS - startMS, billed, price);
+    return this.calculate(
+      this.differenceInMilliseconds(end, start),
+      billed,
+      price,
+    );
   }
 
   private static calculate(
@@ -242,34 +244,18 @@ export class AmenityReservationController extends Access {
     close: string,
     name: string,
   ) {
-    const startTime = new Date(start);
-    const endTime = new Date(end);
-    if (isAfter(startTime, endTime) || isEqual(startTime, endTime)) {
+    if (
+      isAfter(start, end) ||
+      Dates.dateToTime(start) === Dates.dateToTime(end)
+    ) {
       return "Your reservation's start time must be before its end time";
     }
-    const openTime = this.toDate(open, new Date(start));
-    if (isBefore(startTime, openTime)) {
+    if (Dates.dateToTimeInt(start) < Dates.dateToTimeInt(open)) {
       return `Your reservation's start time cannot be before the ${name} opens`;
     }
-    // TODO allow reservations that span multiple days
-    const closeTime = this.toDate(close, new Date(end));
-    if (isAfter(endTime, closeTime)) {
+    if (Dates.dateToTimeInt(end) > Dates.dateToTimeInt(close)) {
       return `Your reservation's end time cannot be after after the ${name} opens`;
     }
-  }
-
-  private static toDate(time: string, date = new Date()) {
-    const [hours, minutes] = time.split(":");
-    if (!hours || !minutes) {
-      throw new GraphQLError(
-        "Your reservation has an invalid start or end time",
-      );
-    }
-    date.setHours(parseInt(hours));
-    date.setMinutes(parseInt(minutes));
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
   }
 
   private static getBillFrequency(frequency: BillFrequency) {
@@ -281,6 +267,13 @@ export class AmenityReservationController extends Access {
     }
     throw new GraphQLError(
       "This amenity has an invalid bill frequency. Please update it on the amenity configuration page",
+    );
+  }
+
+  private static differenceInMilliseconds(start: string, end: string) {
+    return differenceInMilliseconds(
+      Dates.populateTimeFrom(start),
+      Dates.populateTimeFrom(end),
     );
   }
 }
