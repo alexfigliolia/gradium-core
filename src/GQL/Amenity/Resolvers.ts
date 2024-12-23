@@ -84,7 +84,7 @@ export const deleteAmenity: GraphQLFieldConfig<any, Context, IDeleteAmenity> = {
       organizationId,
       session: context.req.session,
       operation: AmenityController.delete,
-      errorMessage: "You do not have permissions to delete this living space",
+      errorMessage: "You do not have permissions to delete this amenity",
     });
     return operation(id);
   },

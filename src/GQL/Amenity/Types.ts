@@ -9,31 +9,26 @@ import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID } from "Types/GraphQL";
 
-export interface IAmenity extends DBID {
+export interface IBaseAmenity {
   name: string;
   price: string;
   open: string;
   close: string;
   capacity: number;
   billed: IBillFrequency;
+}
+
+export interface IAmenity extends IBaseAmenity, DBID {
   images: IGradiumImage[];
   floorPlans: IGradiumImage[];
   propertyId: number;
 }
 
-export interface IUpdateAmenity extends IdentifyProperty {
+export interface IUpdateAmenity extends IdentifyProperty, IBaseAmenity {
   id?: number;
-  name: string;
-  price: string;
-  open: string;
-  close: string;
-  capacity: number;
-  billed: IBillFrequency;
 }
 
-export interface IDeleteAmenity extends IdentifyProperty {
-  id: number;
-}
+export interface IDeleteAmenity extends IdentifyProperty, DBID {}
 
 export enum IBillFrequency {
   "hour" = "hour",

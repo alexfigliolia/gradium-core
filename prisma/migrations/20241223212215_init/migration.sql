@@ -96,8 +96,8 @@ CREATE TABLE "RentPayment" (
 CREATE TABLE "Lease" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "start" TIMESTAMPTZ(3) NOT NULL,
-    "end" TIMESTAMPTZ(3) NOT NULL,
+    "start" TEXT NOT NULL,
+    "end" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "status" "LeaseStatus" NOT NULL,
     "paymentFrequency" "RentPaymentFrequency" NOT NULL,
@@ -112,9 +112,9 @@ CREATE TABLE "Lease" (
 -- CreateTable
 CREATE TABLE "AmenityReservation" (
     "id" SERIAL NOT NULL,
-    "date" TIMESTAMPTZ(3) NOT NULL,
-    "start" TIMESTAMPTZ(3) NOT NULL,
-    "end" TIMESTAMPTZ(3) NOT NULL,
+    "date" TEXT NOT NULL,
+    "start" TEXT NOT NULL,
+    "end" TEXT NOT NULL,
     "cancelled" BOOLEAN NOT NULL DEFAULT false,
     "amenityId" INTEGER NOT NULL,
     "personId" INTEGER NOT NULL,

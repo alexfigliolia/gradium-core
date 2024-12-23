@@ -56,7 +56,7 @@ export class UserController {
       return client.user.update({
         where: { id: userId },
         data: {
-          password: await hash(next, 10),
+          password: await hash(next, UserController.SALTS),
         },
       });
     });

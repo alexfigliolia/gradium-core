@@ -84,8 +84,8 @@ model RentPayment {
 model Lease {
   id               Int                  @id @unique @default(autoincrement())
   createdAt        DateTime             @default(now()) @db.Timestamptz(3)
-  start            DateTime             @db.Timestamptz(3)
-  end              DateTime             @db.Timestamptz(3)
+  start            String
+  end              String
   price            Float
   lessees          User[]
   status           LeaseStatus
@@ -102,9 +102,9 @@ model Lease {
 
 model AmenityReservation {
   id        Int                 @id @unique @default(autoincrement())
-  date      DateTime            @db.Timestamptz(3)
-  start     DateTime            @db.Timestamptz(3)
-  end       DateTime            @db.Timestamptz(3)
+  date      String
+  start     String
+  end       String
   cancelled Boolean             @default(false)
   amenity   Amenity             @relation(fields: [amenityId], references: [id])
   amenityId Int

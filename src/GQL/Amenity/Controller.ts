@@ -55,6 +55,7 @@ export class AmenityController extends Access {
         );
       }
       if (amenity._count.reservations) {
+        // Move to cancelled
         return client.amenity.update({
           where: { id },
           data: { deleted: true },
