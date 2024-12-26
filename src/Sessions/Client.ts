@@ -10,9 +10,13 @@ export class SessionsClient {
     if (this.instance) {
       return this.instance;
     }
-    const password = await SecretManager.getSecret("redis-password");
+    const [domain, password, port] = await SecretManager.getSecrets(
+      "redis-domain",
+      "redis-password",
+      "redis-port",
+    );
     const Client = createClient({
-      url: this.connectionURL(password),
+      url: this.connectionURL(domain, password, port),
     });
     this.instance = Client;
     return Client;
@@ -42,10 +46,10 @@ export class SessionsClient {
     CoreLogger.redis(error);
   };
 
-  private static connectionURL(password: string) {
+  private static connectionURL(domain: string, password: string, port: string) {
     if (process.env.NODE_ENV !== "production") {
-      return `redis://:${password}@localhost:6379`;
+      return `redis://:${password}@${domain}:${port}`;
     }
-    return `rediss://default:${password}@gusc1-present-grouper-30100.upstash.io:30100`;
+    return `rediss://default:${password}@${domain}:${port}`;
   }
 }
