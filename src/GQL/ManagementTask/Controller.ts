@@ -1,9 +1,11 @@
+import { GraphQLError } from "graphql";
 import type { ManagementTaskStatus, Prisma as IPrisma } from "@prisma/client";
 import { Prisma } from "DB/Client";
+import { PersonController } from "GQL/Person/Controller";
 import { Permission } from "Tools/Permission";
 import type { IPermissedTransaction } from "Types/GraphQL";
 import { Access } from "./Access";
-import type { IlistManagementTasks } from "./Types";
+import type { ICreateManagementTask, IlistManagementTasks } from "./Types";
 
 export class ManagementTaskController extends Access {
   public static listManagementTasks = ({
@@ -38,6 +40,41 @@ export class ManagementTaskController extends Access {
       }));
     });
   };
+
+  public static async createTask(
+    { images, ...rest }: ICreateManagementTask,
+    userID: number,
+  ) {
+    const person = await PersonController.fetchPerson(
+      userID,
+      rest.organizationId,
+      {
+        id: true,
+      },
+    );
+    if (!person) {
+      throw new GraphQLError(
+        "You do not have permission to create tasks for this organization",
+      );
+    }
+    return Prisma.transact(async client => {
+      const task = await client.managementTask.create({
+        data: {
+          ...rest,
+          personId: person.id,
+        },
+      });
+      if (images.length) {
+        await client.taskImage.createMany({
+          data: images.map(img => ({ ...img, taskId: task.id })),
+        });
+      }
+      return client.managementTask.findUnique({
+        where: { id: task.id },
+        select: this.DEFAULT_SELECTION,
+      });
+    });
+  }
 
   public static getPropertyRelation(id: number) {
     return Prisma.transact(client => {

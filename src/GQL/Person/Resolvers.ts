@@ -2,7 +2,7 @@ import type { GraphQLFieldConfig } from "graphql";
 import { GraphQLInt } from "graphql";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import { type Context, PaginationArgs } from "Types/GraphQL";
 import { PersonController } from "./Controller";
 import type { IFetchPeople } from "./Types";
 import { PaginatedPeople } from "./Types";
@@ -13,12 +13,7 @@ export const listPeople: GraphQLFieldConfig<any, Context, IFetchPeople> = {
     organizationId: {
       type: SchemaBuilder.nonNull(GraphQLInt),
     },
-    limit: {
-      type: GraphQLInt,
-    },
-    cursor: {
-      type: GraphQLInt,
-    },
+    ...PaginationArgs,
   },
   resolve: (_, args, context) => {
     const operation = Permission.permissedTransaction({

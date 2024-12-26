@@ -1,10 +1,24 @@
-import { GraphQLBoolean, type GraphQLFieldConfig, GraphQLInt } from "graphql";
+import {
+  GraphQLBoolean,
+  type GraphQLFieldConfig,
+  GraphQLInt,
+  GraphQLString,
+} from "graphql";
 import { PersonRole } from "@prisma/client";
+import { GradiumImageType } from "GQL/Media/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { ManagementTaskController } from "./Controller";
-import type { IlistManagementTasks, ISetStatus } from "./Types";
-import { ManagementTask, ManagementTaskStatus } from "./Types";
+import type {
+  ICreateManagementTask,
+  IlistManagementTasks,
+  ISetStatus,
+} from "./Types";
+import {
+  ManagementTask,
+  ManagementTaskPriority,
+  ManagementTaskStatus,
+} from "./Types";
 
 export const listManagementTasks: GraphQLFieldConfig<
   any,
@@ -62,5 +76,51 @@ export const setManagementTaskStatus: GraphQLFieldConfig<
       errorMessage: "You do not have permission to modify this task",
     });
     return operation(id, status);
+  },
+};
+
+export const createManagementTask: GraphQLFieldConfig<
+  any,
+  Context,
+  ICreateManagementTask
+> = {
+  type: SchemaBuilder.nonNull(ManagementTask),
+  args: {
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    propertyId: {
+      type: GraphQLInt,
+    },
+    title: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    description: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    status: {
+      type: SchemaBuilder.nonNull(ManagementTaskStatus),
+    },
+    priority: {
+      type: SchemaBuilder.nonNull(ManagementTaskPriority),
+    },
+    images: {
+      type: SchemaBuilder.nonNullArray(GradiumImageType),
+    },
+    assignedToId: {
+      type: GraphQLInt,
+    },
+  },
+  resolve: async (_, args, context) => {
+    const { organizationId, propertyId } = args;
+    const operation = ManagementTaskController.permissedTransaction({
+      propertyId,
+      organizationId,
+      session: context.req.session,
+      permissions: [PersonRole.maintenance],
+      operation: ManagementTaskController.createTask,
+      errorMessage: `You do not have permission to view management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
+    });
+    return operation(args, context.req.session.userID!);
   },
 };

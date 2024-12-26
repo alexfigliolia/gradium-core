@@ -25,6 +25,7 @@ import {
   verifySession,
 } from "./Login/Resolvers";
 import {
+  createManagementTask,
   listManagementTasks,
   setManagementTaskStatus,
 } from "./ManagementTask/Resolvers";
@@ -41,7 +42,7 @@ import {
   createProperty,
   updateBasicPropertyInfo,
 } from "./Property/Resolvers";
-import { inviteStaffMember } from "./Staff/Resolvers";
+import { inviteStaffMember, listStaffMembers } from "./Staff/Resolvers";
 import { resetPassword, userScope } from "./User/Resolvers";
 
 const QueryRoot = new GraphQLObjectType({
@@ -52,6 +53,7 @@ const QueryRoot = new GraphQLObjectType({
     getAmenities,
     verifySession,
     getLivingSpaces,
+    listStaffMembers,
     listManagementTasks,
     fetchAmenityReservations,
     generateUploadSignature,
@@ -80,6 +82,7 @@ const MutationRoot = new GraphQLObjectType({
     setOrganizationName,
     modifyPropertyAddons,
     createOrUpdateAmenity,
+    createManagementTask,
     setManagementTaskStatus,
     updateBasicPropertyInfo,
     createAmenityReservation,

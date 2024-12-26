@@ -12,8 +12,7 @@ import { Expense, type IExpense } from "GQL/Expense/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import { type IPerson, Person } from "GQL/Person/Types";
-import type { IStaffProfile } from "GQL/StaffProfile/Types";
-import { StaffProfile } from "GQL/StaffProfile/Types";
+import { type IStaffProfile, StaffMember } from "GQL/Staff/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID } from "Types/GraphQL";
 
@@ -23,6 +22,15 @@ export interface ISetStatus extends IOrganizationID, DBID {
 
 export interface IlistManagementTasks extends IOrganizationID {
   propertyId?: number;
+}
+
+export interface ICreateManagementTask extends IlistManagementTasks {
+  title: string;
+  description: string;
+  status: IManagementTaskStatus;
+  priority: ITaskPriority;
+  images: IGradiumImage[];
+  assignedToId?: number;
 }
 
 export const ManagementTaskStatus = new GraphQLEnumType({
@@ -107,7 +115,7 @@ export const ManagementTask = new GraphQLObjectType<IManagementTask, Context>({
       resolve: m => m.images,
     },
     assignedTo: {
-      type: StaffProfile,
+      type: StaffMember,
       resolve: m => m.assignedTo,
     },
     expenses: {

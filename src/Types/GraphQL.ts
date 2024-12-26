@@ -22,6 +22,11 @@ export interface IPagination {
   cursor?: number;
 }
 
+export interface IPaginationResult<T> {
+  cursor?: number;
+  list: T[];
+}
+
 export type Session = ISession & Partial<SessionData>;
 
 export interface IPermissedTransaction<F extends (...args: any[]) => any> {
@@ -55,3 +60,12 @@ export const EntitySnapshot = new GraphQLObjectType<IEntitySnapshot, Context>({
     },
   },
 });
+
+export const PaginationArgs = {
+  limit: {
+    type: GraphQLInt,
+  },
+  cursor: {
+    type: GraphQLInt,
+  },
+};

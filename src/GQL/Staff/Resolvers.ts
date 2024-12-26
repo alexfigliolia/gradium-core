@@ -1,9 +1,11 @@
 import type { GraphQLFieldConfig } from "graphql";
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from "graphql";
+import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import { type Context, PaginationArgs } from "Types/GraphQL";
 import { StaffController } from "./Controller";
-import type { IInviteStaffMember } from "./Types";
+import type { IFetchStaff, IInviteStaffMember } from "./Types";
+import { PaginatedStaff } from "./Types";
 
 export const inviteStaffMember: GraphQLFieldConfig<
   any,
@@ -21,5 +23,25 @@ export const inviteStaffMember: GraphQLFieldConfig<
   },
   resolve: (_, args, context) => {
     return StaffController.invite(args, context.req);
+  },
+};
+
+export const listStaffMembers: GraphQLFieldConfig<any, Context, IFetchStaff> = {
+  type: SchemaBuilder.nonNull(PaginatedStaff),
+  args: {
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    ...PaginationArgs,
+  },
+  resolve: (_, args, context) => {
+    const operation = Permission.permissedTransaction({
+      operation: StaffController.fetchStaffMembers,
+      organizationId: args.organizationId,
+      session: context.req.session,
+      errorMessage:
+        "You do not have permission to access a list of staff members",
+    });
+    return operation(args);
   },
 };

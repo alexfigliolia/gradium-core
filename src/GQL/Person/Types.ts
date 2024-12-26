@@ -1,7 +1,12 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context, DBID, IPagination } from "Types/GraphQL";
+import type {
+  Context,
+  DBID,
+  IPagination,
+  IPaginationResult,
+} from "Types/GraphQL";
 
 export interface IPerson extends DBID {
   name: string;
@@ -21,17 +26,14 @@ export const Person = new GraphQLObjectType<IPerson, Context>({
   },
 });
 
-export interface IPaginatedPeople {
-  cursor?: number;
-  list: IPerson[];
-}
+export type IPaginatedPeople = IPaginationResult<IPerson>;
 
 export const PaginatedPeople = new GraphQLObjectType<IPaginatedPeople, Context>(
   {
     name: "PaginatedPeople",
     fields: {
       cursor: {
-        type: SchemaBuilder.nonNull(GraphQLInt),
+        type: GraphQLInt,
         resolve: p => p.cursor,
       },
       list: {

@@ -1,9 +1,10 @@
 import type { Request } from "express";
 import { GraphQLError } from "graphql";
+import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { Permission } from "Tools/Permission";
 import { Validators } from "Tools/Validators";
-import type { IInviteStaffMember } from "./Types";
+import type { IFetchStaff, IInviteStaffMember } from "./Types";
 
 export class StaffController {
   public static async invite(
@@ -30,5 +31,54 @@ export class StaffController {
       return true;
     }
     throw new GraphQLError(Permission.MANAGER_OWNER_PERMISSION_ERROR);
+  }
+
+  public static async fetchStaffMembers({
+    organizationId,
+    ...pagination
+  }: IFetchStaff) {
+    const staff = await Prisma.transact(client => {
+      return client.person.findMany({
+        where: {
+          AND: [
+            { organizationId },
+            {
+              roles: {
+                some: {
+                  role: {
+                    in: [
+                      PersonRole.owner,
+                      PersonRole.manager,
+                      PersonRole.maintenance,
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+        ...Prisma.paginationArguments(pagination),
+        orderBy: {
+          user: {
+            name: "asc",
+          },
+        },
+        select: {
+          id: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+    });
+    return {
+      cursor: staff[staff.length - 1]?.id,
+      list: staff.map(member => ({
+        id: member.id,
+        name: member.user.name,
+      })),
+    };
   }
 }

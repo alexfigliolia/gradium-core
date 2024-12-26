@@ -241,16 +241,6 @@ CREATE TABLE "Role" (
 );
 
 -- CreateTable
-CREATE TABLE "StaffProfile" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "organizationId" INTEGER NOT NULL,
-    "personId" INTEGER NOT NULL,
-
-    CONSTRAINT "StaffProfile_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Person" (
     "id" SERIAL NOT NULL,
     "organizationId" INTEGER NOT NULL,
@@ -303,12 +293,6 @@ CREATE TABLE "_ExpenseToManagementTask" (
 
 -- CreateTable
 CREATE TABLE "_LeaseToUser" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "_PropertyToStaffProfile" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
@@ -374,12 +358,6 @@ CREATE UNIQUE INDEX "StaffInvite_id_key" ON "StaffInvite"("id");
 CREATE UNIQUE INDEX "Role_id_key" ON "Role"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "StaffProfile_id_key" ON "StaffProfile"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "StaffProfile_organizationId_userId_key" ON "StaffProfile"("organizationId", "userId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Person_id_key" ON "Person"("id");
 
 -- CreateIndex
@@ -409,12 +387,6 @@ CREATE UNIQUE INDEX "_LeaseToUser_AB_unique" ON "_LeaseToUser"("A", "B");
 -- CreateIndex
 CREATE INDEX "_LeaseToUser_B_index" ON "_LeaseToUser"("B");
 
--- CreateIndex
-CREATE UNIQUE INDEX "_PropertyToStaffProfile_AB_unique" ON "_PropertyToStaffProfile"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_PropertyToStaffProfile_B_index" ON "_PropertyToStaffProfile"("B");
-
 -- AddForeignKey
 ALTER TABLE "ExpenseAttachment" ADD CONSTRAINT "ExpenseAttachment_expenseId_fkey" FOREIGN KEY ("expenseId") REFERENCES "Expense"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -437,7 +409,7 @@ ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_personId_fkey" FOREI
 ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_assignStaffId_fkey" FOREIGN KEY ("assignStaffId") REFERENCES "StaffProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_assignStaffId_fkey" FOREIGN KEY ("assignStaffId") REFERENCES "Person"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -497,9 +469,6 @@ ALTER TABLE "StaffInvite" ADD CONSTRAINT "StaffInvite_organizationId_fkey" FOREI
 ALTER TABLE "Role" ADD CONSTRAINT "Role_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "StaffProfile" ADD CONSTRAINT "StaffProfile_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Person" ADD CONSTRAINT "Person_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -522,9 +491,3 @@ ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_A_fkey" FOREIGN KEY ("A"
 
 -- AddForeignKey
 ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_A_fkey" FOREIGN KEY ("A") REFERENCES "Property"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_PropertyToStaffProfile" ADD CONSTRAINT "_PropertyToStaffProfile_B_fkey" FOREIGN KEY ("B") REFERENCES "StaffProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;

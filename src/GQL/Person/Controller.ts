@@ -4,23 +4,16 @@ import { Access } from "./Access";
 import type { IFetchPeople } from "./Types";
 
 export class PersonController extends Access {
-  public static fetch = ({ organizationId, cursor, limit }: IFetchPeople) => {
+  public static fetch = ({ organizationId, ...pagination }: IFetchPeople) => {
     return Prisma.transact(async client => {
-      const hasCursor = typeof cursor === "number";
       const results = await client.person.findMany({
         where: { organizationId },
-        take: limit ?? 10,
-        skip: hasCursor ? 1 : 0,
+        ...Prisma.paginationArguments(pagination),
         orderBy: {
           user: {
             name: "asc",
           },
         },
-        cursor: hasCursor
-          ? {
-              id: cursor,
-            }
-          : undefined,
         select: {
           id: true,
           user: {
@@ -34,7 +27,7 @@ export class PersonController extends Access {
         id: item.id,
         name: item.user.name,
       }));
-      return { list, cursor: list[list.length - 1]?.id ?? 0 };
+      return { list, cursor: list[list.length - 1]?.id };
     });
   };
 
