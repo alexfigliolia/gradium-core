@@ -5,7 +5,7 @@ import {
   GraphQLString,
 } from "graphql";
 import { PersonRole } from "@prisma/client";
-import { GradiumImageType } from "GQL/Media/Types";
+import { GradiumImageInput } from "GQL/Media/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { ManagementTaskController } from "./Controller";
@@ -105,7 +105,7 @@ export const createManagementTask: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(ManagementTaskPriority),
     },
     images: {
-      type: SchemaBuilder.nonNullArray(GradiumImageType),
+      type: SchemaBuilder.nonNullArray(GradiumImageInput),
     },
     assignedToId: {
       type: GraphQLInt,

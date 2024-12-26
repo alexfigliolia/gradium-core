@@ -1,6 +1,7 @@
 import {
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLInputObjectType,
   GraphQLInt,
   GraphQLObjectType,
   GraphQLString,
@@ -142,6 +143,18 @@ export const GradiumImage = new GraphQLObjectType<IGradiumImage, Context>({
     url: {
       type: SchemaBuilder.nonNull(GraphQLString),
       resolve: property => property.url,
+    },
+  },
+});
+
+export const GradiumImageInput = new GraphQLInputObjectType({
+  name: "GradiumImageInput",
+  fields: {
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    url: {
+      type: SchemaBuilder.nonNull(GraphQLString),
     },
   },
 });
