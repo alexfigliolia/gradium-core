@@ -1,5 +1,6 @@
 import type { Prisma as Client } from "@prisma/client";
 import { Prisma } from "DB/Client";
+import { PersonController } from "GQL/Person/Controller";
 
 export class Access {
   public static ONE_HOUR = 1000 * 60 * 60;
@@ -43,10 +44,7 @@ export class Access {
       const { person, ...rest } = item;
       return {
         ...rest,
-        person: {
-          id: person.id,
-          name: person.user.name,
-        },
+        person: PersonController.toPersonType(person),
       };
     });
   }

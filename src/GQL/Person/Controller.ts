@@ -23,10 +23,7 @@ export class PersonController extends Access {
           },
         },
       });
-      const list = results.map(item => ({
-        id: item.id,
-        name: item.user.name,
-      }));
+      const list = results.map(this.toPersonType);
       return { list, cursor: list[list.length - 1]?.id };
     });
   };
@@ -45,5 +42,14 @@ export class PersonController extends Access {
         select: access,
       });
     });
+  }
+
+  public static toPersonType(data: {
+    id: number;
+    user: {
+      name: string;
+    };
+  }) {
+    return { id: data.id, name: data.user.name };
   }
 }

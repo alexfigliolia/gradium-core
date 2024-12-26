@@ -27,15 +27,9 @@ export class ManagementTaskController extends Access {
       });
       return tasks.map(task => ({
         ...task,
-        createdBy: {
-          id: task.createdBy.id,
-          name: task.createdBy.user.name,
-        },
+        createdBy: PersonController.toPersonType(task.createdBy),
         assignedTo: task.assignedTo
-          ? {
-              id: task.assignedTo?.id,
-              name: task.assignedTo.user.name,
-            }
+          ? PersonController.toPersonType(task.assignedTo)
           : undefined,
       }));
     });
@@ -69,10 +63,23 @@ export class ManagementTaskController extends Access {
           data: images.map(img => ({ ...img, taskId: task.id })),
         });
       }
-      return client.managementTask.findUnique({
+      const newTask = await client.managementTask.findUnique({
         where: { id: task.id },
-        select: this.DEFAULT_SELECTION,
+        select: Access.DEFAULT_SELECTION,
       });
+      if (!newTask) {
+        throw new GraphQLError(
+          "Something went wrong while createing your task. Please try again",
+        );
+      }
+      const { assignedTo, createdBy, ...taskData } = newTask;
+      return {
+        ...taskData,
+        assignedTo: assignedTo
+          ? PersonController.toPersonType(assignedTo)
+          : undefined,
+        createdBy: PersonController.toPersonType(createdBy),
+      };
     });
   }
 
