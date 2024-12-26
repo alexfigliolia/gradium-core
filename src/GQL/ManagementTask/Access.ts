@@ -25,14 +25,9 @@ export class Access {
     assignedTo: {
       select: {
         id: true,
-        person: {
+        user: {
           select: {
-            id: true,
-            user: {
-              select: {
-                name: true,
-              },
-            },
+            name: true,
           },
         },
       },

@@ -10,7 +10,7 @@ export class PropertyController extends Access {
     if (access === "*") {
       return this.fetchAll(organizationId);
     }
-    return this.fetchByIDs(organizationId, access);
+    return this.fetchByIDs(organizationId);
   }
 
   public static fetchAll(organizationId: number) {
@@ -24,19 +24,11 @@ export class PropertyController extends Access {
     });
   }
 
-  public static fetchByIDs(organizationId: number, ids: number[]) {
+  public static fetchByIDs(organizationId: number) {
     return Prisma.transact(client => {
       return client.property.findMany({
         where: {
-          AND: [
-            { organizationId },
-            { deleted: false },
-            {
-              id: {
-                in: ids,
-              },
-            },
-          ],
+          AND: [{ organizationId }, { deleted: false }],
         },
         include: this.BASIC_ATTRIBUTE_SELECTION,
       });

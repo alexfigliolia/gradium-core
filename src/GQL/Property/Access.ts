@@ -1,5 +1,4 @@
 import { GraphQLError } from "graphql";
-import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
 
 export class Access {
@@ -34,15 +33,6 @@ export class Access {
               role: true,
             },
           },
-          staffProfile: {
-            select: {
-              propertyAccess: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          },
         },
       });
     });
@@ -51,13 +41,10 @@ export class Access {
         "There were no accessible properties found. Please contact us",
       );
     }
-    if (user.roles.some(role => role.role === PersonRole.owner)) {
-      return "*";
-    }
-    if (!user.staffProfile) {
-      return [];
-    }
-    return user.staffProfile[0].propertyAccess.map(p => p.id);
+    // TODO property access control by residency
+    // if (user.roles.some(role => role.role === PersonRole.owner)) {
+    return "*";
+    // }
   }
 
   protected static createSlug(name: string, ...appendages: string[]) {

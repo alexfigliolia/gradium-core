@@ -34,7 +34,7 @@ export class ManagementTaskController extends Access {
         assignedTo: task.assignedTo
           ? {
               id: task.assignedTo?.id,
-              name: task.assignedTo.person.user.name,
+              name: task.assignedTo.user.name,
             }
           : undefined,
       }));

@@ -86,7 +86,6 @@ export class Permission {
   >({
     session,
     operation,
-    propertyId,
     organizationId,
     permissions = [PersonRole.manager],
     errorMessage = "You do not have permission to modify this property's data",
@@ -98,18 +97,12 @@ export class Permission {
       const person = await PersonController.fetchPerson(
         organizationId,
         session.userID,
-        PersonController.ROLE_AND_PROPERTY_ACCESS,
+        PersonController.ROLE_SELECTION,
       );
       if (!person || !this.matchesRolePermissions(person.roles, permissions)) {
         throw new GraphQLError(errorMessage);
       }
-      if (this.matchesRolePermissions(person.roles, [PersonRole.owner])) {
-        return operation(...args);
-      }
-      const access = person.staffProfile?.[0]?.propertyAccess || [];
-      if (!access.some(({ id }) => id === propertyId)) {
-        throw new GraphQLError(errorMessage);
-      }
+      // TODO - restrict transactions by property access
       return operation(...args);
     };
   }
