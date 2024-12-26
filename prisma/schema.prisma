@@ -64,8 +64,8 @@ model ManagementTask {
   property       Property?            @relation(fields: [propertyId], references: [id])
   propertyId     Int?
   priority       TaskPriority         @default(high)
-  assignedTo     Person?              @relation(name: "assignedTo", fields: [assignStaffId], references: [id])
-  assignStaffId  Int?
+  assignedTo     Person?              @relation(name: "assignedTo", fields: [assignedToId], references: [id])
+  assignedToId   Int?
   expenses       Expense[]
 }
 
