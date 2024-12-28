@@ -40,6 +40,13 @@ export class AmenityReservationController extends Access {
         },
       });
     }
+    if (args?.reservers?.length) {
+      whereClauses.push({
+        personId: {
+          in: args.reservers,
+        },
+      });
+    }
     const result = await this.list(whereClauses);
     return this.toGQL(...result);
   };

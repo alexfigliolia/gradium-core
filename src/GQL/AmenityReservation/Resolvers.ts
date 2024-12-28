@@ -33,6 +33,9 @@ export const fetchAmenityReservations: GraphQLFieldConfig<
     amenityIds: {
       type: new GraphQLList(SchemaBuilder.nonNull(GraphQLInt)),
     },
+    reservers: {
+      type: new GraphQLList(SchemaBuilder.nonNull(GraphQLInt)),
+    },
   },
   resolve: (_, args, context) => {
     // TODO - move property related operations over to this middleware

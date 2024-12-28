@@ -21,6 +21,7 @@ export interface IDeleteReservation extends IdentifyProperty, DBID {}
 export interface IListReservations extends IOrganizationID {
   date: string;
   propertyId: number;
+  reservers?: number[];
   amenityIds?: number[];
 }
 
