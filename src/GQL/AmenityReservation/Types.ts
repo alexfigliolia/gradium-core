@@ -1,9 +1,5 @@
-import {
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLObjectType,
-  GraphQLString,
-} from "graphql";
+import { GraphQLBoolean, GraphQLInt, GraphQLObjectType } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -11,7 +7,6 @@ import type { Context, DBID, IEntitySnapshot } from "Types/GraphQL";
 import { EntitySnapshot } from "Types/GraphQL";
 
 export interface ICreateReservation extends IdentifyProperty {
-  date: string;
   start: string;
   end: string;
   charge?: boolean;
@@ -31,7 +26,6 @@ export interface IListReservations extends IOrganizationID {
 
 export interface IReservation {
   id: number;
-  date: string;
   start: string;
   end: string;
   amenity: IEntitySnapshot;
@@ -45,16 +39,12 @@ export const AmenityReservation = new GraphQLObjectType<IReservation, Context>({
       type: SchemaBuilder.nonNull(GraphQLInt),
       resolve: v => v.id,
     },
-    date: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-      resolve: v => v.date,
-    },
     start: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
       resolve: v => v.start,
     },
     end: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
       resolve: v => v.end,
     },
     amenity: {
@@ -85,14 +75,11 @@ export const CreateReservationArgs = {
   personId: {
     type: SchemaBuilder.nonNull(GraphQLInt),
   },
-  date: {
-    type: SchemaBuilder.nonNull(GraphQLString),
-  },
   start: {
-    type: SchemaBuilder.nonNull(GraphQLString),
+    type: SchemaBuilder.nonNull(GraphQLDateTime),
   },
   end: {
-    type: SchemaBuilder.nonNull(GraphQLString),
+    type: SchemaBuilder.nonNull(GraphQLDateTime),
   },
   charge: {
     type: GraphQLBoolean,

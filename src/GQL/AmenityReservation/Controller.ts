@@ -1,4 +1,4 @@
-import { differenceInMilliseconds, isAfter, isBefore } from "date-fns";
+import { addDays, differenceInMilliseconds, isAfter, isBefore } from "date-fns";
 import { GraphQLError } from "graphql";
 import type { Prisma as Client } from "@prisma/client";
 import { BillFrequency } from "@prisma/client";
@@ -15,6 +15,8 @@ import type {
 
 export class AmenityReservationController extends Access {
   public static listReservations = async (args: IListReservations) => {
+    const start = args.date;
+    const end = new Date(addDays(args.date, 1)).toISOString();
     const whereClauses: Client.AmenityReservationWhereInput[] = [
       {
         amenity: {
@@ -25,8 +27,9 @@ export class AmenityReservationController extends Access {
         cancelled: false,
       },
       {
-        date: {
-          equals: args.date,
+        start: {
+          gte: start,
+          lte: end,
         },
       },
     ];
@@ -118,7 +121,6 @@ export class AmenityReservationController extends Access {
           personId: true,
           start: true,
           end: true,
-          date: true,
           amenity: {
             select: {
               price: true,
@@ -137,9 +139,9 @@ export class AmenityReservationController extends Access {
           "This reservation was already deleted by another user. Please refresh your page",
         );
       }
-      const now = new Date();
+      const now = new Date().toISOString();
       const { personId, charges, start, end, amenity } = reservation;
-      if (isAfter(now, end)) {
+      if (isAfter(now, end.toISOString())) {
         throw new GraphQLError("You cannot cancel past reservations");
       }
       await client.amenityReservation.update({
@@ -149,13 +151,14 @@ export class AmenityReservationController extends Access {
       if (!charges.length) {
         return id;
       }
+      const startISO = start.toISOString();
       await ReservationChargeController.deleteMany(charges.map(c => c.id));
-      if (isBefore(now, start)) {
+      if (isBefore(now, startISO)) {
         return id;
       }
       const { billed, price } = amenity;
       const amount = this.calculate(
-        differenceInMilliseconds(now, start),
+        differenceInMilliseconds(now, startISO),
         billed,
         price,
       );
@@ -180,7 +183,7 @@ export class AmenityReservationController extends Access {
         "Reservations must have valid starting and ending times",
       );
     }
-    if (isBefore(new Date(start), new Date(new Date().toISOString()))) {
+    if (isBefore(start, new Date().toISOString())) {
       throw new GraphQLError(
         `You may only ${action} reservations for future times`,
       );
@@ -192,8 +195,8 @@ export class AmenityReservationController extends Access {
     const error = this.validateDuration(
       start,
       end,
-      constraints.open,
-      constraints.close,
+      constraints.open.toISOString(),
+      constraints.close.toISOString(),
       constraints.name,
     );
     if (error) {
@@ -214,11 +217,7 @@ export class AmenityReservationController extends Access {
     price: string,
     billed: BillFrequency,
   ) {
-    return this.calculate(
-      this.differenceInMilliseconds(end, start),
-      billed,
-      price,
-    );
+    return this.calculate(differenceInMilliseconds(end, start), billed, price);
   }
 
   private static calculate(
@@ -250,11 +249,13 @@ export class AmenityReservationController extends Access {
     ) {
       return "Your reservation's start time must be before its end time";
     }
-    if (Dates.dateToTimeInt(start) < Dates.dateToTimeInt(open)) {
+    const startDate = Dates.populateDateFrom(open, new Date(start));
+    if (isBefore(startDate, open)) {
       return `Your reservation's start time cannot be before the ${name} opens`;
     }
-    if (Dates.dateToTimeInt(end) > Dates.dateToTimeInt(close)) {
-      return `Your reservation's end time cannot be after after the ${name} opens`;
+    const endDate = Dates.populateDateFrom(close, new Date(end));
+    if (isAfter(endDate, close)) {
+      return `Your reservation's end time cannot be after the ${name} closes`;
     }
   }
 
@@ -267,13 +268,6 @@ export class AmenityReservationController extends Access {
     }
     throw new GraphQLError(
       "This amenity has an invalid bill frequency. Please update it on the amenity configuration page",
-    );
-  }
-
-  private static differenceInMilliseconds(start: string, end: string) {
-    return differenceInMilliseconds(
-      Dates.populateTimeFrom(start),
-      Dates.populateTimeFrom(end),
     );
   }
 }

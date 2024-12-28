@@ -34,10 +34,11 @@ CREATE TABLE "ExpenseAttachment" (
 -- CreateTable
 CREATE TABLE "ReservationCharge" (
     "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "amount" DOUBLE PRECISION NOT NULL,
     "personId" INTEGER NOT NULL,
     "reservationId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "ReservationCharge_pkey" PRIMARY KEY ("id")
 );
@@ -45,11 +46,12 @@ CREATE TABLE "ReservationCharge" (
 -- CreateTable
 CREATE TABLE "Expense" (
     "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "cost" TEXT NOT NULL DEFAULT '0',
     "title" TEXT NOT NULL DEFAULT '',
     "description" TEXT NOT NULL DEFAULT '',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
 );
@@ -59,6 +61,8 @@ CREATE TABLE "TaskImage" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "taskId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "TaskImage_pkey" PRIMARY KEY ("id")
 );
@@ -66,7 +70,6 @@ CREATE TABLE "TaskImage" (
 -- CreateTable
 CREATE TABLE "ManagementTask" (
     "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" "ManagementTaskStatus" NOT NULL,
@@ -75,7 +78,9 @@ CREATE TABLE "ManagementTask" (
     "personId" INTEGER NOT NULL,
     "propertyId" INTEGER,
     "priority" "TaskPriority" NOT NULL DEFAULT 'high',
-    "assignStaffId" INTEGER,
+    "assignedToId" INTEGER,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "ManagementTask_pkey" PRIMARY KEY ("id")
 );
@@ -84,6 +89,7 @@ CREATE TABLE "ManagementTask" (
 CREATE TABLE "RentPayment" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
     "value" DOUBLE PRECISION NOT NULL,
     "userId" INTEGER NOT NULL,
     "leaseId" INTEGER NOT NULL,
@@ -96,8 +102,9 @@ CREATE TABLE "RentPayment" (
 CREATE TABLE "Lease" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "start" TEXT NOT NULL,
-    "end" TEXT NOT NULL,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+    "start" TIMESTAMPTZ(3) NOT NULL,
+    "end" TIMESTAMPTZ(3) NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "status" "LeaseStatus" NOT NULL,
     "paymentFrequency" "RentPaymentFrequency" NOT NULL,
@@ -112,12 +119,13 @@ CREATE TABLE "Lease" (
 -- CreateTable
 CREATE TABLE "AmenityReservation" (
     "id" SERIAL NOT NULL,
-    "date" TEXT NOT NULL,
-    "start" TEXT NOT NULL,
-    "end" TEXT NOT NULL,
+    "start" TIMESTAMPTZ(3) NOT NULL,
+    "end" TIMESTAMPTZ(3) NOT NULL,
     "cancelled" BOOLEAN NOT NULL DEFAULT false,
     "amenityId" INTEGER NOT NULL,
     "personId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "AmenityReservation_pkey" PRIMARY KEY ("id")
 );
@@ -127,6 +135,8 @@ CREATE TABLE "AmenityFloorPlan" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "amenityId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "AmenityFloorPlan_pkey" PRIMARY KEY ("id")
 );
@@ -136,6 +146,8 @@ CREATE TABLE "AmenityImage" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "amenityId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "AmenityImage_pkey" PRIMARY KEY ("id")
 );
@@ -145,12 +157,14 @@ CREATE TABLE "Amenity" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL DEFAULT '',
     "price" TEXT NOT NULL DEFAULT '0',
-    "open" TEXT NOT NULL,
-    "close" TEXT NOT NULL,
+    "open" TIMESTAMPTZ(3) NOT NULL,
+    "close" TIMESTAMPTZ(3) NOT NULL,
     "capacity" INTEGER NOT NULL DEFAULT 0,
     "billed" "BillFrequency" NOT NULL DEFAULT 'hour',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "Amenity_pkey" PRIMARY KEY ("id")
 );
@@ -160,6 +174,8 @@ CREATE TABLE "LivingSpaceImage" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "livingSpaceId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "LivingSpaceImage_pkey" PRIMARY KEY ("id")
 );
@@ -169,6 +185,8 @@ CREATE TABLE "LivingSpaceFloorPlan" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "livingSpaceId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "LivingSpaceFloorPlan_pkey" PRIMARY KEY ("id")
 );
@@ -183,6 +201,8 @@ CREATE TABLE "LivingSpace" (
     "size" TEXT NOT NULL DEFAULT '0',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "LivingSpace_pkey" PRIMARY KEY ("id")
 );
@@ -192,6 +212,8 @@ CREATE TABLE "PropertyAddon" (
     "id" SERIAL NOT NULL,
     "type" "PropertyAddonType" NOT NULL,
     "propertyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "PropertyAddon_pkey" PRIMARY KEY ("id")
 );
@@ -201,6 +223,8 @@ CREATE TABLE "PropertyImage" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
     "propertyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "PropertyImage_pkey" PRIMARY KEY ("id")
 );
@@ -218,6 +242,8 @@ CREATE TABLE "Property" (
     "mapsLink" TEXT NOT NULL DEFAULT '',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "organizationId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
 );
@@ -227,6 +253,8 @@ CREATE TABLE "StaffInvite" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "organizationId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "StaffInvite_pkey" PRIMARY KEY ("id")
 );
@@ -236,6 +264,8 @@ CREATE TABLE "Role" (
     "id" SERIAL NOT NULL,
     "role" "PersonRole" NOT NULL,
     "personId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
@@ -246,6 +276,8 @@ CREATE TABLE "Person" (
     "organizationId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
     "linkedEmailId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "Person_pkey" PRIMARY KEY ("id")
 );
@@ -409,7 +441,7 @@ ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_personId_fkey" FOREI
 ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_assignStaffId_fkey" FOREIGN KEY ("assignStaffId") REFERENCES "Person"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_assignedToId_fkey" FOREIGN KEY ("assignedToId") REFERENCES "Person"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

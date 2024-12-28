@@ -1,5 +1,6 @@
 import type { GraphQLFieldConfig } from "graphql";
-import { GraphQLInt, GraphQLList, GraphQLString } from "graphql";
+import { GraphQLInt, GraphQLList } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import { PersonRole } from "@prisma/client";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -27,7 +28,7 @@ export const fetchAmenityReservations: GraphQLFieldConfig<
   args: {
     ...IdentifyPropertyArgs,
     date: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
     },
     amenityIds: {
       type: new GraphQLList(SchemaBuilder.nonNull(GraphQLInt)),

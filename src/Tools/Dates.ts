@@ -57,10 +57,6 @@ export class Dates {
     return `${this.pad(date.getHours())}:${this.pad(date.getMinutes())}:${this.pad(date.getSeconds())}`;
   }
 
-  public static dateToTimeInt(input: Date | string) {
-    return parseInt(this.dateToTime(input).split(":").join(""));
-  }
-
   public static populateTimeFrom(input: Date | string, base = new Date()) {
     const date = typeof input === "string" ? new Date(input) : input;
     base.setHours(date.getHours());
@@ -70,12 +66,12 @@ export class Dates {
     return date;
   }
 
-  public static populateDateFrom(input: Date | string, base = new Date()) {
-    const date = typeof input === "string" ? new Date(input) : input;
-    base.setFullYear(date.getFullYear());
-    base.setMonth(date.getMonth());
-    base.setDate(date.getDate());
-    return date;
+  public static populateDateFrom(base: Date | string, newDate = new Date()) {
+    const baseDate = typeof base === "string" ? new Date(base) : base;
+    newDate.setFullYear(baseDate.getFullYear());
+    newDate.setMonth(baseDate.getMonth());
+    newDate.setDate(baseDate.getDate());
+    return newDate;
   }
 
   private static pad(value: number) {

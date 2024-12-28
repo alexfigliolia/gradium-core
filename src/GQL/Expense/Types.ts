@@ -1,4 +1,5 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
@@ -20,7 +21,7 @@ export const Expense = new GraphQLObjectType<IExpense, Context>({
       resolve: e => e.id,
     },
     createdAt: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
       resolve: e => e.createdAt,
     },
     cost: {

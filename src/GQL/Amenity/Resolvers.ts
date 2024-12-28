@@ -1,4 +1,5 @@
 import { type GraphQLFieldConfig, GraphQLInt, GraphQLString } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { Permission } from "Tools/Permission";
@@ -42,10 +43,10 @@ export const createOrUpdateAmenity: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(BillFrequency),
     },
     open: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
     },
     close: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
     },
     price: {
       type: SchemaBuilder.nonNull(GraphQLString),

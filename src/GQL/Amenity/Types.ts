@@ -4,6 +4,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -67,11 +68,11 @@ export const Amenity = new GraphQLObjectType<IAmenity, Context>({
       resolve: space => space.billed,
     },
     open: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
       resolve: space => space.open,
     },
     close: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
       resolve: space => space.close,
     },
     capacity: {

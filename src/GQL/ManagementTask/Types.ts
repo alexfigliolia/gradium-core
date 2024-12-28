@@ -4,6 +4,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import type {
   ManagementTaskStatus as IManagementTaskStatus,
   TaskPriority as ITaskPriority,
@@ -87,7 +88,7 @@ export const ManagementTask = new GraphQLObjectType<IManagementTask, Context>({
       resolve: m => m.id,
     },
     createdAt: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
       resolve: m => m.createdAt,
     },
     title: {

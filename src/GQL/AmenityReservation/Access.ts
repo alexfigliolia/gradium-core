@@ -9,7 +9,6 @@ export class Access {
     id: true,
     start: true,
     end: true,
-    date: true,
     amenity: {
       select: {
         id: true,

@@ -23,35 +23,38 @@ model ExpenseAttachment {
 
 model ReservationCharge {
   id            Int                @id @unique @default(autoincrement())
-  createdAt     DateTime           @default(now()) @db.Timestamptz(3)
   amount        Float
   person        Person             @relation(fields: [personId], references: [id])
   personId      Int
   reservation   AmenityReservation @relation(fields: [reservationId], references: [id])
   reservationId Int
+  createdAt     DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime           @updatedAt @db.Timestamptz(3)
 }
 
 model Expense {
   id          Int                 @id @unique @default(autoincrement())
-  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
   cost        String              @default("0")
   title       String              @default("")
   description String              @default("")
   deleted     Boolean             @default(false)
   attachments ExpenseAttachment[]
   tasks       ManagementTask[]
+  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime            @updatedAt @db.Timestamptz(3)
 }
 
 model TaskImage {
-  id     Int            @id @unique @default(autoincrement())
-  url    String
-  task   ManagementTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  taskId Int
+  id        Int            @id @unique @default(autoincrement())
+  url       String
+  task      ManagementTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    Int
+  createdAt DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime       @updatedAt @db.Timestamptz(3)
 }
 
 model ManagementTask {
   id             Int                  @id @unique @default(autoincrement())
-  createdAt      DateTime             @default(now()) @db.Timestamptz(3)
   title          String
   description    String
   status         ManagementTaskStatus
@@ -67,11 +70,14 @@ model ManagementTask {
   assignedTo     Person?              @relation(name: "assignedTo", fields: [assignedToId], references: [id])
   assignedToId   Int?
   expenses       Expense[]
+  createdAt      DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime             @updatedAt @db.Timestamptz(3)
 }
 
 model RentPayment {
   id             Int          @id @unique @default(autoincrement())
   createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
   value          Float
   user           User         @relation(fields: [userId], references: [id])
   userId         Int
@@ -84,8 +90,9 @@ model RentPayment {
 model Lease {
   id               Int                  @id @unique @default(autoincrement())
   createdAt        DateTime             @default(now()) @db.Timestamptz(3)
-  start            String
-  end              String
+  updatedAt        DateTime             @updatedAt @db.Timestamptz(3)
+  start            DateTime             @db.Timestamptz(3)
+  end              DateTime             @db.Timestamptz(3)
   price            Float
   lessees          User[]
   status           LeaseStatus
@@ -102,37 +109,42 @@ model Lease {
 
 model AmenityReservation {
   id        Int                 @id @unique @default(autoincrement())
-  date      String
-  start     String
-  end       String
+  start     DateTime            @db.Timestamptz(3)
+  end       DateTime            @db.Timestamptz(3)
   cancelled Boolean             @default(false)
   amenity   Amenity             @relation(fields: [amenityId], references: [id])
   amenityId Int
   person    Person              @relation(fields: [personId], references: [id])
   personId  Int
   charges   ReservationCharge[]
+  createdAt DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime            @updatedAt @db.Timestamptz(3)
 }
 
 model AmenityFloorPlan {
-  id        Int     @id @unique @default(autoincrement())
+  id        Int      @id @unique @default(autoincrement())
   url       String
-  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  amenity   Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
   amenityId Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model AmenityImage {
-  id        Int     @id @unique @default(autoincrement())
+  id        Int      @id @unique @default(autoincrement())
   url       String
-  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  amenity   Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
   amenityId Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Amenity {
   id           Int                  @id @unique @default(autoincrement())
   name         String               @default("")
   price        String               @default("0")
-  open         String
-  close        String
+  open         DateTime             @db.Timestamptz(3)
+  close        DateTime             @db.Timestamptz(3)
   capacity     Int                  @default(0)
   billed       BillFrequency        @default(hour)
   deleted      Boolean              @default(false)
@@ -141,6 +153,8 @@ model Amenity {
   property     Property             @relation(fields: [propertyId], references: [id])
   propertyId   Int
   reservations AmenityReservation[]
+  createdAt    DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime             @updatedAt @db.Timestamptz(3)
 }
 
 model LivingSpaceImage {
@@ -148,6 +162,8 @@ model LivingSpaceImage {
   url           String
   livingSpace   LivingSpace @relation(fields: [livingSpaceId], references: [id], onDelete: Cascade)
   livingSpaceId Int
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime    @updatedAt @db.Timestamptz(3)
 }
 
 model LivingSpaceFloorPlan {
@@ -155,6 +171,8 @@ model LivingSpaceFloorPlan {
   url           String
   livingSpace   LivingSpace @relation(fields: [livingSpaceId], references: [id], onDelete: Cascade)
   livingSpaceId Int
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime    @updatedAt @db.Timestamptz(3)
 }
 
 model LivingSpace {
@@ -170,6 +188,8 @@ model LivingSpace {
   floorPlans LivingSpaceFloorPlan[]
   property   Property               @relation(fields: [propertyId], references: [id])
   propertyId Int
+  createdAt  DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime               @updatedAt @db.Timestamptz(3)
 }
 
 model PropertyAddon {
@@ -177,6 +197,8 @@ model PropertyAddon {
   type       PropertyAddonType
   property   Property          @relation(fields: [propertyId], references: [id])
   propertyId Int
+  createdAt  DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime          @updatedAt @db.Timestamptz(3)
 
   @@unique([propertyId, type])
 }
@@ -186,6 +208,8 @@ model PropertyImage {
   url        String
   property   Property @relation(fields: [propertyId], references: [id])
   propertyId Int
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Property {
@@ -207,6 +231,8 @@ model Property {
   organizationId  Int
   managementTasks ManagementTask[]
   addons          PropertyAddon[]
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime         @updatedAt @db.Timestamptz(3)
 }
 
 model StaffInvite {
@@ -214,13 +240,17 @@ model StaffInvite {
   email          String
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId Int
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
 }
 
 model Role {
-  id       Int        @id @unique @default(autoincrement())
-  role     PersonRole
-  person   Person     @relation(fields: [personId], references: [id])
-  personId Int
+  id        Int        @id @unique @default(autoincrement())
+  role      PersonRole
+  person    Person     @relation(fields: [personId], references: [id])
+  personId  Int
+  createdAt DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime   @updatedAt @db.Timestamptz(3)
 }
 
 model Person {
@@ -236,6 +266,8 @@ model Person {
   amenityReservations AmenityReservation[]
   reservationCharges  ReservationCharge[]
   assignedTasks       ManagementTask[]     @relation("assignedTo")
+  createdAt           DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime             @updatedAt @db.Timestamptz(3)
 
   @@unique(name: "identity", [organizationId, userId])
 }

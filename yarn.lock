@@ -1180,6 +1180,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/graphql-iso-date@^3.4.3":
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@types/graphql-iso-date/-/graphql-iso-date-3.4.3.tgz#de4a916fb2b7e59b11b4f595883e8510b6b8267e"
+  integrity sha512-XBNgBXEY8Yy0Ax2NE7fCmeCTk8dc4AALPWpaDtIuP0bIez2eyPn9CVuhDnG153hUnX+QRASKJXcc+I2pplQ2ww==
+  dependencies:
+    graphql "^15.1.0"
+
 "@types/http-errors@*":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.4.tgz#7eb47726c391b7345a6ec35ad7f4de469cf5ba4f"
@@ -3258,6 +3265,11 @@ graphemer@^1.4.0:
   resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.4.0.tgz#fb2f1d55e0e3a1849aeffc90c4fa0dd53a0e66c6"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
+graphql-iso-date@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.6.1.tgz#bd2d0dc886e0f954cbbbc496bbf1d480b57ffa96"
+  integrity sha512-AwFGIuYMJQXOEAgRlJlFL4H1ncFM8n8XmoVDTNypNOZyQ8LFDG2ppMFlsS862BSTCDcSUfHp8PD3/uJhv7t59Q==
+
 graphql-yoga@^5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/graphql-yoga/-/graphql-yoga-5.7.0.tgz#7c9a6e14cd9483cf04d26b5a189f2eed4a8a7111"
@@ -3275,7 +3287,7 @@ graphql-yoga@^5.7.0:
     lru-cache "^10.0.0"
     tslib "^2.5.2"
 
-graphql@^16.9.0:
+graphql@^15.1.0, graphql@^16.9.0:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.9.0.tgz#1c310e63f16a49ce1fbb230bd0a000e99f6f115f"
   integrity sha512-GGTKBX4SD7Wdb8mqeDLni2oaRGYQWjWHGKPQ24ZMnUtKfcsVoiv4uX8+LJr1K6U5VW2Lu1BwJnj7uiori0YtRw==
