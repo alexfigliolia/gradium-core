@@ -2,6 +2,7 @@ import {
   GraphQLBoolean,
   type GraphQLFieldConfig,
   GraphQLInt,
+  GraphQLList,
   GraphQLString,
 } from "graphql";
 import { PersonRole } from "@prisma/client";
@@ -32,6 +33,15 @@ export const listManagementTasks: GraphQLFieldConfig<
     },
     propertyId: {
       type: GraphQLInt,
+    },
+    priority: {
+      type: new GraphQLList(ManagementTaskPriority),
+    },
+    assignedToId: {
+      type: new GraphQLList(GraphQLInt),
+    },
+    searchString: {
+      type: GraphQLString,
     },
   },
   resolve: async (_, args, context) => {

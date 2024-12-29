@@ -9,13 +9,27 @@ import type { ICreateManagementTask, IlistManagementTasks } from "./Types";
 
 export class ManagementTaskController extends Access {
   public static listManagementTasks = ({
+    searchString,
+    assignedToId,
+    priority,
     propertyId,
     organizationId,
   }: IlistManagementTasks) => {
     let where: IPrisma.ManagementTaskWhereInput;
-    if (typeof propertyId === "number") {
+    if (
+      !!propertyId ||
+      !!searchString ||
+      !!assignedToId?.length ||
+      !!priority?.length
+    ) {
       where = {
-        AND: [{ propertyId }, { organizationId }],
+        AND: this.buildFilterCombinator({
+          priority,
+          propertyId,
+          searchString,
+          assignedToId,
+          organizationId,
+        }),
       };
     } else {
       where = { organizationId };

@@ -7,7 +7,7 @@ import {
 import { GraphQLDateTime } from "graphql-iso-date";
 import type {
   ManagementTaskStatus as IManagementTaskStatus,
-  TaskPriority as ITaskPriority,
+  TaskPriority as IManagementTaskPriorirty,
 } from "@prisma/client";
 import { Expense, type IExpense } from "GQL/Expense/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
@@ -23,15 +23,19 @@ export interface ISetStatus extends IOrganizationID, DBID {
 
 export interface IlistManagementTasks extends IOrganizationID {
   propertyId?: number;
+  assignedToId?: number[];
+  searchString?: string;
+  priority?: IManagementTaskPriorirty[];
 }
 
-export interface ICreateManagementTask extends IlistManagementTasks {
+export interface ICreateManagementTask extends IOrganizationID {
   title: string;
   description: string;
   status: IManagementTaskStatus;
-  priority: ITaskPriority;
+  priority: IManagementTaskPriorirty;
   images: IGradiumImage[];
   assignedToId?: number;
+  propertyId?: number;
 }
 
 export const ManagementTaskStatus = new GraphQLEnumType({
@@ -75,7 +79,7 @@ export interface IManagementTask {
   status: IManagementTaskStatus;
   images: IGradiumImage[];
   createdBy: IPerson;
-  priority: ITaskPriority;
+  priority: IManagementTaskPriorirty;
   assignedTo?: IStaffProfile;
   expenses: IExpense[];
 }
