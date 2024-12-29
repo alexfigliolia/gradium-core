@@ -28,6 +28,7 @@ import {
   createManagementTask,
   listManagementTasks,
   setManagementTaskStatus,
+  updateManagementTask,
 } from "./ManagementTask/Resolvers";
 import {
   deleteImage,
@@ -83,6 +84,7 @@ const MutationRoot = new GraphQLObjectType({
     modifyPropertyAddons,
     createOrUpdateAmenity,
     createManagementTask,
+    updateManagementTask,
     setManagementTaskStatus,
     updateBasicPropertyInfo,
     createAmenityReservation,

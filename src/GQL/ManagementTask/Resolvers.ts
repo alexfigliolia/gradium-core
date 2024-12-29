@@ -14,11 +14,13 @@ import type {
   ICreateManagementTask,
   IlistManagementTasks,
   ISetStatus,
+  IUpdateManagementTask,
 } from "./Types";
 import {
   ManagementTask,
   ManagementTaskPriority,
   ManagementTaskStatus,
+  TaskArguments,
 } from "./Types";
 
 export const listManagementTasks: GraphQLFieldConfig<
@@ -96,29 +98,9 @@ export const createManagementTask: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(ManagementTask),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: GraphQLInt,
-    },
-    title: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-    description: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-    status: {
-      type: SchemaBuilder.nonNull(ManagementTaskStatus),
-    },
-    priority: {
-      type: SchemaBuilder.nonNull(ManagementTaskPriority),
-    },
+    ...TaskArguments,
     images: {
       type: SchemaBuilder.nonNullArray(GradiumImageInput),
-    },
-    assignedToId: {
-      type: GraphQLInt,
     },
   },
   resolve: async (_, args, context) => {
@@ -132,5 +114,31 @@ export const createManagementTask: GraphQLFieldConfig<
       errorMessage: `You do not have permission to view management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
     });
     return operation(args, context.req.session.userID!);
+  },
+};
+
+export const updateManagementTask: GraphQLFieldConfig<
+  any,
+  Context,
+  IUpdateManagementTask
+> = {
+  type: SchemaBuilder.nonNull(ManagementTask),
+  args: {
+    ...TaskArguments,
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+  },
+  resolve: async (_, args, context) => {
+    const { organizationId, propertyId } = args;
+    const operation = ManagementTaskController.permissedTransaction({
+      propertyId,
+      organizationId,
+      session: context.req.session,
+      permissions: [PersonRole.maintenance],
+      operation: ManagementTaskController.updateTask,
+      errorMessage: `You do not have permission to view management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
+    });
+    return operation(args);
   },
 };

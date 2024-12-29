@@ -38,6 +38,11 @@ export interface ICreateManagementTask extends IOrganizationID {
   propertyId?: number;
 }
 
+export interface IUpdateManagementTask
+  extends Omit<ICreateManagementTask, "images"> {
+  id: number;
+}
+
 export const ManagementTaskStatus = new GraphQLEnumType({
   name: "ManagementTaskStatus",
   values: {
@@ -129,3 +134,27 @@ export const ManagementTask = new GraphQLObjectType<IManagementTask, Context>({
     },
   },
 });
+
+export const TaskArguments = {
+  organizationId: {
+    type: SchemaBuilder.nonNull(GraphQLInt),
+  },
+  propertyId: {
+    type: GraphQLInt,
+  },
+  title: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  description: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  status: {
+    type: SchemaBuilder.nonNull(ManagementTaskStatus),
+  },
+  priority: {
+    type: SchemaBuilder.nonNull(ManagementTaskPriority),
+  },
+  assignedToId: {
+    type: GraphQLInt,
+  },
+};
