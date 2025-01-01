@@ -53,13 +53,13 @@ export class ManagementTaskController extends Access {
     });
   };
 
-  public static async createTask(
-    { images, ...rest }: ICreateManagementTask,
+  public static createTask = async (
+    data: ICreateManagementTask,
     userID: number,
-  ) {
+  ) => {
     const person = await PersonController.fetchPerson(
       userID,
-      rest.organizationId,
+      data.organizationId,
       {
         id: true,
       },
@@ -72,24 +72,22 @@ export class ManagementTaskController extends Access {
     return Prisma.transact(async client => {
       const task = await client.managementTask.create({
         data: {
-          ...rest,
+          ...data,
           personId: person.id,
         },
       });
-      if (images.length) {
-        await client.taskImage.createMany({
-          data: images.map(img => ({ ...img, taskId: task.id })),
-        });
-      }
       return this.getByID(task.id);
     });
-  }
+  };
 
   public static updateTask = ({ id, ...data }: IUpdateManagementTask) => {
     return Prisma.transact(async client => {
       await client.managementTask.update({
         where: { id },
-        data,
+        data: {
+          ...data,
+          assignedToId: data.assignedToId || null,
+        },
       });
       return this.getByID(id);
     });

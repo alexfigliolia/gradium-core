@@ -114,7 +114,7 @@ export const saveImage: GraphQLFieldConfig<any, Context, ICreateGradiumImage> =
         session: context.req.session,
         operation: MediaController.Images.create,
         errorMessage:
-          "You do not have permission to modify this property's images",
+          "You do not have permission to modify media content for this property",
       });
       return operation(rest);
     },

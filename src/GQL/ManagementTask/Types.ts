@@ -33,13 +33,11 @@ export interface ICreateManagementTask extends IOrganizationID {
   description: string;
   status: IManagementTaskStatus;
   priority: IManagementTaskPriorirty;
-  images: IGradiumImage[];
   assignedToId?: number;
   propertyId?: number;
 }
 
-export interface IUpdateManagementTask
-  extends Omit<ICreateManagementTask, "images"> {
+export interface IUpdateManagementTask extends ICreateManagementTask {
   id: number;
 }
 

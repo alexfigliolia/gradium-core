@@ -6,7 +6,6 @@ import {
   GraphQLString,
 } from "graphql";
 import { PersonRole } from "@prisma/client";
-import { GradiumImageInput } from "GQL/Media/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { ManagementTaskController } from "./Controller";
@@ -97,12 +96,7 @@ export const createManagementTask: GraphQLFieldConfig<
   ICreateManagementTask
 > = {
   type: SchemaBuilder.nonNull(ManagementTask),
-  args: {
-    ...TaskArguments,
-    images: {
-      type: SchemaBuilder.nonNullArray(GradiumImageInput),
-    },
-  },
+  args: TaskArguments,
   resolve: async (_, args, context) => {
     const { organizationId, propertyId } = args;
     const operation = ManagementTaskController.permissedTransaction({
