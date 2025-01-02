@@ -26,6 +26,7 @@ import {
 } from "./Login/Resolvers";
 import {
   createManagementTask,
+  deleteManagementTask,
   listManagementTasks,
   setManagementTaskStatus,
   updateManagementTask,
@@ -85,6 +86,7 @@ const MutationRoot = new GraphQLObjectType({
     createOrUpdateAmenity,
     createManagementTask,
     updateManagementTask,
+    deleteManagementTask,
     setManagementTaskStatus,
     updateBasicPropertyInfo,
     createAmenityReservation,

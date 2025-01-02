@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import type { ManagementTaskStatus, Prisma as IPrisma } from "@prisma/client";
+import type { ManagementTaskStatus } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { PersonController } from "GQL/Person/Controller";
 import { Permission } from "Tools/Permission";
@@ -19,28 +19,17 @@ export class ManagementTaskController extends Access {
     propertyId,
     organizationId,
   }: IlistManagementTasks) => {
-    let where: IPrisma.ManagementTaskWhereInput;
-    if (
-      !!propertyId ||
-      !!searchString ||
-      !!assignedToId?.length ||
-      !!priority?.length
-    ) {
-      where = {
-        AND: this.buildFilterCombinator({
-          priority,
-          propertyId,
-          searchString,
-          assignedToId,
-          organizationId,
-        }),
-      };
-    } else {
-      where = { organizationId };
-    }
     return Prisma.transact(async client => {
       const tasks = await client.managementTask.findMany({
-        where,
+        where: {
+          AND: this.buildFilterCombinator({
+            priority,
+            propertyId,
+            searchString,
+            assignedToId,
+            organizationId,
+          }),
+        },
         select: this.DEFAULT_SELECTION,
       });
       return tasks.map(task => ({
@@ -138,6 +127,16 @@ export class ManagementTaskController extends Access {
       };
     });
   }
+
+  public static deleteTask = (id: number) => {
+    return Prisma.transact(async client => {
+      await client.managementTask.update({
+        where: { id },
+        data: { deleted: true },
+      });
+      return true;
+    });
+  };
 
   public static permissedTransaction<F extends (...args: any[]) => any>({
     session,

@@ -59,7 +59,10 @@ export class Access {
     assignedToId,
     priority,
   }: IlistManagementTasks) {
-    const combinator: IPrisma.ManagementTaskWhereInput[] = [{ organizationId }];
+    const combinator: IPrisma.ManagementTaskWhereInput[] = [
+      { organizationId },
+      { deleted: false },
+    ];
     if (propertyId) {
       combinator.push({ propertyId });
     }

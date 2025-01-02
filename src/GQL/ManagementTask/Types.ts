@@ -41,6 +41,10 @@ export interface IUpdateManagementTask extends ICreateManagementTask {
   id: number;
 }
 
+export interface IDeleteTask extends DBID, IOrganizationID {
+  propertyId?: number;
+}
+
 export const ManagementTaskStatus = new GraphQLEnumType({
   name: "ManagementTaskStatus",
   values: {
@@ -133,13 +137,17 @@ export const ManagementTask = new GraphQLObjectType<IManagementTask, Context>({
   },
 });
 
-export const TaskArguments = {
+export const ScopeArgs = {
   organizationId: {
     type: SchemaBuilder.nonNull(GraphQLInt),
   },
   propertyId: {
     type: GraphQLInt,
   },
+};
+
+export const TaskArguments = {
+  ...ScopeArgs,
   title: {
     type: SchemaBuilder.nonNull(GraphQLString),
   },

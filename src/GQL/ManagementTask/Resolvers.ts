@@ -11,6 +11,7 @@ import type { Context } from "Types/GraphQL";
 import { ManagementTaskController } from "./Controller";
 import type {
   ICreateManagementTask,
+  IDeleteTask,
   IlistManagementTasks,
   ISetStatus,
   IUpdateManagementTask,
@@ -19,6 +20,7 @@ import {
   ManagementTask,
   ManagementTaskPriority,
   ManagementTaskStatus,
+  ScopeArgs,
   TaskArguments,
 } from "./Types";
 
@@ -105,7 +107,7 @@ export const createManagementTask: GraphQLFieldConfig<
       session: context.req.session,
       permissions: [PersonRole.maintenance],
       operation: ManagementTaskController.createTask,
-      errorMessage: `You do not have permission to view management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
+      errorMessage: `You do not have permission to create management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
     });
     return operation(args, context.req.session.userID!);
   },
@@ -131,8 +133,34 @@ export const updateManagementTask: GraphQLFieldConfig<
       session: context.req.session,
       permissions: [PersonRole.maintenance],
       operation: ManagementTaskController.updateTask,
-      errorMessage: `You do not have permission to view management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
+      errorMessage: `You do not have permission to edit management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
     });
     return operation(args);
+  },
+};
+
+export const deleteManagementTask: GraphQLFieldConfig<
+  any,
+  Context,
+  IDeleteTask
+> = {
+  type: SchemaBuilder.nonNull(GraphQLBoolean),
+  args: {
+    ...ScopeArgs,
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+  },
+  resolve: async (_, args, context) => {
+    const { organizationId, propertyId, id } = args;
+    const operation = ManagementTaskController.permissedTransaction({
+      propertyId,
+      organizationId,
+      session: context.req.session,
+      permissions: [PersonRole.maintenance],
+      operation: ManagementTaskController.deleteTask,
+      errorMessage: `You do not have permission to delete management tasks for this ${typeof propertyId === "number" ? "property" : "organization"}`,
+    });
+    return operation(id);
   },
 };
