@@ -1,7 +1,7 @@
 import { Prisma } from "DB/Client";
 import { PersonController } from "GQL/Person/Controller";
 import { Access } from "./Access";
-import type { ICreateExpense } from "./Types";
+import type { ICreateExpense, IUpdateExpense } from "./Types";
 
 export class ExpenseController extends Access {
   public static create = async (
@@ -18,6 +18,24 @@ export class ExpenseController extends Access {
           ...data,
           personId,
         },
+        select: this.DEFAULT_SELECTION,
+      });
+    });
+    return {
+      ...expense,
+      createdBy: PersonController.toPersonType(expense.createdBy),
+    };
+  };
+
+  public static update = async ({
+    id,
+    propertyId: _,
+    ...data
+  }: IUpdateExpense) => {
+    const expense = await Prisma.transact(client => {
+      return client.expense.update({
+        where: { id },
+        data,
         select: this.DEFAULT_SELECTION,
       });
     });

@@ -18,6 +18,10 @@ export interface ICreateExpense extends IOrganizationID, IExpenseContent {
   propertyId?: number;
 }
 
+export interface IUpdateExpense extends ICreateExpense {
+  id: number;
+}
+
 export interface IExpense extends IExpenseContent {
   id: number;
   createdAt: string;
@@ -58,3 +62,21 @@ export const Expense = new GraphQLObjectType<IExpense, Context>({
     },
   },
 });
+
+export const TaskArgs = {
+  organizationId: {
+    type: SchemaBuilder.nonNull(GraphQLInt),
+  },
+  propertyId: {
+    type: GraphQLInt,
+  },
+  cost: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  title: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  description: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+};

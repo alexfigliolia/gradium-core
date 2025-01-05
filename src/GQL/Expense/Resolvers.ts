@@ -1,34 +1,20 @@
 import type { GraphQLFieldConfig } from "graphql";
-import { GraphQLInt, GraphQLString } from "graphql";
+import { GraphQLInt } from "graphql";
 import { PersonRole } from "@prisma/client";
 import { ManagementTaskController } from "GQL/ManagementTask/Controller";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 import { ExpenseController } from "./Controller";
-import type { ICreateExpense } from "./Types";
-import { Expense } from "./Types";
+import type { ICreateExpense, IUpdateExpense } from "./Types";
+import { Expense, TaskArgs } from "./Types";
 
 export const createExpense: GraphQLFieldConfig<any, Context, ICreateExpense> = {
   type: SchemaBuilder.nonNull(Expense),
   args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    propertyId: {
-      type: GraphQLInt,
-    },
     taskId: {
       type: SchemaBuilder.nonNull(GraphQLInt),
     },
-    cost: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-    title: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
-    description: {
-      type: SchemaBuilder.nonNull(GraphQLString),
-    },
+    ...TaskArgs,
   },
   resolve: (_, args, context) => {
     const operation = ManagementTaskController.permissedTransaction({
@@ -41,5 +27,26 @@ export const createExpense: GraphQLFieldConfig<any, Context, ICreateExpense> = {
     });
     const { userID } = context.req.session;
     return operation(args, userID!);
+  },
+};
+
+export const updateExpense: GraphQLFieldConfig<any, Context, IUpdateExpense> = {
+  type: SchemaBuilder.nonNull(Expense),
+  args: {
+    id: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    ...TaskArgs,
+  },
+  resolve: (_, args, context) => {
+    const operation = ManagementTaskController.permissedTransaction({
+      propertyId: args.propertyId,
+      organizationId: args.organizationId,
+      session: context.req.session,
+      permissions: [PersonRole.maintenance],
+      operation: ExpenseController.update,
+      errorMessage: `You do not have permission to update expenses for this ${typeof args.propertyId === "number" ? "property" : "organization"}`,
+    });
+    return operation(args);
   },
 };

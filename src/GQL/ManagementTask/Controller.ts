@@ -113,13 +113,17 @@ export class ManagementTaskController extends Access {
           "Something went wrong while createing your task. Please try again",
         );
       }
-      const { assignedTo, createdBy, ...taskData } = newTask;
+      const { assignedTo, createdBy, expenses, ...taskData } = newTask;
       return {
         ...taskData,
         assignedTo: assignedTo
           ? PersonController.toPersonType(assignedTo)
           : undefined,
         createdBy: PersonController.toPersonType(createdBy),
+        expenses: expenses.map(expense => ({
+          ...expense,
+          createdBy: PersonController.toPersonType(createdBy),
+        })),
       };
     });
   }
