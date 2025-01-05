@@ -22,6 +22,8 @@ export class ImageController {
     [IGradiumImageType.amenityFloorPlan]:
       this.createOperation("amenityFloorPlan"),
     [IGradiumImageType.taskImage]: this.createOperation("taskImage"),
+    [IGradiumImageType.expenseAttachment]:
+      this.createOperation("expenseAttachment"),
   };
   private readonly deleteOperationMap = {
     [IGradiumImageType.propertyImage]: this.deleteOperation("propertyImage"),
@@ -34,6 +36,8 @@ export class ImageController {
     [IGradiumImageType.amenityFloorPlan]:
       this.deleteOperation("amenityFloorPlan"),
     [IGradiumImageType.taskImage]: this.deleteOperation("taskImage"),
+    [IGradiumImageType.expenseAttachment]:
+      this.deleteOperation("expenseAttachment"),
   };
 
   public create = (data: Omit<ICreateGradiumImage, "organizationId">) => {
@@ -81,6 +85,7 @@ enum TableMap {
   "amenityImage" = "amenityId",
   "amenityFloorPlan" = "amenityId",
   "taskImage" = "taskId",
+  "expenseAttachment" = "expenseId",
 }
 
 type TableName =
@@ -89,4 +94,5 @@ type TableName =
   | "livingSpaceFloorPlan"
   | "amenityImage"
   | "amenityFloorPlan"
-  | "taskImage";
+  | "taskImage"
+  | "expenseAttachment";

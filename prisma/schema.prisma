@@ -33,15 +33,20 @@ model ReservationCharge {
 }
 
 model Expense {
-  id          Int                 @id @unique @default(autoincrement())
-  cost        String              @default("0")
-  title       String              @default("")
-  description String              @default("")
-  deleted     Boolean             @default(false)
-  attachments ExpenseAttachment[]
-  tasks       ManagementTask[]
-  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime            @updatedAt @db.Timestamptz(3)
+  id             Int                 @id @unique @default(autoincrement())
+  cost           String              @default("0")
+  title          String              @default("")
+  description    String              @default("")
+  deleted        Boolean             @default(false)
+  attachments    ExpenseAttachment[]
+  taskId         Int
+  task           ManagementTask      @relation(fields: [taskId], references: [id])
+  createdBy      Person              @relation(fields: [personId], references: [id])
+  personId       Int
+  organizationId Int
+  organization   Organization        @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime            @updatedAt @db.Timestamptz(3)
 }
 
 model TaskImage {
@@ -268,6 +273,7 @@ model Person {
   assignedTasks       ManagementTask[]     @relation("assignedTo")
   createdAt           DateTime             @default(now()) @db.Timestamptz(3)
   updatedAt           DateTime             @updatedAt @db.Timestamptz(3)
+  expensesCreated     Expense[]
 
   @@unique(name: "identity", [organizationId, userId])
 }
@@ -284,6 +290,7 @@ model Organization {
   createdAt    DateTime         @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime         @updatedAt @db.Timestamptz(3)
   staffInvites StaffInvite[]
+  Expense      Expense[]
 }
 
 model LinkedEmail {

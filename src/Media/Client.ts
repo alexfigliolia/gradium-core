@@ -14,6 +14,7 @@ export class MediaClient {
     [IGradiumImageType.amenityImage]: "amenity_images",
     [IGradiumImageType.amenityFloorPlan]: "amenity_floor_plans",
     [IGradiumImageType.taskImage]: "task_images",
+    [IGradiumImageType.expenseAttachment]: "expense_attachments",
   };
   private static _Client?: typeof cloudinary;
 

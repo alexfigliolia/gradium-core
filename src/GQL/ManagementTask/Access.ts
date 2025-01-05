@@ -1,4 +1,5 @@
 import type { Prisma as IPrisma } from "@prisma/client";
+import { Access as ExpenseAccess } from "GQL/Expense/Access";
 import type { IlistManagementTasks } from "./Types";
 
 export class Access {
@@ -36,19 +37,7 @@ export class Access {
       },
     },
     expenses: {
-      select: {
-        id: true,
-        cost: true,
-        title: true,
-        createdAt: true,
-        description: true,
-        attachments: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
-      },
+      select: ExpenseAccess.DEFAULT_SELECTION,
     },
   };
 

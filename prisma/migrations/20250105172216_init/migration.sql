@@ -50,6 +50,9 @@ CREATE TABLE "Expense" (
     "title" TEXT NOT NULL DEFAULT '',
     "description" TEXT NOT NULL DEFAULT '',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
+    "taskId" INTEGER NOT NULL,
+    "personId" INTEGER NOT NULL,
+    "organizationId" INTEGER NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
@@ -318,12 +321,6 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "_ExpenseToManagementTask" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "_LeaseToUser" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -408,12 +405,6 @@ CREATE UNIQUE INDEX "LinkedEmail_email_key" ON "LinkedEmail"("email");
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_ExpenseToManagementTask_AB_unique" ON "_ExpenseToManagementTask"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_ExpenseToManagementTask_B_index" ON "_ExpenseToManagementTask"("B");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_LeaseToUser_AB_unique" ON "_LeaseToUser"("A", "B");
 
 -- CreateIndex
@@ -427,6 +418,15 @@ ALTER TABLE "ReservationCharge" ADD CONSTRAINT "ReservationCharge_personId_fkey"
 
 -- AddForeignKey
 ALTER TABLE "ReservationCharge" ADD CONSTRAINT "ReservationCharge_reservationId_fkey" FOREIGN KEY ("reservationId") REFERENCES "AmenityReservation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Expense" ADD CONSTRAINT "Expense_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "ManagementTask"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Expense" ADD CONSTRAINT "Expense_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Expense" ADD CONSTRAINT "Expense_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TaskImage" ADD CONSTRAINT "TaskImage_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "ManagementTask"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -511,12 +511,6 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_linkedEmailId_fkey" FOREIGN KEY ("li
 
 -- AddForeignKey
 ALTER TABLE "LinkedEmail" ADD CONSTRAINT "LinkedEmail_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ExpenseToManagementTask" ADD CONSTRAINT "_ExpenseToManagementTask_A_fkey" FOREIGN KEY ("A") REFERENCES "Expense"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ExpenseToManagementTask" ADD CONSTRAINT "_ExpenseToManagementTask_B_fkey" FOREIGN KEY ("B") REFERENCES "ManagementTask"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Lease"("id") ON DELETE CASCADE ON UPDATE CASCADE;

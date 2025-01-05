@@ -99,7 +99,7 @@ export const createManagementTask: GraphQLFieldConfig<
 > = {
   type: SchemaBuilder.nonNull(ManagementTask),
   args: TaskArguments,
-  resolve: async (_, args, context) => {
+  resolve: (_, args, context) => {
     const { organizationId, propertyId } = args;
     const operation = ManagementTaskController.permissedTransaction({
       propertyId,
@@ -125,7 +125,7 @@ export const updateManagementTask: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLInt),
     },
   },
-  resolve: async (_, args, context) => {
+  resolve: (_, args, context) => {
     const { organizationId, propertyId } = args;
     const operation = ManagementTaskController.permissedTransaction({
       propertyId,
@@ -151,7 +151,7 @@ export const deleteManagementTask: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLInt),
     },
   },
-  resolve: async (_, args, context) => {
+  resolve: (_, args, context) => {
     const { organizationId, propertyId, id } = args;
     const operation = ManagementTaskController.permissedTransaction({
       propertyId,

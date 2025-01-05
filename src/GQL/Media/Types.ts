@@ -106,6 +106,7 @@ export enum IGradiumImageType {
   "amenityImage" = "amenityImage",
   "amenityFloorPlan" = "amenityFloorPlan",
   "taskImage" = "taskImage",
+  "expenseAttachment" = "expenseAttachment",
 }
 
 export const GradiumImageType = new GraphQLEnumType({
@@ -128,6 +129,9 @@ export const GradiumImageType = new GraphQLEnumType({
     },
     taskImage: {
       value: "taskImage",
+    },
+    expenseAttachment: {
+      value: "expenseAttachment",
     },
   },
 });

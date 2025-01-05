@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import type { Prisma as Client } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { Access } from "./Access";
@@ -42,6 +43,18 @@ export class PersonController extends Access {
         select: access,
       });
     });
+  }
+
+  public static async requirePersonID(userID: number, organizationId: number) {
+    const person = await PersonController.fetchPerson(userID, organizationId, {
+      id: true,
+    });
+    if (!person) {
+      throw new GraphQLError(
+        "This user's role within this organization was not found",
+      );
+    }
+    return person.id;
   }
 
   public static toPersonType(data: {

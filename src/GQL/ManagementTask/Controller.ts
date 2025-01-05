@@ -38,6 +38,10 @@ export class ManagementTaskController extends Access {
         assignedTo: task.assignedTo
           ? PersonController.toPersonType(task.assignedTo)
           : undefined,
+        expenses: task.expenses.map(expense => ({
+          ...expense,
+          createdBy: PersonController.toPersonType(expense.createdBy),
+        })),
       }));
     });
   };
@@ -46,23 +50,15 @@ export class ManagementTaskController extends Access {
     data: ICreateManagementTask,
     userID: number,
   ) => {
-    const person = await PersonController.fetchPerson(
+    const personId = await PersonController.requirePersonID(
       userID,
       data.organizationId,
-      {
-        id: true,
-      },
     );
-    if (!person) {
-      throw new GraphQLError(
-        "You do not have permission to create tasks for this organization",
-      );
-    }
     return Prisma.transact(async client => {
       const task = await client.managementTask.create({
         data: {
           ...data,
-          personId: person.id,
+          personId,
         },
       });
       return this.getByID(task.id);
