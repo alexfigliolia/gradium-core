@@ -1,4 +1,10 @@
-import { addDays, differenceInMilliseconds, isAfter, isBefore } from "date-fns";
+import {
+  addDays,
+  addMilliseconds,
+  differenceInMilliseconds,
+  isAfter,
+  isBefore,
+} from "date-fns";
 import { GraphQLError } from "graphql";
 import type { Prisma as Client } from "@prisma/client";
 import { BillFrequency } from "@prisma/client";
@@ -260,8 +266,15 @@ export class AmenityReservationController extends Access {
     if (isBefore(startDate, open)) {
       return `Your reservation's start time cannot be before the ${name} opens`;
     }
-    const endDate = Dates.populateDateFrom(close, new Date(end));
-    if (isAfter(endDate, close)) {
+    const endReservation = addMilliseconds(
+      startDate,
+      Math.abs(differenceInMilliseconds(start, end)),
+    );
+    const closeTime = addMilliseconds(
+      open,
+      Math.abs(differenceInMilliseconds(open, close)),
+    );
+    if (isAfter(endReservation, closeTime)) {
       return `Your reservation's end time cannot be after the ${name} closes`;
     }
   }
