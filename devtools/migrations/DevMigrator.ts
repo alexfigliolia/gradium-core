@@ -62,6 +62,7 @@ export class DevMigrator {
   public static async resetData() {
     const env = await this.createENV();
     await new ChildProcess("yarn prisma db push --force-reset", env).handler;
+    await new ChildProcess("yarn clear-sessions").handler;
   }
 
   public static async exec(...args: string[]) {

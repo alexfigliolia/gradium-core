@@ -25,9 +25,7 @@ export class Permission {
     session: Session,
     target: number,
   ): session is Omit<Session, "userID"> & { userID: number } {
-    if (!this.knownUser(session)) {
-      return false;
-    }
+    this.knownUser(session);
     const orgs = session.organizations ?? [];
     return orgs.includes(target);
   }
@@ -35,7 +33,10 @@ export class Permission {
   public static knownUser(
     session: Session,
   ): session is Omit<Session, "userID"> & { userID: number } {
-    return typeof session.userID === "number";
+    if (typeof session.userID === "number") {
+      return true;
+    }
+    throw new GraphQLError("Your session has timed out. Please login");
   }
 
   public static matchesKnownUser(session: Session, userId: number) {
