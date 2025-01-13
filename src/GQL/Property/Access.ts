@@ -62,6 +62,16 @@ export class Access {
     return result.join("");
   }
 
+  protected static allSlugs(organizationId: number) {
+    return Prisma.transact(async client => {
+      const slugs = await client.property.findMany({
+        where: { organizationId },
+        select: { slug: true },
+      });
+      return new Set(slugs.map(p => p.slug));
+    });
+  }
+
   protected static matchSlug(slug: string, organizationId: number) {
     return Prisma.transact(async client => {
       return client.property.findFirst({

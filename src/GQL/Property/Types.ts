@@ -14,6 +14,8 @@ export interface IBasicPropertyInfo {
   zipCode: string;
 }
 
+export interface ICreateProperty extends IBasicPropertyInfo, IOrganizationID {}
+
 interface IAdminBasicProperty extends IBasicPropertyInfo {
   id: number;
   slug: string;
@@ -108,3 +110,24 @@ export const ConnectedProperty = new GraphQLObjectType<
     },
   },
 });
+
+export const CreatePropertyArgs = {
+  name: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  address1: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  address2: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  city: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  state: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+  zipCode: {
+    type: SchemaBuilder.nonNull(GraphQLString),
+  },
+};

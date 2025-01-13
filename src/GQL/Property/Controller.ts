@@ -1,8 +1,11 @@
 import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
-import type { INameAndOrgID } from "GQL/Organization/Types";
 import { Access } from "./Access";
-import type { IdentifyProperty, IUpdateBasicPropertyInfo } from "./Types";
+import type {
+  ICreateProperty,
+  IdentifyProperty,
+  IUpdateBasicPropertyInfo,
+} from "./Types";
 
 export class PropertyController extends Access {
   public static async fetch(userId: number, organizationId: number) {
@@ -64,25 +67,29 @@ export class PropertyController extends Access {
     });
   };
 
-  public static create(args: INameAndOrgID) {
+  public static create(args: ICreateProperty) {
+    const { organizationId, name } = args;
     return Prisma.transact(async client => {
       const exists = await client.property.findFirst({
-        where: args,
+        where: {
+          AND: [{ name }, { organizationId }],
+        },
         select: {
           id: true,
         },
       });
       if (exists) {
         throw new GraphQLError(
-          `A property with this name already exists within your organization`,
+          "A property with this name already exists within your organization",
         );
       }
+      const slugs = await this.allSlugs(organizationId);
       let attemps = 0;
       const max = 10;
       let appendage = "";
       while (attemps < max) {
         const slug = this.createSlug(args.name, appendage);
-        if (await this.matchSlug(slug, args.organizationId)) {
+        if (slugs.has(slug)) {
           attemps++;
           appendage = (attemps + 1).toString();
           continue;
@@ -96,7 +103,7 @@ export class PropertyController extends Access {
         });
       }
       throw new GraphQLError(
-        "We encountered an error creating your property. Would you mind trying a different name? It can always be updated later.",
+        "We encountered an error creating your property. Please try a different name.",
       );
     });
   }
