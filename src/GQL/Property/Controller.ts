@@ -50,7 +50,7 @@ export class PropertyController extends Access {
     });
   }
 
-  public static updateBasicInfo = async ({
+  public static updateBasicInfo = ({
     propertyId,
     organizationId,
     ...data

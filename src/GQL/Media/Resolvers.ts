@@ -87,7 +87,7 @@ export const deleteImage: GraphQLFieldConfig<
       session: context.req.session,
       operation: MediaController.Images.delete,
       errorMessage:
-        "You do not have permission to modify this property's images",
+        "You do not have permission to modify attachments for this property",
     });
     return operation(rest);
   },
