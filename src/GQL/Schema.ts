@@ -11,7 +11,11 @@ import {
   fetchAmenityReservations,
   updateAmenityReservation,
 } from "./AmenityReservation/Resolvers";
-import { createExpense, updateExpense } from "./Expense/Resolvers";
+import {
+  createExpense,
+  deleteExpense,
+  updateExpense,
+} from "./Expense/Resolvers";
 import { deleteEmail, linkEmail, updateEmail } from "./LinkedEmail/Resolvers";
 import {
   createOrUpdateLivingSpace,
@@ -82,6 +86,7 @@ const MutationRoot = new GraphQLObjectType({
     createProperty,
     createExpense,
     updateExpense,
+    deleteExpense,
     inviteStaffMember,
     deleteLivingSpace,
     setOrganizationName,

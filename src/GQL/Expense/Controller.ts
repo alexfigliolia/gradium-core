@@ -1,7 +1,7 @@
 import { Prisma } from "DB/Client";
 import { PersonController } from "GQL/Person/Controller";
 import { Access } from "./Access";
-import type { ICreateExpense, IUpdateExpense } from "./Types";
+import type { ICreateExpense, IDeleteExpense, IUpdateExpense } from "./Types";
 
 export class ExpenseController extends Access {
   public static create = async (
@@ -43,5 +43,16 @@ export class ExpenseController extends Access {
       ...expense,
       createdBy: PersonController.toPersonType(expense.createdBy),
     };
+  };
+
+  public static delete = ({ id }: IDeleteExpense) => {
+    return Prisma.transact(async client => {
+      await client.expense.update({
+        where: { id },
+        data: { deleted: true },
+        select: { id: true },
+      });
+      return true;
+    });
   };
 }

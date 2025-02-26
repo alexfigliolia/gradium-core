@@ -18,6 +18,11 @@ export interface ICreateExpense extends IOrganizationID, IExpenseContent {
   propertyId?: number;
 }
 
+export interface IDeleteExpense extends IOrganizationID {
+  id: number;
+  propertyId?: number;
+}
+
 export interface IUpdateExpense extends ICreateExpense {
   id: number;
 }

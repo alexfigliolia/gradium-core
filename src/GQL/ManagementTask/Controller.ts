@@ -132,7 +132,19 @@ export class ManagementTaskController extends Access {
     return Prisma.transact(async client => {
       await client.managementTask.update({
         where: { id },
-        data: { deleted: true },
+        data: {
+          deleted: true,
+          expenses: {
+            updateMany: {
+              where: {
+                taskId: id,
+              },
+              data: {
+                deleted: true,
+              },
+            },
+          },
+        },
       });
       return true;
     });

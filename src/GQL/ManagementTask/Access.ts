@@ -37,6 +37,9 @@ export class Access {
       },
     },
     expenses: {
+      where: {
+        deleted: false,
+      },
       select: ExpenseAccess.DEFAULT_SELECTION,
     },
   };
