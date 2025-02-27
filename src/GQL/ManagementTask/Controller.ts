@@ -1,5 +1,5 @@
 import { GraphQLError } from "graphql";
-import type { ManagementTaskStatus } from "@prisma/client";
+import { ManagementTaskStatus } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { PersonController } from "GQL/Person/Controller";
 import { Permission } from "Tools/Permission";
@@ -13,6 +13,7 @@ import type {
 
 export class ManagementTaskController extends Access {
   public static listManagementTasks = ({
+    archive,
     searchString,
     assignedToId,
     priority,
@@ -22,13 +23,16 @@ export class ManagementTaskController extends Access {
     return Prisma.transact(async client => {
       const tasks = await client.managementTask.findMany({
         where: {
-          AND: this.buildFilterCombinator({
-            priority,
-            propertyId,
-            searchString,
-            assignedToId,
-            organizationId,
-          }),
+          AND: [
+            ...this.buildFilterCombinator({
+              archive,
+              priority,
+              propertyId,
+              searchString,
+              assignedToId,
+              organizationId,
+            }),
+          ],
         },
         select: this.DEFAULT_SELECTION,
       });
@@ -67,11 +71,19 @@ export class ManagementTaskController extends Access {
 
   public static updateTask = ({ id, ...data }: IUpdateManagementTask) => {
     return Prisma.transact(async client => {
+      const task = await client.managementTask.findUnique({ where: { id } });
+      if (!task) {
+        throw new GraphQLError("No task with the corresponding ID was found");
+      }
       await client.managementTask.update({
         where: { id },
         data: {
           ...data,
           assignedToId: data.assignedToId || null,
+          completedAt:
+            data.status === ManagementTaskStatus.complete && !task.completedAt
+              ? new Date()
+              : task.completedAt,
         },
       });
       return this.getByID(id);
@@ -95,6 +107,8 @@ export class ManagementTaskController extends Access {
         where: { id },
         data: {
           status,
+          completedAt:
+            status === ManagementTaskStatus.complete ? new Date() : null,
         },
         select: { id: true },
       });

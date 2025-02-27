@@ -84,6 +84,7 @@ CREATE TABLE "ManagementTask" (
     "assignedToId" INTEGER,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+    "completedAt" TIMESTAMP(3),
 
     CONSTRAINT "ManagementTask_pkey" PRIMARY KEY ("id")
 );

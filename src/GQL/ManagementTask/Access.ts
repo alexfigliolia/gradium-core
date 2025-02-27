@@ -1,4 +1,5 @@
-import type { Prisma as IPrisma } from "@prisma/client";
+import { addDays } from "date-fns";
+import { ManagementTaskStatus, type Prisma as IPrisma } from "@prisma/client";
 import { Access as ExpenseAccess } from "GQL/Expense/Access";
 import type { IlistManagementTasks } from "./Types";
 
@@ -45,6 +46,7 @@ export class Access {
   };
 
   public static buildFilterCombinator({
+    archive,
     organizationId,
     propertyId,
     searchString,
@@ -55,6 +57,24 @@ export class Access {
       { organizationId },
       { deleted: false },
     ];
+    if (!archive) {
+      combinator.push({
+        OR: [
+          {
+            status: {
+              not: {
+                equals: ManagementTaskStatus.complete,
+              },
+            },
+          },
+          {
+            completedAt: {
+              lte: addDays(new Date(), 30),
+            },
+          },
+        ],
+      });
+    }
     if (propertyId) {
       combinator.push({ propertyId });
     }

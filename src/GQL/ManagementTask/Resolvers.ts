@@ -46,6 +46,9 @@ export const listManagementTasks: GraphQLFieldConfig<
     searchString: {
       type: GraphQLString,
     },
+    archive: {
+      type: GraphQLBoolean,
+    },
   },
   resolve: async (_, args, context) => {
     const { organizationId, propertyId } = args;

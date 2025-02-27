@@ -22,6 +22,7 @@ export interface ISetStatus extends IOrganizationID, DBID {
 }
 
 export interface IlistManagementTasks extends IOrganizationID {
+  archive?: boolean;
   propertyId?: number;
   assignedToId?: number[];
   searchString?: string;
