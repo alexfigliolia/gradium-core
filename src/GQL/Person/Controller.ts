@@ -8,9 +8,10 @@ import type { IFetchPeople } from "./Types";
 export class PersonController extends Access {
   public static fetch = ({ organizationId, ...pagination }: IFetchPeople) => {
     return Prisma.transact(async client => {
+      const pagingArgs = Prisma.paginationArguments(pagination);
       const results = await client.person.findMany({
         where: { organizationId },
-        ...Prisma.paginationArguments(pagination),
+        ...pagingArgs,
         orderBy: {
           user: {
             name: "asc",
@@ -26,7 +27,7 @@ export class PersonController extends Access {
         },
       });
       const list = results.map(this.toPersonType);
-      return SchemaBuilder.toPaginationResult(list);
+      return SchemaBuilder.toPaginationResult(list, pagingArgs.take);
     });
   };
 

@@ -35,7 +35,7 @@ export class Prisma {
   }
 
   public static paginationArguments({ cursor, limit }: IPagination) {
-    const hasCursor = cursor !== undefined;
+    const hasCursor = typeof cursor === "number";
     return {
       cursor: hasCursor
         ? {

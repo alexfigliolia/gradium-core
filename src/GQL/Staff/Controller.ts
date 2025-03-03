@@ -39,6 +39,7 @@ export class StaffController {
     organizationId,
     ...pagination
   }: IFetchStaff) {
+    const pagingArgs = Prisma.paginationArguments(pagination);
     const staff = await Prisma.transact(client => {
       return client.person.findMany({
         where: {
@@ -59,7 +60,6 @@ export class StaffController {
             },
           ],
         },
-        ...Prisma.paginationArguments(pagination),
         orderBy: {
           user: {
             name: "asc",
@@ -73,10 +73,12 @@ export class StaffController {
             },
           },
         },
+        ...pagingArgs,
       });
     });
     return SchemaBuilder.toPaginationResult(
       staff.map(PersonController.toPersonType),
+      pagingArgs.take,
     );
   }
 }

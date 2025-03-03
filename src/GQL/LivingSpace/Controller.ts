@@ -93,9 +93,8 @@ export class LivingSpaceController extends Access {
 
   public static findAvailableSpaces = ({
     organizationId,
-    cursor,
-    limit,
     search,
+    ...pagination
   }: IFetchAvailableSpaces) => {
     return Prisma.transact(async client => {
       const where: PrismaType.LivingSpaceWhereInput[] = [
@@ -138,27 +137,23 @@ export class LivingSpaceController extends Access {
           },
         });
       }
+      const pagingArgs = Prisma.paginationArguments(pagination);
       const list = await client.livingSpace.findMany({
         where: { AND: where },
         select: this.AVAILABLE_NOW_SELECTION,
-        cursor: cursor
-          ? {
-              id: cursor,
-            }
-          : undefined,
-        take: limit,
+        ...pagingArgs,
       });
       return SchemaBuilder.toPaginationResult(
         list.map(this.transformToAvailableNow),
+        pagingArgs.take,
       );
     });
   };
 
   public static findSpacesBecomingAvailable = ({
     organizationId,
-    cursor,
-    limit,
     search,
+    ...pagination
   }: IFetchAvailableSpaces) => {
     return Prisma.transact(async client => {
       const where: PrismaType.LivingSpaceWhereInput[] = [
@@ -197,20 +192,17 @@ export class LivingSpaceController extends Access {
           },
         });
       }
+      const pagingArgs = Prisma.paginationArguments(pagination);
       const list = await client.livingSpace.findMany({
         where: {
           AND: where,
         },
         select: this.AVAILABLE_SOON_SELECTION,
-        cursor: cursor
-          ? {
-              id: cursor,
-            }
-          : undefined,
-        take: limit,
+        ...pagingArgs,
       });
       return SchemaBuilder.toPaginationResult(
         list.map(this.transformToAvailableSoon),
+        pagingArgs.take,
       );
     });
   };

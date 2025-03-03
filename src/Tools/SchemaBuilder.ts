@@ -35,7 +35,10 @@ export class SchemaBuilder {
     });
   }
 
-  public static toPaginationResult<T extends DBID>(list: T[]) {
-    return { list, cursor: list?.[list.length - 1]?.id };
+  public static toPaginationResult<T extends DBID>(list: T[], limit: number) {
+    return {
+      list,
+      cursor: list.length === limit ? list?.[list.length - 1]?.id : undefined,
+    };
   }
 }
