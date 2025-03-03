@@ -8,7 +8,7 @@ import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import { type Context, PaginationArgs } from "Types/GraphQL";
+import { type Context } from "Types/GraphQL";
 import { LivingSpaceController } from "./Controller";
 import type {
   IDeleteLivingSpace,
@@ -16,6 +16,7 @@ import type {
   IUpdateLivingSpace,
 } from "./Types";
 import {
+  AvailableSpacesArgs,
   LivingSpace,
   LivingSpaceType,
   PaginatedAvailableLivingSpaces,
@@ -114,12 +115,7 @@ export const fetchAvailableSpaces: GraphQLFieldConfig<
   IFetchAvailableSpaces
 > = {
   type: SchemaBuilder.nonNull(PaginatedAvailableLivingSpaces),
-  args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    ...PaginationArgs,
-  },
+  args: AvailableSpacesArgs,
   resolve: (_, args, context) => {
     const operation = Permission.permissedTransaction({
       organizationId: args.organizationId,
@@ -138,12 +134,7 @@ export const fetchSoonToBeAvailableSpaces: GraphQLFieldConfig<
   IFetchAvailableSpaces
 > = {
   type: SchemaBuilder.nonNull(PaginatedAvailableSoonLivingSpaces),
-  args: {
-    organizationId: {
-      type: SchemaBuilder.nonNull(GraphQLInt),
-    },
-    ...PaginationArgs,
-  },
+  args: AvailableSpacesArgs,
   resolve: (_, args, context) => {
     const operation = Permission.permissedTransaction({
       organizationId: args.organizationId,

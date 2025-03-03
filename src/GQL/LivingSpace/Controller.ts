@@ -1,5 +1,6 @@
 import { addMonths } from "date-fns";
 import { GraphQLError } from "graphql";
+import type { Prisma as PrismaType } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { IGradiumImageType } from "GQL/Media/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
@@ -94,43 +95,51 @@ export class LivingSpaceController extends Access {
     organizationId,
     cursor,
     limit,
+    search,
   }: IFetchAvailableSpaces) => {
     return Prisma.transact(async client => {
-      const list = await client.livingSpace.findMany({
-        where: {
-          AND: [
-            { organizationId },
-            {
-              leases: {
-                none: {
-                  AND: [
+      const where: PrismaType.LivingSpaceWhereInput[] = [
+        { organizationId },
+        {
+          leases: {
+            none: {
+              AND: [
+                {
+                  OR: [
                     {
-                      OR: [
-                        {
-                          start: {
-                            gte: new Date(),
-                          },
-                        },
-                        {
-                          end: {
-                            gte: new Date(),
-                          },
-                        },
-                      ],
+                      start: {
+                        gte: new Date(),
+                      },
                     },
                     {
-                      status: {
-                        not: {
-                          in: ["terminated", "complete"],
-                        },
+                      end: {
+                        gte: new Date(),
                       },
                     },
                   ],
                 },
-              },
+                {
+                  status: {
+                    not: {
+                      in: ["terminated", "complete"],
+                    },
+                  },
+                },
+              ],
             },
-          ],
+          },
         },
+      ];
+      if (search) {
+        where.push({
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        });
+      }
+      const list = await client.livingSpace.findMany({
+        where: { AND: where },
         select: this.AVAILABLE_NOW_SELECTION,
         cursor: cursor
           ? {
@@ -149,38 +158,48 @@ export class LivingSpaceController extends Access {
     organizationId,
     cursor,
     limit,
+    search,
   }: IFetchAvailableSpaces) => {
     return Prisma.transact(async client => {
+      const where: PrismaType.LivingSpaceWhereInput[] = [
+        { organizationId },
+        {
+          leases: {
+            some: {
+              AND: [
+                {
+                  end: {
+                    lte: addMonths(new Date(), 6),
+                  },
+                },
+                {
+                  end: {
+                    gt: new Date(),
+                  },
+                },
+                {
+                  status: {
+                    not: {
+                      in: ["complete", "terminated"],
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ];
+      if (search) {
+        where.push({
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        });
+      }
       const list = await client.livingSpace.findMany({
         where: {
-          AND: [
-            { organizationId },
-            {
-              leases: {
-                some: {
-                  AND: [
-                    {
-                      end: {
-                        lte: addMonths(new Date(), 6),
-                      },
-                    },
-                    {
-                      end: {
-                        gt: new Date(),
-                      },
-                    },
-                    {
-                      status: {
-                        not: {
-                          in: ["complete", "terminated"],
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
+          AND: where,
         },
         select: this.AVAILABLE_SOON_SELECTION,
         cursor: cursor

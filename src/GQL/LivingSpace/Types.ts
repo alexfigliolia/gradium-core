@@ -16,7 +16,7 @@ import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context, IPagination } from "Types/GraphQL";
+import { type Context, type IPagination, PaginationArgs } from "Types/GraphQL";
 
 export interface ILivingSpace {
   id: number;
@@ -56,7 +56,9 @@ export interface IDeleteLivingSpace extends IdentifyProperty {
   id: number;
 }
 
-export interface IFetchAvailableSpaces extends IPagination, IOrganizationID {}
+export interface IFetchAvailableSpaces extends IPagination, IOrganizationID {
+  search?: string;
+}
 
 export interface IRawRentableSpace extends ILivingSpace {
   property: {
@@ -189,3 +191,13 @@ export const PaginatedAvailableSoonLivingSpaces =
     "PaginatedAvailableSoonLivingSpaces",
     AvailableSoonRentableSpace,
   );
+
+export const AvailableSpacesArgs = {
+  organizationId: {
+    type: SchemaBuilder.nonNull(GraphQLInt),
+  },
+  search: {
+    type: GraphQLString,
+  },
+  ...PaginationArgs,
+};
