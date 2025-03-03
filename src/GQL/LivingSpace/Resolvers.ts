@@ -8,10 +8,19 @@ import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import { type Context, PaginationArgs } from "Types/GraphQL";
 import { LivingSpaceController } from "./Controller";
-import type { IDeleteLivingSpace, IUpdateLivingSpace } from "./Types";
-import { LivingSpace, LivingSpaceType } from "./Types";
+import type {
+  IDeleteLivingSpace,
+  IFetchAvailableSpaces,
+  IUpdateLivingSpace,
+} from "./Types";
+import {
+  LivingSpace,
+  LivingSpaceType,
+  PaginatedAvailableLivingSpaces,
+  PaginatedAvailableSoonLivingSpaces,
+} from "./Types";
 
 export const getLivingSpaces: GraphQLFieldConfig<
   any,
@@ -59,20 +68,20 @@ export const createOrUpdateLivingSpace: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLString),
     },
   },
-  resolve: (_, { organizationId, ...rest }, context) => {
+  resolve: (_, args, context) => {
     let errorMessage: string;
-    if (rest.id) {
+    if (args.id) {
       errorMessage = "You do not have permissions to update this living space";
     } else {
       errorMessage = "You do not have permissions to create living spaces";
     }
     const operation = Permission.permissedTransaction({
       errorMessage,
-      organizationId,
+      organizationId: args.organizationId,
       session: context.req.session,
       operation: LivingSpaceController.createOrUpdate,
     });
-    return operation(rest);
+    return operation(args);
   },
 };
 
@@ -96,5 +105,53 @@ export const deleteLivingSpace: GraphQLFieldConfig<
       errorMessage: "You do not have permissions to delete this living space",
     });
     return operation(id);
+  },
+};
+
+export const fetchAvailableSpaces: GraphQLFieldConfig<
+  any,
+  Context,
+  IFetchAvailableSpaces
+> = {
+  type: SchemaBuilder.nonNull(PaginatedAvailableLivingSpaces),
+  args: {
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    ...PaginationArgs,
+  },
+  resolve: (_, args, context) => {
+    const operation = Permission.permissedTransaction({
+      organizationId: args.organizationId,
+      session: context.req.session,
+      operation: LivingSpaceController.findAvailableSpaces,
+      errorMessage:
+        "You do not have permissions to view available spaces within this organization",
+    });
+    return operation(args);
+  },
+};
+
+export const fetchSoonToBeAvailableSpaces: GraphQLFieldConfig<
+  any,
+  Context,
+  IFetchAvailableSpaces
+> = {
+  type: SchemaBuilder.nonNull(PaginatedAvailableSoonLivingSpaces),
+  args: {
+    organizationId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    ...PaginationArgs,
+  },
+  resolve: (_, args, context) => {
+    const operation = Permission.permissedTransaction({
+      organizationId: args.organizationId,
+      session: context.req.session,
+      operation: LivingSpaceController.findSpacesBecomingAvailable,
+      errorMessage:
+        "You do not have permissions to view available spaces within this organization",
+    });
+    return operation(args);
   },
 };

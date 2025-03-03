@@ -1,3 +1,5 @@
+import { isAfter } from "date-fns";
+
 export class Dates {
   private static readonly VALIDATION_MAP = {
     month: {
@@ -72,6 +74,20 @@ export class Dates {
     newDate.setMonth(baseDate.getMonth());
     newDate.setDate(baseDate.getDate());
     return newDate;
+  }
+
+  public static latest(...dates: (string | undefined | Date)[]) {
+    let max: Date | undefined = undefined;
+    for (const date of dates) {
+      if (!date) {
+        continue;
+      }
+      const d = date instanceof Date ? date : new Date(date);
+      if (!max || isAfter(d, max)) {
+        max = d;
+      }
+    }
+    return max?.toISOString() as string;
   }
 
   private static pad(value: number) {

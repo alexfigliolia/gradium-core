@@ -1,10 +1,13 @@
+import { addMonths } from "date-fns";
 import { GraphQLError } from "graphql";
 import { Prisma } from "DB/Client";
 import { IGradiumImageType } from "GQL/Media/Types";
+import type { IdentifyProperty } from "GQL/Property/Types";
 import { MediaClient } from "Media/Client";
+import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { Validators } from "Tools/Validators";
 import { Access } from "./Access";
-import type { IUpdateLivingSpace } from "./Types";
+import type { IFetchAvailableSpaces, IUpdateLivingSpace } from "./Types";
 
 export class LivingSpaceController extends Access {
   public static readonly FLOAT_KEYS: (keyof IUpdateLivingSpace)[] = ["size"];
@@ -19,10 +22,10 @@ export class LivingSpaceController extends Access {
     });
   };
 
-  public static create = (propertyId: number) => {
+  public static create = ({ propertyId, organizationId }: IdentifyProperty) => {
     return Prisma.transact(client => {
       return client.livingSpace.create({
-        data: { propertyId },
+        data: { propertyId, organizationId },
         select: this.BASIC_SELECTION,
       });
     });
@@ -31,7 +34,7 @@ export class LivingSpaceController extends Access {
   public static createOrUpdate = async ({
     id,
     ...data
-  }: Omit<IUpdateLivingSpace, "organizationId">) => {
+  }: IUpdateLivingSpace) => {
     this.validate(data);
     return Prisma.transact(client => {
       return client.livingSpace.upsert({
@@ -84,6 +87,112 @@ export class LivingSpaceController extends Access {
         ),
       ]);
       return deletedSpace;
+    });
+  };
+
+  public static findAvailableSpaces = ({
+    organizationId,
+    cursor,
+    limit,
+  }: IFetchAvailableSpaces) => {
+    return Prisma.transact(async client => {
+      const list = await client.livingSpace.findMany({
+        where: {
+          AND: [
+            { organizationId },
+            {
+              leases: {
+                none: {
+                  AND: [
+                    {
+                      OR: [
+                        {
+                          start: {
+                            gte: new Date(),
+                          },
+                        },
+                        {
+                          end: {
+                            gte: new Date(),
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      status: {
+                        not: {
+                          in: ["terminated", "complete"],
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+        select: this.AVAILABLE_NOW_SELECTION,
+        cursor: cursor
+          ? {
+              id: cursor,
+            }
+          : undefined,
+        take: limit,
+      });
+      return SchemaBuilder.toPaginationResult(
+        list.map(this.transformToAvailableNow),
+      );
+    });
+  };
+
+  public static findSpacesBecomingAvailable = ({
+    organizationId,
+    cursor,
+    limit,
+  }: IFetchAvailableSpaces) => {
+    return Prisma.transact(async client => {
+      const list = await client.livingSpace.findMany({
+        where: {
+          AND: [
+            { organizationId },
+            {
+              leases: {
+                some: {
+                  AND: [
+                    {
+                      end: {
+                        lte: addMonths(new Date(), 6),
+                      },
+                    },
+                    {
+                      end: {
+                        gt: new Date(),
+                      },
+                    },
+                    {
+                      status: {
+                        not: {
+                          in: ["complete", "terminated"],
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+        select: this.AVAILABLE_SOON_SELECTION,
+        cursor: cursor
+          ? {
+              id: cursor,
+            }
+          : undefined,
+        take: limit,
+      });
+      return SchemaBuilder.toPaginationResult(
+        list.map(this.transformToAvailableSoon),
+      );
     });
   };
 

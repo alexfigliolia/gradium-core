@@ -34,16 +34,7 @@ export const StaffMember = new GraphQLObjectType<IStaffProfile, Context>({
 
 export type IPaginatedStaff = IPaginationResult<IStaffProfile>;
 
-export const PaginatedStaff = new GraphQLObjectType<IPaginatedStaff, Context>({
-  name: "PaginatedStaff",
-  fields: {
-    cursor: {
-      type: GraphQLInt,
-      resolve: p => p.cursor,
-    },
-    list: {
-      type: SchemaBuilder.nonNullArray(StaffMember),
-      resolve: p => p.list,
-    },
-  },
-});
+export const PaginatedStaff = SchemaBuilder.paginatedType<IStaffProfile>(
+  "PaginatedStaff",
+  StaffMember,
+);

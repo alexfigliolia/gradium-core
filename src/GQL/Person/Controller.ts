@@ -1,6 +1,7 @@
 import { GraphQLError } from "graphql";
 import type { Prisma as Client } from "@prisma/client";
 import { Prisma } from "DB/Client";
+import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { Access } from "./Access";
 import type { IFetchPeople } from "./Types";
 
@@ -25,7 +26,7 @@ export class PersonController extends Access {
         },
       });
       const list = results.map(this.toPersonType);
-      return { list, cursor: list[list.length - 1]?.id };
+      return SchemaBuilder.toPaginationResult(list);
     });
   };
 

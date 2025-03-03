@@ -102,6 +102,7 @@ model Lease {
   price            Float
   lessees          User[]
   status           LeaseStatus
+  terminatedDate   DateTime?            @db.Timestamptz(3)
   paymentFrequency RentPaymentFrequency
   deleted          Boolean              @default(false)
   payments         RentPayment[]
@@ -182,20 +183,22 @@ model LivingSpaceFloorPlan {
 }
 
 model LivingSpace {
-  id         Int                    @id @unique @default(autoincrement())
-  name       String                 @default("")
-  type       LivingSpaceType        @default(unit)
-  beds       Int                    @default(0)
-  baths      Float                  @default(0)
-  size       String                 @default("0")
-  deleted    Boolean                @default(false)
-  leases     Lease[]
-  images     LivingSpaceImage[]
-  floorPlans LivingSpaceFloorPlan[]
-  property   Property               @relation(fields: [propertyId], references: [id])
-  propertyId Int
-  createdAt  DateTime               @default(now()) @db.Timestamptz(3)
-  updatedAt  DateTime               @updatedAt @db.Timestamptz(3)
+  id             Int                    @id @unique @default(autoincrement())
+  name           String                 @default("")
+  type           LivingSpaceType        @default(unit)
+  beds           Int                    @default(0)
+  baths          Float                  @default(0)
+  size           String                 @default("0")
+  deleted        Boolean                @default(false)
+  leases         Lease[]
+  images         LivingSpaceImage[]
+  floorPlans     LivingSpaceFloorPlan[]
+  property       Property               @relation(fields: [propertyId], references: [id])
+  propertyId     Int
+  organization   Organization           @relation(fields: [organizationId], references: [id])
+  organizationId Int
+  createdAt      DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime               @updatedAt @db.Timestamptz(3)
 }
 
 model PropertyAddon {
@@ -292,6 +295,7 @@ model Organization {
   updatedAt    DateTime         @updatedAt @db.Timestamptz(3)
   staffInvites StaffInvite[]
   Expense      Expense[]
+  LivingSpace  LivingSpace[]
 }
 
 model LinkedEmail {
@@ -337,6 +341,7 @@ enum BillFrequency {
 
 enum RentPaymentFrequency {
   day
+  week
   month
   year
 }

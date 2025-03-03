@@ -5,11 +5,18 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
-import type { LivingSpaceType as ILivingSpaceType } from "@prisma/client";
+import { GraphQLDateTime } from "graphql-iso-date";
+import type {
+  LeaseStatus,
+  LivingSpaceType as ILivingSpaceType,
+} from "@prisma/client";
+import type { ILeaseSnapShot } from "GQL/Leases/Types";
+import { LeaseSnapShotType } from "GQL/Leases/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
+import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import type { Context, IPagination } from "Types/GraphQL";
 
 export interface ILivingSpace {
   id: number;
@@ -19,8 +26,21 @@ export interface ILivingSpace {
   baths: number;
   size: string;
   propertyId: number;
-  images: IGradiumImage;
-  floorPlans: IGradiumImage;
+  images: IGradiumImage[];
+  floorPlans: IGradiumImage[];
+}
+
+export interface IRentableSpace extends ILivingSpace {
+  propertyName: string;
+}
+
+export interface IAvailableRentableSpace extends IRentableSpace {
+  availableSince: string;
+}
+
+export interface IAvailableSoonRentableSpace extends IRentableSpace {
+  availableOn: string;
+  lease: ILeaseSnapShot;
 }
 
 export interface IUpdateLivingSpace extends IdentifyProperty {
@@ -34,6 +54,31 @@ export interface IUpdateLivingSpace extends IdentifyProperty {
 
 export interface IDeleteLivingSpace extends IdentifyProperty {
   id: number;
+}
+
+export interface IFetchAvailableSpaces extends IPagination, IOrganizationID {}
+
+export interface IRawRentableSpace extends ILivingSpace {
+  property: {
+    name: string;
+    _count: { livingSpaces: number };
+  };
+}
+
+export interface IRawAvailableRentableSpace extends IRawRentableSpace {
+  createdAt: Date;
+  leases: {
+    end: Date;
+    terminatedDate: Date | null;
+  }[];
+}
+
+export interface IRawAvailableSoonRentableSpace extends IRawRentableSpace {
+  leases: {
+    end: Date;
+    start: Date;
+    status: LeaseStatus;
+  }[];
 }
 
 export const LivingSpaceType = new GraphQLEnumType({
@@ -89,3 +134,58 @@ export const LivingSpace = new GraphQLObjectType<ILivingSpace, Context>({
     },
   },
 });
+
+export const RentableSpace = new GraphQLObjectType<IRentableSpace, Context>({
+  name: "RentableSpace",
+  fields: {
+    ...LivingSpace.toConfig().fields,
+    propertyName: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: space => space.propertyName,
+    },
+  },
+});
+
+export const AvailableRentableSpace = new GraphQLObjectType<
+  IAvailableRentableSpace,
+  Context
+>({
+  name: "AvailableRentableSpace",
+  fields: {
+    ...RentableSpace.toConfig().fields,
+    availableSince: {
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
+      resolve: space => space.availableSince,
+    },
+  },
+});
+
+export const AvailableSoonRentableSpace = new GraphQLObjectType<
+  IAvailableSoonRentableSpace,
+  Context
+>({
+  name: "AvailableSoonRentableSpace",
+  fields: {
+    ...RentableSpace.toConfig().fields,
+    availableOn: {
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
+      resolve: space => space.availableOn,
+    },
+    lease: {
+      type: SchemaBuilder.nonNull(LeaseSnapShotType),
+      resolve: space => space.lease,
+    },
+  },
+});
+
+export const PaginatedAvailableLivingSpaces =
+  SchemaBuilder.paginatedType<IAvailableRentableSpace>(
+    "PaginatedAvailableLivingSpaces",
+    AvailableRentableSpace,
+  );
+
+export const PaginatedAvailableSoonLivingSpaces =
+  SchemaBuilder.paginatedType<IAvailableSoonRentableSpace>(
+    "PaginatedAvailableSoonLivingSpaces",
+    AvailableSoonRentableSpace,
+  );

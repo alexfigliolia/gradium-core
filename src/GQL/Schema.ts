@@ -16,10 +16,13 @@ import {
   deleteExpense,
   updateExpense,
 } from "./Expense/Resolvers";
+import { getLeases } from "./Leases/Resolvers";
 import { deleteEmail, linkEmail, updateEmail } from "./LinkedEmail/Resolvers";
 import {
   createOrUpdateLivingSpace,
   deleteLivingSpace,
+  fetchAvailableSpaces,
+  fetchSoonToBeAvailableSpaces,
   getLivingSpaces,
 } from "./LivingSpace/Resolvers";
 import {
@@ -56,16 +59,19 @@ const QueryRoot = new GraphQLObjectType({
   name: "Query",
   fields: {
     userScope,
+    getLeases,
     listPeople,
     getAmenities,
     verifySession,
     getLivingSpaces,
     listStaffMembers,
     listManagementTasks,
+    fetchAvailableSpaces,
     fetchAmenityReservations,
     generateUploadSignature,
     generateDestroySignature,
     adminBasicPropertiesList,
+    fetchSoonToBeAvailableSpaces,
   },
 });
 

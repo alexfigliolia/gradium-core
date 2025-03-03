@@ -4,6 +4,7 @@ import { PersonRole } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { PersonController } from "GQL/Person/Controller";
 import { Permission } from "Tools/Permission";
+import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { Validators } from "Tools/Validators";
 import type { IFetchStaff, IInviteStaffMember } from "./Types";
 
@@ -74,9 +75,8 @@ export class StaffController {
         },
       });
     });
-    return {
-      cursor: staff[staff.length - 1]?.id,
-      list: staff.map(PersonController.toPersonType),
-    };
+    return SchemaBuilder.toPaginationResult(
+      staff.map(PersonController.toPersonType),
+    );
   }
 }

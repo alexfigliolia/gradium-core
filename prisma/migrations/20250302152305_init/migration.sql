@@ -8,7 +8,7 @@ CREATE TYPE "LivingSpaceType" AS ENUM ('unit', 'dwelling');
 CREATE TYPE "BillFrequency" AS ENUM ('hour', 'day');
 
 -- CreateEnum
-CREATE TYPE "RentPaymentFrequency" AS ENUM ('day', 'month', 'year');
+CREATE TYPE "RentPaymentFrequency" AS ENUM ('day', 'week', 'month', 'year');
 
 -- CreateEnum
 CREATE TYPE "LeaseStatus" AS ENUM ('complete', 'inProgress', 'terminated', 'pending');
@@ -111,6 +111,7 @@ CREATE TABLE "Lease" (
     "end" TIMESTAMPTZ(3) NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "status" "LeaseStatus" NOT NULL,
+    "terminatedDate" TIMESTAMPTZ(3),
     "paymentFrequency" "RentPaymentFrequency" NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "organizationId" INTEGER NOT NULL,
@@ -205,6 +206,7 @@ CREATE TABLE "LivingSpace" (
     "size" TEXT NOT NULL DEFAULT '0',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "propertyId" INTEGER NOT NULL,
+    "organizationId" INTEGER NOT NULL,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
@@ -324,7 +326,9 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "_LeaseToUser" (
     "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_LeaseToUser_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -406,9 +410,6 @@ CREATE UNIQUE INDEX "LinkedEmail_email_key" ON "LinkedEmail"("email");
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_LeaseToUser_AB_unique" ON "_LeaseToUser"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_LeaseToUser_B_index" ON "_LeaseToUser"("B");
 
 -- AddForeignKey
@@ -485,6 +486,9 @@ ALTER TABLE "LivingSpaceFloorPlan" ADD CONSTRAINT "LivingSpaceFloorPlan_livingSp
 
 -- AddForeignKey
 ALTER TABLE "LivingSpace" ADD CONSTRAINT "LivingSpace_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "LivingSpace" ADD CONSTRAINT "LivingSpace_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PropertyAddon" ADD CONSTRAINT "PropertyAddon_propertyId_fkey" FOREIGN KEY ("propertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
