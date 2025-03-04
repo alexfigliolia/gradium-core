@@ -2,9 +2,9 @@ import { GraphQLBoolean, GraphQLInt, GraphQLObjectType } from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
+import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context, DBID, IEntitySnapshot } from "Types/GraphQL";
-import { EntitySnapshot } from "Types/GraphQL";
+import type { Context, DBID, Identity } from "Types/GraphQL";
 
 export interface ICreateReservation extends IdentifyProperty {
   start: string;
@@ -29,8 +29,8 @@ export interface IReservation {
   id: number;
   start: string;
   end: string;
-  amenity: IEntitySnapshot;
-  person: IEntitySnapshot;
+  amenity: Identity;
+  person: Identity;
 }
 
 export const AmenityReservation = new GraphQLObjectType<IReservation, Context>({
@@ -49,11 +49,11 @@ export const AmenityReservation = new GraphQLObjectType<IReservation, Context>({
       resolve: v => v.end,
     },
     amenity: {
-      type: SchemaBuilder.nonNull(EntitySnapshot),
+      type: SchemaBuilder.nonNull(GraphQLIdentityType),
       resolve: v => v.amenity,
     },
     person: {
-      type: SchemaBuilder.nonNull(EntitySnapshot),
+      type: SchemaBuilder.nonNull(GraphQLIdentityType),
       resolve: v => v.person,
     },
   },

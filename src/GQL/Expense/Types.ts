@@ -2,10 +2,9 @@ import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
-import type { IPerson } from "GQL/Person/Types";
-import { Person } from "GQL/Person/Types";
+import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import type { Context, Identity } from "Types/GraphQL";
 
 export interface IExpenseContent {
   cost: string;
@@ -30,7 +29,7 @@ export interface IUpdateExpense extends ICreateExpense {
 export interface IExpense extends IExpenseContent {
   id: number;
   createdAt: string;
-  createdBy: IPerson;
+  createdBy: Identity;
   attachments: IGradiumImage[];
 }
 
@@ -46,7 +45,7 @@ export const Expense = new GraphQLObjectType<IExpense, Context>({
       resolve: e => e.createdAt,
     },
     createdBy: {
-      type: SchemaBuilder.nonNull(Person),
+      type: SchemaBuilder.nonNull(GraphQLIdentityType),
       resolve: e => e.createdBy,
     },
     cost: {

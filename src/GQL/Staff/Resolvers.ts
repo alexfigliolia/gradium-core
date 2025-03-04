@@ -1,11 +1,11 @@
 import type { GraphQLFieldConfig } from "graphql";
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from "graphql";
+import { PaginatedIdentitiesType } from "Tools/GraphQLIdentity";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { type Context, PaginationArgs } from "Types/GraphQL";
 import { StaffController } from "./Controller";
 import type { IFetchStaff, IInviteStaffMember } from "./Types";
-import { PaginatedStaff } from "./Types";
 
 export const inviteStaffMember: GraphQLFieldConfig<
   any,
@@ -27,7 +27,7 @@ export const inviteStaffMember: GraphQLFieldConfig<
 };
 
 export const listStaffMembers: GraphQLFieldConfig<any, Context, IFetchStaff> = {
-  type: SchemaBuilder.nonNull(PaginatedStaff),
+  type: SchemaBuilder.nonNull(PaginatedIdentitiesType),
   args: {
     organizationId: {
       type: SchemaBuilder.nonNull(GraphQLInt),

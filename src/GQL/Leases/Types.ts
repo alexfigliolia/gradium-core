@@ -7,9 +7,14 @@ import {
 import { GraphQLDateTime } from "graphql-iso-date";
 import type { ILivingSpace } from "GQL/LivingSpace/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
-import { type IPerson, Person } from "GQL/Person/Types";
+import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context, IPagination, IPaginationResult } from "Types/GraphQL";
+import type {
+  Context,
+  Identity,
+  IPagination,
+  IPaginationResult,
+} from "Types/GraphQL";
 
 export const RentPaymentFrequencyType = new GraphQLEnumType({
   name: "RentPaymentFrequency",
@@ -75,7 +80,7 @@ export const LeaseType = new GraphQLObjectType<ILease, Context>({
       resolve: lease => lease.price,
     },
     lessees: {
-      type: SchemaBuilder.nonNullArray(Person),
+      type: SchemaBuilder.nonNullArray(GraphQLIdentityType),
       resolve: lease => lease.lessees,
     },
     paymentFrequency: {
@@ -126,7 +131,7 @@ export interface ILease {
   start: string;
   end: string;
   price: number;
-  lessees: IPerson;
+  lessees: Identity;
   status: ILeaseStatus;
   paymentFrequency: IRentPaymentFrequency;
   livingSpace: ILivingSpace;
