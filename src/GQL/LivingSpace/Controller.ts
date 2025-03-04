@@ -3,7 +3,7 @@ import { GraphQLError } from "graphql";
 import type { Prisma as PrismaType } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { IGradiumImageType } from "GQL/Media/Types";
-import type { IdentifyProperty } from "GQL/Property/Types";
+import type { IdentifyProperty, IPaginateProperties } from "GQL/Property/Types";
 import { MediaClient } from "Media/Client";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { Validators } from "Tools/Validators";
@@ -23,8 +23,13 @@ export class LivingSpaceController extends Access {
     });
   };
 
-  public static identifySpaces = async (propertyId: number) => {
-    return Prisma.transact(client => {
+  public static identifySpaces = async ({
+    propertyId,
+    organizationId: _,
+    ...pagination
+  }: IPaginateProperties) => {
+    const pagingArgs = Prisma.paginationArguments(pagination);
+    const list = await Prisma.transact(client => {
       return client.livingSpace.findMany({
         where: {
           AND: [{ propertyId }, { deleted: false }],
@@ -33,8 +38,10 @@ export class LivingSpaceController extends Access {
           id: true,
           name: true,
         },
+        ...pagingArgs,
       });
     });
+    return SchemaBuilder.toPaginationResult(list, pagingArgs.take);
   };
 
   public static create = ({ propertyId, organizationId }: IdentifyProperty) => {

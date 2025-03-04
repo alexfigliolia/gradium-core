@@ -3,7 +3,7 @@ import { type IPropertyAddon, PropertyAddon } from "GQL/Addons/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context } from "Types/GraphQL";
+import type { Context, IPagination } from "Types/GraphQL";
 
 export interface IBasicPropertyInfo {
   name: string;
@@ -27,6 +27,8 @@ interface IAdminBasicProperty extends IBasicPropertyInfo {
 export interface IdentifyProperty extends IOrganizationID {
   propertyId: number;
 }
+
+export interface IPaginateProperties extends IdentifyProperty, IPagination {}
 
 export interface IUpdateBasicPropertyInfo
   extends IdentifyProperty,

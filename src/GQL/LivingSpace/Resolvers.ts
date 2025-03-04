@@ -5,11 +5,11 @@ import {
   GraphQLString,
 } from "graphql";
 import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
-import type { IdentifyProperty } from "GQL/Property/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import type { IdentifyProperty, IPaginateProperties } from "GQL/Property/Types";
+import { PaginatedIdentitiesType } from "Tools/GraphQLIdentity";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import { type Context } from "Types/GraphQL";
+import { type Context, PaginationArgs } from "Types/GraphQL";
 import { LivingSpaceController } from "./Controller";
 import type {
   IDeleteLivingSpace,
@@ -28,6 +28,7 @@ export const getLivingSpaces: GraphQLFieldConfig<
   any,
   Context,
   IdentifyProperty
+  // TODO - paginate
 > = {
   type: SchemaBuilder.nonNullArray(LivingSpace),
   args: IdentifyPropertyArgs,
@@ -46,19 +47,22 @@ export const getLivingSpaces: GraphQLFieldConfig<
 export const identifySpaces: GraphQLFieldConfig<
   any,
   Context,
-  IdentifyProperty
+  IPaginateProperties
 > = {
-  type: SchemaBuilder.nonNullArray(GraphQLIdentityType),
-  args: IdentifyPropertyArgs,
-  resolve: (_, { organizationId, propertyId }, context) => {
+  type: SchemaBuilder.nonNull(PaginatedIdentitiesType),
+  args: {
+    ...IdentifyPropertyArgs,
+    ...PaginationArgs,
+  },
+  resolve: (_, args, context) => {
     const operation = Permission.permissedTransaction({
-      organizationId,
+      organizationId: args.organizationId,
       session: context.req.session,
       operation: LivingSpaceController.identifySpaces,
       errorMessage:
         "You do not have permissions to access this property's living spaces",
     });
-    return operation(propertyId);
+    return operation(args);
   },
 };
 
