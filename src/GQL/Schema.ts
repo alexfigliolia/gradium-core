@@ -24,6 +24,7 @@ import {
   fetchAvailableSpaces,
   fetchSoonToBeAvailableSpaces,
   getLivingSpaces,
+  identifySpaces,
 } from "./LivingSpace/Resolvers";
 import {
   createAccount,
@@ -63,6 +64,7 @@ const QueryRoot = new GraphQLObjectType({
     listPeople,
     getAmenities,
     verifySession,
+    identifySpaces,
     getLivingSpaces,
     listStaffMembers,
     listManagementTasks,

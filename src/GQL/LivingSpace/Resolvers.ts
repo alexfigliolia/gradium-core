@@ -6,6 +6,7 @@ import {
 } from "graphql";
 import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
+import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { type Context } from "Types/GraphQL";
@@ -35,6 +36,25 @@ export const getLivingSpaces: GraphQLFieldConfig<
       organizationId,
       session: context.req.session,
       operation: LivingSpaceController.fetchAll,
+      errorMessage:
+        "You do not have permissions to access this property's living spaces",
+    });
+    return operation(propertyId);
+  },
+};
+
+export const identifySpaces: GraphQLFieldConfig<
+  any,
+  Context,
+  IdentifyProperty
+> = {
+  type: SchemaBuilder.nonNullArray(GraphQLIdentityType),
+  args: IdentifyPropertyArgs,
+  resolve: (_, { organizationId, propertyId }, context) => {
+    const operation = Permission.permissedTransaction({
+      organizationId,
+      session: context.req.session,
+      operation: LivingSpaceController.identifySpaces,
       errorMessage:
         "You do not have permissions to access this property's living spaces",
     });

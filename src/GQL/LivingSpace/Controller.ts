@@ -23,6 +23,20 @@ export class LivingSpaceController extends Access {
     });
   };
 
+  public static identifySpaces = async (propertyId: number) => {
+    return Prisma.transact(client => {
+      return client.livingSpace.findMany({
+        where: {
+          AND: [{ propertyId }, { deleted: false }],
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+    });
+  };
+
   public static create = ({ propertyId, organizationId }: IdentifyProperty) => {
     return Prisma.transact(client => {
       return client.livingSpace.create({
