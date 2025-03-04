@@ -10,7 +10,48 @@ export class UserController {
     return Prisma.transact(async client => {
       const link = await client.linkedEmail.findUnique({
         where: { email },
-        select: { user: true },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              deleted: true,
+              password: true,
+            },
+          },
+        },
+      });
+      return link?.user;
+    });
+  }
+
+  public static findAffiliationsByEmail(email: string) {
+    return Prisma.transact(async client => {
+      const link = await client.linkedEmail.findUnique({
+        where: { email },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              affiliations: {
+                select: {
+                  linkedEmail: {
+                    select: {
+                      email: true,
+                    },
+                  },
+                  roles: {
+                    select: {
+                      role: true,
+                    },
+                  },
+                  organizationId: true,
+                },
+              },
+            },
+          },
+        },
       });
       return link?.user;
     });

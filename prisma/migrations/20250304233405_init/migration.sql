@@ -23,6 +23,16 @@ CREATE TYPE "ManagementTaskStatus" AS ENUM ('todo', 'inProgress', 'underReview',
 CREATE TYPE "PropertyAddonType" AS ENUM ('packageManagement', 'amenityReservations', 'propertyEvents', 'leaseManagement', 'hoaManagement');
 
 -- CreateTable
+CREATE TABLE "LeaseDocument" (
+    "id" SERIAL NOT NULL,
+    "url" TEXT NOT NULL,
+    "thumbnail" TEXT NOT NULL,
+    "leaseId" INTEGER NOT NULL,
+
+    CONSTRAINT "LeaseDocument_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "ExpenseAttachment" (
     "id" SERIAL NOT NULL,
     "url" TEXT NOT NULL,
@@ -95,7 +105,7 @@ CREATE TABLE "RentPayment" (
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
     "value" DOUBLE PRECISION NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "personId" INTEGER NOT NULL,
     "leaseId" INTEGER NOT NULL,
     "organizationId" INTEGER NOT NULL,
 
@@ -266,6 +276,19 @@ CREATE TABLE "StaffInvite" (
 );
 
 -- CreateTable
+CREATE TABLE "LeaseInvite" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "organizationId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+    "leaseId" INTEGER NOT NULL,
+
+    CONSTRAINT "LeaseInvite_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Role" (
     "id" SERIAL NOT NULL,
     "role" "PersonRole" NOT NULL,
@@ -324,12 +347,15 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "_LeaseToUser" (
+CREATE TABLE "_LeaseToPerson" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL,
 
-    CONSTRAINT "_LeaseToUser_AB_pkey" PRIMARY KEY ("A","B")
+    CONSTRAINT "_LeaseToPerson_AB_pkey" PRIMARY KEY ("A","B")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "LeaseDocument_id_key" ON "LeaseDocument"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ExpenseAttachment_id_key" ON "ExpenseAttachment"("id");
@@ -389,6 +415,9 @@ CREATE UNIQUE INDEX "Property_id_key" ON "Property"("id");
 CREATE UNIQUE INDEX "StaffInvite_id_key" ON "StaffInvite"("id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "LeaseInvite_id_key" ON "LeaseInvite"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Role_id_key" ON "Role"("id");
 
 -- CreateIndex
@@ -410,7 +439,10 @@ CREATE UNIQUE INDEX "LinkedEmail_email_key" ON "LinkedEmail"("email");
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
-CREATE INDEX "_LeaseToUser_B_index" ON "_LeaseToUser"("B");
+CREATE INDEX "_LeaseToPerson_B_index" ON "_LeaseToPerson"("B");
+
+-- AddForeignKey
+ALTER TABLE "LeaseDocument" ADD CONSTRAINT "LeaseDocument_leaseId_fkey" FOREIGN KEY ("leaseId") REFERENCES "Lease"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ExpenseAttachment" ADD CONSTRAINT "ExpenseAttachment_expenseId_fkey" FOREIGN KEY ("expenseId") REFERENCES "Expense"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -446,7 +478,7 @@ ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_propertyId_fkey" FOR
 ALTER TABLE "ManagementTask" ADD CONSTRAINT "ManagementTask_assignedToId_fkey" FOREIGN KEY ("assignedToId") REFERENCES "Person"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentPayment" ADD CONSTRAINT "RentPayment_leaseId_fkey" FOREIGN KEY ("leaseId") REFERENCES "Lease"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -503,6 +535,12 @@ ALTER TABLE "Property" ADD CONSTRAINT "Property_organizationId_fkey" FOREIGN KEY
 ALTER TABLE "StaffInvite" ADD CONSTRAINT "StaffInvite_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "LeaseInvite" ADD CONSTRAINT "LeaseInvite_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "LeaseInvite" ADD CONSTRAINT "LeaseInvite_leaseId_fkey" FOREIGN KEY ("leaseId") REFERENCES "Lease"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Role" ADD CONSTRAINT "Role_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -518,7 +556,7 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_linkedEmailId_fkey" FOREIGN KEY ("li
 ALTER TABLE "LinkedEmail" ADD CONSTRAINT "LinkedEmail_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Lease"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_LeaseToPerson" ADD CONSTRAINT "_LeaseToPerson_A_fkey" FOREIGN KEY ("A") REFERENCES "Lease"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_LeaseToUser" ADD CONSTRAINT "_LeaseToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_LeaseToPerson" ADD CONSTRAINT "_LeaseToPerson_B_fkey" FOREIGN KEY ("B") REFERENCES "Person"("id") ON DELETE CASCADE ON UPDATE CASCADE;

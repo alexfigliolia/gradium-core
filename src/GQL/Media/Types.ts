@@ -11,7 +11,8 @@ import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context } from "Types/GraphQL";
 
 export interface IGenerateUploadSignature extends IOrganizationID {
-  type: IGradiumImageType;
+  imageType?: IGradiumImageType;
+  documentType?: IGradiumDocumentType;
 }
 
 export interface IGenerateDestroySignature extends IGenerateUploadSignature {
@@ -86,8 +87,19 @@ export interface IGradiumImage {
   id: number;
   url: string;
 }
+
+export interface IGradiumDocument extends IGradiumImage {
+  id: number;
+  url: string;
+  thumbnail: string;
+}
+
 export interface IdentifyGradiumImage extends IdentifyProperty {
   type: IGradiumImageType;
+}
+
+export interface IdentifyGradiumDocument extends IdentifyProperty {
+  type: IGradiumDocumentType;
 }
 
 export interface IDeleteGradiumImage extends IdentifyGradiumImage {
@@ -99,6 +111,16 @@ export interface ICreateGradiumImage extends IdentifyGradiumImage {
   entityId: number;
 }
 
+export interface IDeleteGradiumDocument extends IdentifyGradiumDocument {
+  id: number;
+}
+
+export interface ICreateGradiumDocument extends IdentifyGradiumDocument {
+  url: string;
+  thumbnail: string;
+  entityId: number;
+}
+
 export enum IGradiumImageType {
   "propertyImage" = "propertyImage",
   "livingSpaceImage" = "livingSpaceImage",
@@ -107,6 +129,10 @@ export enum IGradiumImageType {
   "amenityFloorPlan" = "amenityFloorPlan",
   "taskImage" = "taskImage",
   "expenseAttachment" = "expenseAttachment",
+}
+
+export enum IGradiumDocumentType {
+  "leaseDocument" = "leaseDocument",
 }
 
 export const GradiumImageType = new GraphQLEnumType({
@@ -136,16 +162,38 @@ export const GradiumImageType = new GraphQLEnumType({
   },
 });
 
+export const GradiumDocumentType = new GraphQLEnumType({
+  name: "GradiumDocumentType",
+  values: {
+    leaseDocument: {
+      value: "leaseDocument",
+    },
+  },
+});
+
 export const GradiumImage = new GraphQLObjectType<IGradiumImage, Context>({
   name: "GradiumImage",
   fields: {
     id: {
       type: SchemaBuilder.nonNull(GraphQLInt),
-      resolve: property => property.id,
+      resolve: image => image.id,
     },
     url: {
       type: SchemaBuilder.nonNull(GraphQLString),
-      resolve: property => property.url,
+      resolve: image => image.url,
     },
   },
 });
+
+export const GradiumDocument = new GraphQLObjectType<IGradiumDocument, Context>(
+  {
+    name: "GradiumDocument",
+    fields: {
+      ...GradiumImage.toConfig().fields,
+      thumbnail: {
+        type: SchemaBuilder.nonNull(GraphQLString),
+        resolve: image => image.thumbnail,
+      },
+    },
+  },
+);

@@ -16,7 +16,7 @@ import {
   deleteExpense,
   updateExpense,
 } from "./Expense/Resolvers";
-import { getLeases } from "./Leases/Resolvers";
+import { fetchLeases } from "./Leases/Resolvers";
 import { deleteEmail, linkEmail, updateEmail } from "./LinkedEmail/Resolvers";
 import {
   createOrUpdateLivingSpace,
@@ -41,9 +41,11 @@ import {
   updateManagementTask,
 } from "./ManagementTask/Resolvers";
 import {
+  deleteDocument,
   deleteImage,
   generateDestroySignature,
   generateUploadSignature,
+  saveDocument,
   saveImage,
 } from "./Media/Resolvers";
 import { setOrganizationName } from "./Organization/Resolvers";
@@ -60,8 +62,8 @@ const QueryRoot = new GraphQLObjectType({
   name: "Query",
   fields: {
     userScope,
-    getLeases,
     listPeople,
+    fetchLeases,
     getAmenities,
     verifySession,
     identifySpaces,
@@ -87,6 +89,7 @@ const MutationRoot = new GraphQLObjectType({
     deleteImage,
     deleteEmail,
     updateEmail,
+    saveDocument,
     resetPassword,
     createAccount,
     forgotPassword,
@@ -95,6 +98,7 @@ const MutationRoot = new GraphQLObjectType({
     createExpense,
     updateExpense,
     deleteExpense,
+    deleteDocument,
     inviteStaffMember,
     deleteLivingSpace,
     setOrganizationName,

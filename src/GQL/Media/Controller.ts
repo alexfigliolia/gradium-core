@@ -1,10 +1,12 @@
 import { GraphQLError } from "graphql";
 import { Permission } from "Tools/Permission";
 import type { Session } from "Types/GraphQL";
+import { DocumentController } from "./Documents";
 import { ImageController } from "./Images";
 
 export class MediaController {
   public static Images = new ImageController();
+  public static Documents = new DocumentController();
 
   public static verify(session: Session, organizationId: number) {
     if (!Permission.hasOrgAccess(session, organizationId)) {

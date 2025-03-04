@@ -1,20 +1,20 @@
 import {
   GraphQLEnumType,
   GraphQLFloat,
+  GraphQLInputObjectType,
   GraphQLInt,
   GraphQLObjectType,
+  GraphQLString,
 } from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
+import type { LeaseStatus, RentPaymentFrequency } from "@prisma/client";
 import type { ILivingSpace } from "GQL/LivingSpace/Types";
+import type { IGradiumDocument } from "GQL/Media/Types";
+import { GradiumImageType } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type {
-  Context,
-  Identity,
-  IPagination,
-  IPaginationResult,
-} from "Types/GraphQL";
+import type { Context, Identity, IPagination } from "Types/GraphQL";
 
 export const RentPaymentFrequencyType = new GraphQLEnumType({
   name: "RentPaymentFrequency",
@@ -87,24 +87,22 @@ export const LeaseType = new GraphQLObjectType<ILease, Context>({
       type: SchemaBuilder.nonNull(RentPaymentFrequencyType),
       resolve: lease => lease.paymentFrequency,
     },
+    terminatedDate: {
+      type: GraphQLDateTime,
+      resolve: lease => lease.terminatedDate,
+    },
+    documents: {
+      type: SchemaBuilder.nonNull(GradiumImageType),
+      resolve: lease => lease.documents,
+    },
     ...LeaseSnapShotType.toConfig().fields,
   },
 });
 
-export const PaginatedLeasesType = new GraphQLObjectType<
-  IPaginationResult<ILease>
->({
-  name: "PaginatedLeases",
-  fields: {
-    list: {
-      type: SchemaBuilder.nonNullArray(LeaseType),
-      resolve: result => result.list,
-    },
-    cursor: {
-      type: GraphQLInt,
-    },
-  },
-});
+export const PaginatedLeasesType = SchemaBuilder.paginatedType<ILease>(
+  "PaginatedLeases",
+  LeaseType,
+);
 
 export interface ILeaseSnapShot {
   start: string;
@@ -131,10 +129,75 @@ export interface ILease {
   start: string;
   end: string;
   price: number;
-  lessees: Identity;
+  propertyId: number;
+  lessees: Identity[];
   status: ILeaseStatus;
+  terminatedDate?: string;
   paymentFrequency: IRentPaymentFrequency;
   livingSpace: ILivingSpace;
+  documents: IGradiumDocument[];
 }
 
 export interface IFetchLeases extends IPagination, IOrganizationID {}
+
+export interface ILessee {
+  name: string;
+  email: string;
+}
+
+export interface ICreateLease extends IOrganizationID {
+  start: string;
+  end: string;
+  price: number;
+  propertyId: number;
+  paymentFrequency: IRentPaymentFrequency;
+  lessees: ILessee[];
+  livingSpaceId: number;
+}
+
+export const LesseeType = new GraphQLInputObjectType({
+  name: "Lessee",
+  fields: {
+    name: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+    email: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+    },
+  },
+});
+
+export interface IRawLease {
+  id: number;
+  start: Date;
+  end: Date;
+  status: LeaseStatus;
+  price: number;
+  livingSpace: {
+    name: string;
+  };
+  property: {
+    id: number;
+    name: string;
+  };
+  invites: {
+    name: string;
+    email: string;
+  }[];
+  lessees: {
+    id: number;
+    linkedEmail: {
+      email: string;
+    };
+    user: {
+      name: string;
+    };
+  }[];
+  terminatedDate: Date | null;
+  paymentFrequency: RentPaymentFrequency;
+  documents: {
+    id: number;
+    url: string;
+    thumbnail: string;
+  }[];
+}

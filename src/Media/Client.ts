@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import type { IDestroySignature, IGradiumImage } from "GQL/Media/Types";
-import { IGradiumImageType } from "GQL/Media/Types";
+import { IGradiumDocumentType, IGradiumImageType } from "GQL/Media/Types";
 import { SecretManager } from "Secrets/Manager";
 
 export class MediaClient {
@@ -15,6 +15,7 @@ export class MediaClient {
     [IGradiumImageType.amenityFloorPlan]: "amenity_floor_plans",
     [IGradiumImageType.taskImage]: "task_images",
     [IGradiumImageType.expenseAttachment]: "expense_attachments",
+    [IGradiumDocumentType.leaseDocument]: "lease_documents",
   };
   private static _Client?: typeof cloudinary;
 
@@ -49,7 +50,9 @@ export class MediaClient {
     return { name: this.#name, api_key: this.#key, secret: this.#secret };
   }
 
-  public static signUpload = async (type: IGradiumImageType) => {
+  public static signUpload = async (
+    type: IGradiumImageType | IGradiumDocumentType,
+  ) => {
     const Client = await this.getClient();
     const folder = this.getAssetDesination(type);
     const timestamp = Math.round(new Date().getTime() / 1000);
@@ -70,7 +73,7 @@ export class MediaClient {
   };
 
   public static signDestroy = async (
-    imageType: IGradiumImageType,
+    imageType: IGradiumImageType | IGradiumDocumentType,
     public_id: string,
   ) => {
     const Client = await this.getClient();
@@ -132,7 +135,9 @@ export class MediaClient {
     return json;
   }
 
-  private static getAssetDesination(type: IGradiumImageType) {
+  private static getAssetDesination(
+    type: IGradiumImageType | IGradiumDocumentType,
+  ) {
     const tokens: string[] = ["gradium"];
     if (!(type in this.directoryMap)) {
       throw new Error("Media Client: Unknown image type");
