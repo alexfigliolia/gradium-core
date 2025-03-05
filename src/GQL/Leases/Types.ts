@@ -10,11 +10,11 @@ import { GraphQLDateTime } from "graphql-iso-date";
 import type { LeaseStatus, RentPaymentFrequency } from "@prisma/client";
 import type { ILivingSpace } from "GQL/LivingSpace/Types";
 import type { IGradiumDocument } from "GQL/Media/Types";
-import { GradiumImageType } from "GQL/Media/Types";
+import { GradiumDocument } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import { GradiumPersonType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
-import type { Context, Identity, IPagination } from "Types/GraphQL";
+import type { Context, IPagination, PersonIdentifier } from "Types/GraphQL";
 
 export const RentPaymentFrequencyType = new GraphQLEnumType({
   name: "RentPaymentFrequency",
@@ -80,8 +80,12 @@ export const LeaseType = new GraphQLObjectType<ILease, Context>({
       resolve: lease => lease.price,
     },
     lessees: {
-      type: SchemaBuilder.nonNullArray(GraphQLIdentityType),
+      type: SchemaBuilder.nonNullArray(GradiumPersonType),
       resolve: lease => lease.lessees,
+    },
+    invites: {
+      type: SchemaBuilder.nonNullArray(GradiumPersonType),
+      resolve: lease => lease.invites,
     },
     paymentFrequency: {
       type: SchemaBuilder.nonNull(RentPaymentFrequencyType),
@@ -92,7 +96,7 @@ export const LeaseType = new GraphQLObjectType<ILease, Context>({
       resolve: lease => lease.terminatedDate,
     },
     documents: {
-      type: SchemaBuilder.nonNull(GradiumImageType),
+      type: SchemaBuilder.nonNullArray(GradiumDocument),
       resolve: lease => lease.documents,
     },
     ...LeaseSnapShotType.toConfig().fields,
@@ -130,7 +134,8 @@ export interface ILease {
   end: string;
   price: number;
   propertyId: number;
-  lessees: Identity[];
+  lessees: PersonIdentifier[];
+  invites: PersonIdentifier[];
   status: ILeaseStatus;
   terminatedDate?: string;
   paymentFrequency: IRentPaymentFrequency;

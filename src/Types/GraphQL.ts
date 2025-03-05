@@ -16,6 +16,10 @@ export interface Identity extends DBID {
   name: string;
 }
 
+export interface PersonIdentifier extends Identity {
+  email: string;
+}
+
 export interface IPagination {
   limit?: number;
   cursor?: number;

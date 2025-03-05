@@ -2,7 +2,7 @@ import { GraphQLBoolean, GraphQLInt, GraphQLObjectType } from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import { GradiumIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID, Identity } from "Types/GraphQL";
 
@@ -49,11 +49,11 @@ export const AmenityReservation = new GraphQLObjectType<IReservation, Context>({
       resolve: v => v.end,
     },
     amenity: {
-      type: SchemaBuilder.nonNull(GraphQLIdentityType),
+      type: SchemaBuilder.nonNull(GradiumIdentityType),
       resolve: v => v.amenity,
     },
     person: {
-      type: SchemaBuilder.nonNull(GraphQLIdentityType),
+      type: SchemaBuilder.nonNull(GradiumIdentityType),
       resolve: v => v.person,
     },
   },

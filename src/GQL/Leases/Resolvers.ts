@@ -1,9 +1,5 @@
-import {
-  type GraphQLFieldConfig,
-  GraphQLFloat,
-  GraphQLInt,
-  GraphQLString,
-} from "graphql";
+import { type GraphQLFieldConfig, GraphQLFloat, GraphQLInt } from "graphql";
+import { GraphQLDateTime } from "graphql-iso-date";
 import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import { Permission } from "Tools/Permission";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
@@ -41,16 +37,19 @@ export const createLease: GraphQLFieldConfig<any, Context, ICreateLease> = {
   type: SchemaBuilder.nonNull(LeaseType),
   args: {
     start: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
     },
     end: {
-      type: SchemaBuilder.nonNull(GraphQLString),
+      type: SchemaBuilder.nonNull(GraphQLDateTime),
     },
     price: {
       type: SchemaBuilder.nonNull(GraphQLFloat),
     },
     lessees: {
       type: SchemaBuilder.nonNullArray(LesseeType),
+    },
+    livingSpaceId: {
+      type: SchemaBuilder.nonNull(GraphQLInt),
     },
     paymentFrequency: {
       type: SchemaBuilder.nonNull(RentPaymentFrequencyType),

@@ -15,7 +15,7 @@ import { LeaseSnapShotType } from "GQL/Leases/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import { GradiumIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, Identity, IPagination } from "Types/GraphQL";
 import { PaginationArgs } from "Types/GraphQL";
@@ -98,7 +98,7 @@ export const LivingSpaceType = new GraphQLEnumType({
 export const LivingSpace = new GraphQLObjectType<ILivingSpace, Context>({
   name: "LivingSpace",
   fields: {
-    ...GraphQLIdentityType.toConfig().fields,
+    ...GradiumIdentityType.toConfig().fields,
     type: {
       type: SchemaBuilder.nonNull(LivingSpaceType),
       resolve: space => space.type,

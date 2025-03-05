@@ -320,7 +320,7 @@ model Organization {
   staffInvites StaffInvite[]
   expenses     Expense[]
   livingSpaces LivingSpace[]
-  LeaseInvites LeaseInvite[]
+  leaseInvites LeaseInvite[]
 }
 
 model LinkedEmail {

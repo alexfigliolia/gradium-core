@@ -26,7 +26,7 @@ export class LeaseController extends Access {
     const inviteEmails = new Map<string, string>(
       lessees.map(l => [l.email, l.name]),
     );
-    const foundPeople = await this.findUsers(organizationId, lessees);
+    const foundPeople = await this.findExistingLessees(organizationId, lessees);
     for (const person of foundPeople) {
       personIDs.push(person.id);
       inviteEmails.delete(person.linkedEmail.email);
@@ -60,7 +60,10 @@ export class LeaseController extends Access {
     return this.toGQL(newLease);
   };
 
-  private static async findUsers(organizationId: number, lessees: ILessee[]) {
+  private static async findExistingLessees(
+    organizationId: number,
+    lessees: ILessee[],
+  ) {
     return Prisma.transact(client => {
       return client.person.findMany({
         where: {

@@ -1,8 +1,8 @@
 import { GraphQLInt, GraphQLObjectType, GraphQLString } from "graphql";
-import type { Context, Identity, IPaginationResult } from "Types/GraphQL";
+import type { Context, Identity, PersonIdentifier } from "Types/GraphQL";
 import { SchemaBuilder } from "./SchemaBuilder";
 
-export const GraphQLIdentityType = new GraphQLObjectType<Identity, Context>({
+export const GradiumIdentityType = new GraphQLObjectType<Identity, Context>({
   name: "Identity",
   fields: {
     id: {
@@ -16,9 +16,27 @@ export const GraphQLIdentityType = new GraphQLObjectType<Identity, Context>({
   },
 });
 
-export type IPaginatedPeople = IPaginationResult<Identity>;
+export const GradiumPersonType = new GraphQLObjectType<
+  PersonIdentifier,
+  Context
+>({
+  name: "GradiumPerson",
+  fields: {
+    ...GradiumIdentityType.toConfig().fields,
+    email: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: i => i.email,
+    },
+  },
+});
 
 export const PaginatedIdentitiesType = SchemaBuilder.paginatedType<Identity>(
   "PaginatedIdentities",
-  GraphQLIdentityType,
+  GradiumIdentityType,
 );
+
+export const PaginatedPersonType =
+  SchemaBuilder.paginatedType<PersonIdentifier>(
+    "PaginatedGradiumPeople",
+    GradiumPersonType,
+  );

@@ -20,6 +20,7 @@ export class Access {
     },
     invites: {
       select: {
+        id: true,
         name: true,
         email: true,
       },
@@ -53,7 +54,7 @@ export class Access {
   public static toGQL(item: IRawLease) {
     const { lessees, livingSpace, ...rest } = item;
     return {
-      rest,
+      ...rest,
       livingSpace: livingSpace.name,
       lessees: lessees.map(l => ({
         id: l.id,

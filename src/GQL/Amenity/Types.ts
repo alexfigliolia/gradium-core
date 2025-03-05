@@ -7,7 +7,7 @@ import {
 import { GraphQLDateTime } from "graphql-iso-date";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IdentifyProperty } from "GQL/Property/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import { GradiumIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID } from "Types/GraphQL";
 
@@ -52,7 +52,7 @@ export const BillFrequency = new GraphQLEnumType({
 export const Amenity = new GraphQLObjectType<IAmenity, Context>({
   name: "Amenity",
   fields: {
-    ...GraphQLIdentityType.toConfig().fields,
+    ...GradiumIdentityType.toConfig().fields,
     price: {
       type: SchemaBuilder.nonNull(GraphQLString),
       resolve: space => space.price,

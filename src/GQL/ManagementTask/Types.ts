@@ -12,7 +12,7 @@ import type {
 import { Expense, type IExpense } from "GQL/Expense/Types";
 import { GradiumImage, type IGradiumImage } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import { GradiumIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, DBID, Identity } from "Types/GraphQL";
 
@@ -119,7 +119,7 @@ export const ManagementTask = new GraphQLObjectType<IManagementTask, Context>({
       resolve: m => m.priority,
     },
     createdBy: {
-      type: SchemaBuilder.nonNull(GraphQLIdentityType),
+      type: SchemaBuilder.nonNull(GradiumIdentityType),
       resolve: m => m.createdBy,
     },
     images: {
@@ -127,7 +127,7 @@ export const ManagementTask = new GraphQLObjectType<IManagementTask, Context>({
       resolve: m => m.images,
     },
     assignedTo: {
-      type: GraphQLIdentityType,
+      type: GradiumIdentityType,
       resolve: m => m.assignedTo,
     },
     expenses: {

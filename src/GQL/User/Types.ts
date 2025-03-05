@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLString } from "graphql";
 import type { Role } from "@prisma/client";
 import { type IEmail, LinkedEmail } from "GQL/LinkedEmail/Types";
 import { RoleType } from "GQL/Roles/Types";
-import { GraphQLIdentityType } from "Tools/GraphQLIdentity";
+import { GradiumIdentityType } from "Tools/GraphQLIdentity";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import type { Context, Identity } from "Types/GraphQL";
 
@@ -42,7 +42,7 @@ export const UserAffiliation = new GraphQLObjectType<IUserAffiliation, Context>(
     name: "UserAffiliation",
     fields: {
       organization: {
-        type: SchemaBuilder.nonNull(GraphQLIdentityType),
+        type: SchemaBuilder.nonNull(GradiumIdentityType),
         resolve: affiliation => affiliation.organization,
       },
       roles: {
@@ -70,7 +70,7 @@ export const BasicUser = new GraphQLObjectType<IBasicUser, Context>({
 export const LoggedInUser = new GraphQLObjectType<ILoggedInUser, Context>({
   name: "LoggedInUser",
   fields: {
-    ...GraphQLIdentityType.toConfig().fields,
+    ...GradiumIdentityType.toConfig().fields,
     emails: {
       type: SchemaBuilder.nonNullArray(LinkedEmail),
       resolve: user => user.emails,
