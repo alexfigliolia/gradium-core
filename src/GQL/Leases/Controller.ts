@@ -1,18 +1,85 @@
+import type { Prisma as PrismaClient } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { Access } from "./Access";
 import type { ICreateLease, IFetchLeases, ILessee } from "./Types";
 
 export class LeaseController extends Access {
-  public static fetch = ({ organizationId, ...pagination }: IFetchLeases) => {
+  public static fetch = ({
+    organizationId,
+    search,
+    ...pagination
+  }: IFetchLeases) => {
     const pagingArgs = Prisma.paginationArguments(pagination);
+    const where: PrismaClient.LeaseWhereInput[] = [{ organizationId }];
+    if (search) {
+      where.push({
+        OR: [
+          {
+            invites: {
+              some: {
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+          {
+            invites: {
+              some: {
+                email: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+          {
+            lessees: {
+              some: {
+                user: {
+                  name: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          },
+          {
+            lessees: {
+              some: {
+                linkedEmail: {
+                  email: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+          },
+          {
+            livingSpace: {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          },
+        ],
+      });
+    }
     return Prisma.transact(async client => {
       const leases = await client.lease.findMany({
-        where: { organizationId },
+        where: { AND: where },
         ...pagingArgs,
         select: this.DEFAULT_SELECTION,
       });
-      return SchemaBuilder.toPaginationResult(leases, pagingArgs.take);
+      return SchemaBuilder.toPaginationResult(
+        leases.map(this.toGQL),
+        pagingArgs.take,
+      );
     });
   };
 

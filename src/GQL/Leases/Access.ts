@@ -1,4 +1,4 @@
-import type { IRawLease } from "./Types";
+import type { ILease, IRawLease } from "./Types";
 
 export class Access {
   public static DEFAULT_SELECTION = {
@@ -14,7 +14,6 @@ export class Access {
     },
     property: {
       select: {
-        id: true,
         name: true,
       },
     },
@@ -52,15 +51,16 @@ export class Access {
   } as const;
 
   public static toGQL(item: IRawLease) {
-    const { lessees, livingSpace, ...rest } = item;
+    const { lessees, livingSpace, property, ...rest } = item;
     return {
       ...rest,
-      livingSpace: livingSpace.name,
+      propertyName: property.name,
+      spaceName: livingSpace.name,
       lessees: lessees.map(l => ({
         id: l.id,
         name: l.user.name,
         email: l.linkedEmail.email,
       })),
-    };
+    } as unknown as ILease;
   }
 }

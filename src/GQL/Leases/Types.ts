@@ -8,7 +8,6 @@ import {
 } from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
 import type { LeaseStatus, RentPaymentFrequency } from "@prisma/client";
-import type { ILivingSpace } from "GQL/LivingSpace/Types";
 import type { IGradiumDocument } from "GQL/Media/Types";
 import { GradiumDocument } from "GQL/Media/Types";
 import type { IOrganizationID } from "GQL/Organization/Types";
@@ -91,6 +90,14 @@ export const LeaseType = new GraphQLObjectType<ILease, Context>({
       type: SchemaBuilder.nonNull(RentPaymentFrequencyType),
       resolve: lease => lease.paymentFrequency,
     },
+    propertyName: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: lease => lease.propertyName,
+    },
+    spaceName: {
+      type: SchemaBuilder.nonNull(GraphQLString),
+      resolve: lease => lease.spaceName,
+    },
     terminatedDate: {
       type: GraphQLDateTime,
       resolve: lease => lease.terminatedDate,
@@ -133,17 +140,19 @@ export interface ILease {
   start: string;
   end: string;
   price: number;
-  propertyId: number;
+  propertyName: string;
+  spaceName: string;
   lessees: PersonIdentifier[];
   invites: PersonIdentifier[];
   status: ILeaseStatus;
   terminatedDate?: string;
   paymentFrequency: IRentPaymentFrequency;
-  livingSpace: ILivingSpace;
   documents: IGradiumDocument[];
 }
 
-export interface IFetchLeases extends IPagination, IOrganizationID {}
+export interface IFetchLeases extends IPagination, IOrganizationID {
+  search?: string;
+}
 
 export interface ILessee {
   name: string;
@@ -182,7 +191,6 @@ export interface IRawLease {
     name: string;
   };
   property: {
-    id: number;
     name: string;
   };
   invites: {

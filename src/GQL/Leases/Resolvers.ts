@@ -1,4 +1,9 @@
-import { type GraphQLFieldConfig, GraphQLFloat, GraphQLInt } from "graphql";
+import {
+  type GraphQLFieldConfig,
+  GraphQLFloat,
+  GraphQLInt,
+  GraphQLString,
+} from "graphql";
 import { GraphQLDateTime } from "graphql-iso-date";
 import { IdentifyPropertyArgs } from "GQL/AmenityReservation/Types";
 import { Permission } from "Tools/Permission";
@@ -18,6 +23,9 @@ export const fetchLeases: GraphQLFieldConfig<any, Context, IFetchLeases> = {
   args: {
     organizationId: {
       type: SchemaBuilder.nonNull(GraphQLInt),
+    },
+    search: {
+      type: GraphQLString,
     },
     ...PaginationArgs,
   },
