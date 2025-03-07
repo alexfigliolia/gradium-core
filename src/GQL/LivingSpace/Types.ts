@@ -8,7 +8,7 @@ import {
 import { GraphQLDateTime } from "graphql-iso-date";
 import type {
   LeaseStatus,
-  LivingSpaceType as ILivingSpaceType,
+  LivingSpaceType as LivingSpaceTypeEnum,
 } from "@prisma/client";
 import type { ILeaseSnapShot } from "GQL/Leases/Types";
 import { LeaseSnapShotType } from "GQL/Leases/Types";
@@ -21,7 +21,7 @@ import type { Context, Identity, IPagination } from "Types/GraphQL";
 import { PaginationArgs } from "Types/GraphQL";
 
 export interface ILivingSpace extends Identity {
-  type: ILivingSpaceType;
+  type: LivingSpaceTypeEnum;
   beds: number;
   baths: number;
   size: string;
@@ -46,7 +46,7 @@ export interface IAvailableSoonRentableSpace extends IRentableSpace {
 export interface IUpdateLivingSpace extends IdentifyProperty {
   id?: number;
   name: string;
-  type: ILivingSpaceType;
+  type: LivingSpaceTypeEnum;
   beds: number;
   baths: number;
   size: string;
@@ -86,11 +86,11 @@ export interface IRawAvailableSoonRentableSpace extends IRawRentableSpace {
 export const LivingSpaceType = new GraphQLEnumType({
   name: "LivingSpaceType",
   values: {
-    unit: {
-      value: "unit",
+    rental: {
+      value: "rental",
     },
-    dwelling: {
-      value: "dwelling",
+    condoCoop: {
+      value: "condoCoop",
     },
   },
 });

@@ -195,7 +195,7 @@ model LivingSpaceFloorPlan {
 model LivingSpace {
   id             Int                    @id @unique @default(autoincrement())
   name           String                 @default("")
-  type           LivingSpaceType        @default(unit)
+  type           LivingSpaceType        @default(rental)
   beds           Int                    @default(0)
   baths          Float                  @default(0)
   size           String                 @default("0")
@@ -353,8 +353,8 @@ enum PersonRole {
 }
 
 enum LivingSpaceType {
-  unit
-  dwelling
+  rental
+  condoCoop
 }
 
 enum BillFrequency {
@@ -370,8 +370,6 @@ enum RentPaymentFrequency {
 }
 
 enum LeaseStatus {
-  complete
-  inProgress
   terminated
   pending
 }

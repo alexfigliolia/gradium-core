@@ -2,7 +2,7 @@
 CREATE TYPE "PersonRole" AS ENUM ('owner', 'manager', 'maintenance', 'resident');
 
 -- CreateEnum
-CREATE TYPE "LivingSpaceType" AS ENUM ('unit', 'dwelling');
+CREATE TYPE "LivingSpaceType" AS ENUM ('rental', 'condoCoop');
 
 -- CreateEnum
 CREATE TYPE "BillFrequency" AS ENUM ('hour', 'day');
@@ -11,7 +11,7 @@ CREATE TYPE "BillFrequency" AS ENUM ('hour', 'day');
 CREATE TYPE "RentPaymentFrequency" AS ENUM ('day', 'week', 'month', 'year');
 
 -- CreateEnum
-CREATE TYPE "LeaseStatus" AS ENUM ('complete', 'inProgress', 'terminated', 'pending');
+CREATE TYPE "LeaseStatus" AS ENUM ('terminated', 'pending');
 
 -- CreateEnum
 CREATE TYPE "TaskPriority" AS ENUM ('immediate', 'high', 'low');
@@ -210,7 +210,7 @@ CREATE TABLE "LivingSpaceFloorPlan" (
 CREATE TABLE "LivingSpace" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL DEFAULT '',
-    "type" "LivingSpaceType" NOT NULL DEFAULT 'unit',
+    "type" "LivingSpaceType" NOT NULL DEFAULT 'rental',
     "beds" INTEGER NOT NULL DEFAULT 0,
     "baths" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "size" TEXT NOT NULL DEFAULT '0',

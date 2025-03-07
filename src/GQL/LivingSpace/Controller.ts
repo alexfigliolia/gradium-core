@@ -1,6 +1,6 @@
 import { addMonths } from "date-fns";
 import { GraphQLError } from "graphql";
-import type { Prisma as PrismaType } from "@prisma/client";
+import { LivingSpaceType, type Prisma as PrismaType } from "@prisma/client";
 import { Prisma } from "DB/Client";
 import { IGradiumImageType } from "GQL/Media/Types";
 import type { IdentifyProperty, IPaginateProperties } from "GQL/Property/Types";
@@ -8,7 +8,7 @@ import { MediaClient } from "Media/Client";
 import { SchemaBuilder } from "Tools/SchemaBuilder";
 import { Validators } from "Tools/Validators";
 import { Access } from "./Access";
-import type { IFetchAvailableSpaces, IUpdateLivingSpace } from "./Types";
+import { type IFetchAvailableSpaces, type IUpdateLivingSpace } from "./Types";
 
 export class LivingSpaceController extends Access {
   public static readonly FLOAT_KEYS: (keyof IUpdateLivingSpace)[] = ["size"];
@@ -23,7 +23,7 @@ export class LivingSpaceController extends Access {
     });
   };
 
-  public static identifySpaces = async ({
+  public static listSpacesForRent = async ({
     propertyId,
     organizationId: _,
     ...pagination
@@ -32,7 +32,11 @@ export class LivingSpaceController extends Access {
     const list = await Prisma.transact(client => {
       return client.livingSpace.findMany({
         where: {
-          AND: [{ propertyId }, { deleted: false }],
+          AND: [
+            { propertyId },
+            { deleted: false },
+            { type: { equals: "rental" } },
+          ],
         },
         select: {
           id: true,
@@ -121,6 +125,11 @@ export class LivingSpaceController extends Access {
       const where: PrismaType.LivingSpaceWhereInput[] = [
         { organizationId },
         {
+          type: {
+            equals: LivingSpaceType.rental,
+          },
+        },
+        {
           leases: {
             none: {
               AND: [
@@ -141,7 +150,7 @@ export class LivingSpaceController extends Access {
                 {
                   status: {
                     not: {
-                      in: ["terminated", "complete"],
+                      equals: "terminated",
                     },
                   },
                 },
@@ -180,6 +189,11 @@ export class LivingSpaceController extends Access {
       const where: PrismaType.LivingSpaceWhereInput[] = [
         { organizationId },
         {
+          type: {
+            equals: LivingSpaceType.rental,
+          },
+        },
+        {
           leases: {
             some: {
               AND: [
@@ -196,7 +210,7 @@ export class LivingSpaceController extends Access {
                 {
                   status: {
                     not: {
-                      in: ["complete", "terminated"],
+                      equals: "terminated",
                     },
                   },
                 },

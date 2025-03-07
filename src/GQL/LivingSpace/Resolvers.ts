@@ -44,7 +44,7 @@ export const getLivingSpaces: GraphQLFieldConfig<
   },
 };
 
-export const identifySpaces: GraphQLFieldConfig<
+export const listSpacesForRent: GraphQLFieldConfig<
   any,
   Context,
   IPaginateProperties
@@ -58,7 +58,7 @@ export const identifySpaces: GraphQLFieldConfig<
     const operation = Permission.permissedTransaction({
       organizationId: args.organizationId,
       session: context.req.session,
-      operation: LivingSpaceController.identifySpaces,
+      operation: LivingSpaceController.listSpacesForRent,
       errorMessage:
         "You do not have permissions to access this property's living spaces",
     });

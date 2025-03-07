@@ -33,12 +33,6 @@ export const RentPaymentFrequencyType = new GraphQLEnumType({
 export const LeaseStatusType = new GraphQLEnumType({
   name: "LeaseStatus",
   values: {
-    complete: {
-      value: "complete",
-    },
-    inProgress: {
-      value: "inProgress",
-    },
     terminated: {
       value: "terminated",
     },
@@ -122,8 +116,6 @@ export interface ILeaseSnapShot {
 }
 
 export enum ILeaseStatus {
-  complete = "complete",
-  inProgress = "inProgress",
   terminated = "terminated",
   pending = "pending",
 }
