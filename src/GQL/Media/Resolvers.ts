@@ -16,6 +16,7 @@ import type {
 } from "./Types";
 import {
   DestroySignature,
+  GradiumDocument,
   GradiumDocumentType,
   GradiumImage,
   GradiumImageType,
@@ -147,7 +148,7 @@ export const deleteDocument: GraphQLFieldConfig<
   Context,
   IDeleteGradiumDocument
 > = {
-  type: SchemaBuilder.nonNull(GradiumImage),
+  type: SchemaBuilder.nonNull(GradiumDocument),
   args: {
     ...IdentifyPropertyArgs,
     id: {
@@ -174,7 +175,7 @@ export const saveDocument: GraphQLFieldConfig<
   Context,
   ICreateGradiumDocument
 > = {
-  type: SchemaBuilder.nonNull(GradiumImage),
+  type: SchemaBuilder.nonNull(GradiumDocument),
   args: {
     ...IdentifyPropertyArgs,
     entityId: {
@@ -187,7 +188,7 @@ export const saveDocument: GraphQLFieldConfig<
       type: SchemaBuilder.nonNull(GraphQLString),
     },
     type: {
-      type: SchemaBuilder.nonNull(GradiumImageType),
+      type: SchemaBuilder.nonNull(GradiumDocumentType),
     },
   },
   resolve: (_, { organizationId, ...rest }, context) => {
