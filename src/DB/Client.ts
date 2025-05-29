@@ -13,25 +13,26 @@ export class Prisma {
     if (this.Client) {
       return this.Client;
     }
-    const [user, password] = await SecretManager.getSecrets(
+    const [user, password, region] = await SecretManager.getSecrets(
       "postgres-user",
       "postgres-password",
+      "postgres-region",
     );
     this.Client = new PrismaClient({
       datasources: {
         db: {
-          url: this.connectionURL(user, password),
+          url: this.connectionURL(user, password, region),
         },
       },
     });
     return this.Client;
   }
 
-  public static connectionURL(user: string, password: string) {
+  public static connectionURL(user: string, password: string, region: string) {
     if (process.env.NODE_ENV !== "production") {
-      return `postgresql://${user}:${password}@localhost:5432/gradium`;
+      return `postgresql://${user}:${password}@${region}:5432/gradium`;
     }
-    return `postgresql://${user}:${password}@aws-0-us-west-1.pooler.supabase.com:5432/postgres`;
+    return `postgresql://${user}:${password}@${region}.supabase.com:5432/postgres`;
   }
 
   public static paginationArguments({ cursor, limit }: IPagination) {

@@ -50,6 +50,6 @@ export class SessionsClient {
     if (process.env.NODE_ENV !== "production") {
       return `redis://:${password}@${domain}:${port}`;
     }
-    return `rediss://default:${password}@${domain}:${port}`;
+    return `redis://default:${password}@${domain}:${port}`;
   }
 }

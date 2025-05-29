@@ -8,6 +8,7 @@ export class Migrator {
   private static AUTH = SecretManager.getSecrets(
     "postgres-user",
     "postgres-password",
+    "postgres-region",
   );
   public static run() {
     return this.exec("yarn prisma migrate deploy", "migration");
@@ -53,8 +54,8 @@ export class Migrator {
   }
 
   private static async connectionURL(port: number) {
-    const [user, password] = await this.AUTH;
-    return `postgresql://${user}:${password}@aws-0-us-west-1.pooler.supabase.com:${port}/postgres`;
+    const [user, password, region] = await this.AUTH;
+    return `postgresql://${user}:${password}@${region}.supabase.com:${port}/postgres`;
   }
 }
 

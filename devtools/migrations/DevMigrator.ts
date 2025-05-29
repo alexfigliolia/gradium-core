@@ -83,11 +83,12 @@ export class DevMigrator {
   }
 
   private static async getURL() {
-    const [user, password] = await SecretManager.getSecrets(
+    const [user, password, region] = await SecretManager.getSecrets(
       "postgres-user",
       "postgres-password",
+      "postgres-region",
     );
-    return Prisma.connectionURL(user, password);
+    return Prisma.connectionURL(user, password, region);
   }
 
   private static recognizedCommand(command: string) {
